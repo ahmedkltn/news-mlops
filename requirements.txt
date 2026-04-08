@@ -1,0 +1,30 @@
+# Scraping
+requests
+beautifulsoup4
+lxml
+
+# Database
+psycopg2-binary
+pgvector
+sqlalchemy
+
+# ML
+sentence-transformers
+bertopic
+hdbscan
+transformers
+torch
+
+# MLOps
+prefect>=3.0.0
+mlflow
+
+# API
+fastapi
+uvicorn
+
+# Utils
+python-dotenv
+pandas
+numpy
+plotly
