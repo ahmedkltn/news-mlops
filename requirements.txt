@@ -14,6 +14,7 @@ bertopic
 hdbscan
 transformers
 torch
+spacy
 
 # MLOps
 prefect>=3.0.0

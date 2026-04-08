@@ -11,18 +11,16 @@ EMBEDDING_MODEL = SentenceTransformer("intfloat/multilingual-e5-large")
 
 SENTIMENT_PIPELINE = pipeline(
     "text-classification",
-    model="tabularisai/multilingual-sentiment-analysis",
+    model="lxyuan/distilbert-base-multilingual-cased-sentiments-student",
     device=0 if torch.cuda.is_available() else -1,
     truncation=True,
     max_length=512,
 )
 
 SENTIMENT_MAP = {
-    "VERY POSITIVE": "positive",
-    "POSITIVE": "positive",
-    "NEUTRAL": "neutral",
-    "NEGATIVE": "negative",
-    "VERY NEGATIVE": "negative",
+    "positive": "positive",
+    "neutral": "neutral",
+    "negative": "negative",
 }
 
 def get_embedding(text: str) -> list[float]:
