@@ -13,6 +13,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   prefect:
     image: prefecthq/prefect:3-latest
@@ -23,39 +28,58 @@ services:
       - "4200:4200"
     environment:
       PREFECT_API_URL: http://0.0.0.0:4200/api
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:4200/api/health')\""]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
-  mlflow:
-    image: ghcr.io/mlflow/mlflow:latest
-    container_name: news_mlflow
+  # mlflow:
+  #   image: ghcr.io/mlflow/mlflow:latest
+  #   container_name: news_mlflow
+  #   restart: unless-stopped
+  #   command: >
+  #     mlflow server
+  #     --host 0.0.0.0
+  #     --port 5000
+  #     --backend-store-uri sqlite:///mlflow.db
+  #     --default-artifact-root /mlflow/artifacts
+  #   ports:
+  #     - "5000:5000"
+  #   volumes:
+  #     - mlflow_data:/mlflow
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: news_api
     restart: unless-stopped
-    command: >
-      mlflow server
-      --host 0.0.0.0
-      --port 5000
-      --backend-store-uri sqlite:///mlflow.db
-      --default-artifact-root /mlflow/artifacts
+    env_file: .env
+    environment:
+      # Override any localhost values from .env with Docker service names
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      PREFECT_API_URL: http://prefect:4200/api
+      MLFLOW_TRACKING_URI: http://mlflow:5000
     ports:
-      - "5000:5000"
-    volumes:
-      - mlflow_data:/mlflow
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      prefect:
+        condition: service_healthy
 
-  # frontend:
-  #   build: ./frontend
-  #   container_name: news_frontend
-  #   ports:
-  #     - "5173:5173"
-  #   depends_on:
-  #     - api
-
-  # api:
-  #   build: ./api
-  #   container_name: news_api
-  #   ports:
-  #     - "8000:8000"
-  #   env_file: .env
-  #   depends_on:
-  #     - postgres
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: news_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
 
 volumes:
   pgdata:
-  mlflow_data:

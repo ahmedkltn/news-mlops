@@ -1,15 +1,11 @@
+import ast
 import logging
 import os
 import numpy as np
-from bertopic import BERTopic
-from sklearn.feature_extraction.text import CountVectorizer
-from etl.load import get_connection
-from sklearn.feature_extraction.text import CountVectorizer
-from spacy.lang.fr.stop_words import STOP_WORDS as FR_STOP_WORDS
 from dotenv import load_dotenv
-import ast
+from etl.load import get_connection
 
-load_dotenv()
+load_dotenv(override=False)
 logger = logging.getLogger(__name__)
 
 
@@ -29,13 +25,10 @@ def load_articles_for_clustering() -> tuple[list[int], list[str], list[list[floa
     conn.close()
 
     ids, texts, embeddings = [], [], []
-
     for row in rows:
         ids.append(row[0])
         text = f"{row[1] or ''} {row[2] or ''}".strip()
         texts.append(text)
-        
-        # Parse embedding from string to list of floats
         embedding = row[3]
         if isinstance(embedding, str):
             embedding = ast.literal_eval(embedding)
@@ -52,9 +45,7 @@ def update_topics(article_ids: list[int], topics: list[int], topic_labels: dict[
     for article_id, topic_id in zip(article_ids, topics):
         label = topic_labels.get(topic_id, "unknown")
         cur.execute("""
-            UPDATE articles
-            SET topic_id = %s, topic_label = %s
-            WHERE id = %s
+            UPDATE articles SET topic_id = %s, topic_label = %s WHERE id = %s
         """, (topic_id, label, article_id))
 
     conn.commit()
@@ -64,6 +55,12 @@ def update_topics(article_ids: list[int], topics: list[int], topic_labels: dict[
 
 
 def run_clustering(min_cluster_size: int = 3) -> dict:
+    # ── Lazy imports — only paid when clustering actually runs, not at API startup
+    from bertopic import BERTopic
+    from sklearn.feature_extraction.text import CountVectorizer
+    from spacy.lang.fr.stop_words import STOP_WORDS as FR_STOP_WORDS
+    # ─────────────────────────────────────────────────────────────────────────────
+
     ids, texts, embeddings = load_articles_for_clustering()
 
     if len(ids) < 10:
@@ -78,7 +75,7 @@ def run_clustering(min_cluster_size: int = 3) -> dict:
         ngram_range=(1, 2),
     )
 
-    logger.info("Fitting BERTopic model...")
+    logger.info("Fitting BERTopic model…")
     topic_model = BERTopic(
         vectorizer_model=vectorizer,
         min_topic_size=min_cluster_size,
@@ -89,19 +86,17 @@ def run_clustering(min_cluster_size: int = 3) -> dict:
 
     topics, _ = topic_model.fit_transform(texts, embeddings=embeddings_array)
 
-    # Get human-readable topic labels
     topic_info = topic_model.get_topic_info()
     topic_labels = {
         row["Topic"]: row["Name"]
         for _, row in topic_info.iterrows()
-        if row["Topic"] != -1  # -1 is the outlier topic in HDBSCAN
+        if row["Topic"] != -1
     }
 
     logger.info(f"Found {len(topic_labels)} topics")
     for tid, label in topic_labels.items():
         logger.info(f"  Topic {tid}: {label}")
 
-    # Save model
     os.makedirs("models", exist_ok=True)
     topic_model.save("models/bertopic_model")
     logger.info("Model saved to models/bertopic_model")
@@ -118,5 +113,4 @@ def run_clustering(min_cluster_size: int = 3) -> dict:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    result = run_clustering()
-    print(result)
+    print(run_clustering())

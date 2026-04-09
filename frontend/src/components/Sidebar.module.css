@@ -1,0 +1,79 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brandText {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  gap: 2px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+}
+
+.link:hover {
+  background: var(--card-hover);
+  color: var(--text);
+}
+
+.active {
+  background: rgba(59, 130, 246, 0.12);
+  color: var(--accent);
+}
+
+.active:hover {
+  background: rgba(59, 130, 246, 0.16);
+  color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+  }
+  .brandText,
+  .label {
+    display: none;
+  }
+  .brand {
+    justify-content: center;
+    padding: 18px 0;
+  }
+  .link {
+    justify-content: center;
+    padding: 10px;
+  }
+}

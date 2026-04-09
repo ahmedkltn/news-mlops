@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS articles (
     topic_id    INTEGER,
     topic_label TEXT,
     sentiment   TEXT,
-    embedding   vector(1024)
+    embedding   vector(384)
 );
 
 CREATE INDEX IF NOT EXISTS idx_articles_topic ON articles(topic_id);

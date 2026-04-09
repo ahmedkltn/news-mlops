@@ -1,0 +1,145 @@
+.page {
+  max-width: 900px;
+}
+
+.pageTitle {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cardIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.cardDesc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.numberInput {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--text);
+  font-size: 15px;
+  width: 120px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.numberInput:focus {
+  border-color: var(--accent);
+}
+
+.statusMsg {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.statusMsg svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  color: var(--positive);
+}
+
+.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: var(--negative);
+}
+
+.actionBtn {
+  margin-top: auto;
+  padding: 11px 20px;
+  background: var(--accent);
+  color: white;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.15s;
+  text-align: center;
+}
+
+.actionBtn:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clusterBtn {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--positive);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.clusterBtn:hover:not(:disabled) {
+  background: rgba(34, 197, 94, 0.22);
+}
+
+@media (max-width: 680px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
