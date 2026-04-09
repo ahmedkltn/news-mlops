@@ -29,3 +29,6 @@ python-dotenv
 pandas
 numpy
 plotly
+tiktoken
+sentencepiece
+protobuf

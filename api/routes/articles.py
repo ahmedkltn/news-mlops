@@ -58,6 +58,32 @@ def get_articles(
         for r in rows
     ]
 
+@router.get("/stats")
+def get_stats():
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT
+            COUNT(*)                                             AS total,
+            COUNT(*) FILTER (WHERE sentiment = 'positive')      AS positive,
+            COUNT(*) FILTER (WHERE sentiment = 'neutral')       AS neutral,
+            COUNT(*) FILTER (WHERE sentiment = 'negative')      AS negative
+        FROM articles
+    """)
+    row = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    return {
+        "total": row[0],
+        "sentiments": [
+            {"name": "positive", "value": row[1]},
+            {"name": "neutral",  "value": row[2]},
+            {"name": "negative", "value": row[3]},
+        ],
+    }
+
 @router.get("/topics")
 def get_topics():
     conn = get_connection()

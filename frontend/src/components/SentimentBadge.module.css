@@ -1,0 +1,23 @@
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: capitalize;
+  color: #0a0a0a;
+}
+
+.positive {
+  background: var(--positive);
+}
+
+.neutral {
+  background: var(--neutral);
+  color: var(--text);
+}
+
+.negative {
+  background: var(--negative);
+}
