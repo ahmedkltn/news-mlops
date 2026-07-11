@@ -36,12 +36,15 @@ def save_raw_articles(articles) -> int:
             a.title   if hasattr(a, "title")   else a.get("title"),
             a.content if hasattr(a, "content") else a.get("content"),
             a.language if hasattr(a, "language") else a.get("language"),
+            a.published_at if hasattr(a, "published_at") else a.get("published_at"),
+            a.image_url if hasattr(a, "image_url") else a.get("image_url"),
+            a.categories if hasattr(a, "categories") else a.get("categories"),
         )
         for a in articles
     ]
 
     query = """
-        INSERT INTO articles (url, source, title, content, language)
+        INSERT INTO articles (url, source, title, content, language, published_at, image_url, categories)
         VALUES %s
         ON CONFLICT (url) DO NOTHING
     """
