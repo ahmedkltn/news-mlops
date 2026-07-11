@@ -13,6 +13,7 @@ def test_log_clustering_metrics_called(monkeypatch):
         def log_params(self, p): calls["params"] = p
         def log_metrics(self, m): calls["metrics"] = m
         def log_artifacts(self, path): calls["artifacts"] = path
+        def log_artifact(self, path): calls["artifact"] = path
     monkeypatch.setattr(cluster, "mlflow", FakeMlflow(), raising=False)
     cluster.log_clustering_run(n_topics=5, outlier_pct=0.2, min_cluster_size=3)
     assert calls["metrics"]["n_topics"] == 5

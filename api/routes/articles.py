@@ -109,7 +109,7 @@ def get_topics():
     ]
 
 @router.get("/timeline")
-def timeline(days: int = Query(30, le=365)):
+def timeline(days: int = Query(30, ge=1, le=365)):
     conn = get_connection(); cur = conn.cursor()
     cur.execute("""
         SELECT COALESCE(published_at::date, scraped_at::date) AS d,

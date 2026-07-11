@@ -23,7 +23,7 @@ def log_clustering_run(n_topics: int, outlier_pct: float, min_cluster_size: int)
         mlflow.log_params({"embed_model": "intfloat/multilingual-e5-small",
                            "min_cluster_size": min_cluster_size})
         mlflow.log_metrics({"n_topics": n_topics, "outlier_pct": outlier_pct})
-        mlflow.log_artifacts("models/bertopic_model")
+        (mlflow.log_artifacts if os.path.isdir("models/bertopic_model") else mlflow.log_artifact)("models/bertopic_model")
 
 
 def load_articles_for_clustering() -> tuple[list[int], list[str], list[list[float]]]:
