@@ -99,7 +99,8 @@ def save_articles(articles: list[dict]) -> int:
     """
     Full upsert — used by the all-in-one pipeline.
     Each dict must have: url, source, title, content, language,
-                         topic_id, topic_label, sentiment, embedding
+                         topic_id, topic_label, sentiment, embedding,
+                         published_at, image_url, categories
     """
     if not articles:
         return 0
@@ -112,6 +113,7 @@ def save_articles(articles: list[dict]) -> int:
             a["url"], a["source"], a["title"], a["content"], a["language"],
             a.get("topic_id"), a.get("topic_label"),
             a.get("sentiment"), a.get("embedding"),
+            a.get("published_at"), a.get("image_url"), a.get("categories"),
         )
         for a in articles
     ]
@@ -119,14 +121,18 @@ def save_articles(articles: list[dict]) -> int:
     query = """
         INSERT INTO articles (
             url, source, title, content, language,
-            topic_id, topic_label, sentiment, embedding
+            topic_id, topic_label, sentiment, embedding,
+            published_at, image_url, categories
         )
         VALUES %s
         ON CONFLICT (url) DO UPDATE SET
             topic_id    = EXCLUDED.topic_id,
             topic_label = EXCLUDED.topic_label,
             sentiment   = EXCLUDED.sentiment,
-            embedding   = EXCLUDED.embedding
+            embedding   = EXCLUDED.embedding,
+            published_at = EXCLUDED.published_at,
+            image_url   = EXCLUDED.image_url,
+            categories  = EXCLUDED.categories
     """
 
     try:

@@ -117,6 +117,8 @@ def transform_articles(articles: list[Article]) -> list[dict]:
             "content":    article.content,
             "language":   article.language,
             "published_at": article.published_at,
+            "image_url":  article.image_url,
+            "categories": article.categories,
             "embedding":  embeddings[i].tolist(),
             "sentiment":  sentiment,
             "topic_id":   None,
