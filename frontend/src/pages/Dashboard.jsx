@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  LineChart, Line, Legend,
 } from 'recharts'
 import { Newspaper, TrendingUp, Activity } from 'lucide-react'
 import client from '../api/client'
@@ -19,21 +20,24 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [topics, setTopics] = useState([])
   const [recentArticles, setRecentArticles] = useState([])
+  const [timeline, setTimeline] = useState([])
   const [selectedArticle, setSelectedArticle] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       try {
-        const [statsRes, recentRes, topicsRes] = await Promise.all([
+        const [statsRes, recentRes, topicsRes, timelineRes] = await Promise.all([
           client.get('/articles/stats'),
           client.get('/articles/', { params: { limit: 5 } }),
           client.get('/articles/topics'),
+          client.get('/articles/timeline', { params: { days: 30 } }),
         ])
 
         setStats(statsRes.data)
         setRecentArticles(recentRes.data)
         setTopics((topicsRes.data || []).slice(0, 10))
+        setTimeline(timelineRes.data || [])
       } catch (err) {
         console.error('Dashboard load error', err)
       } finally {
@@ -138,6 +142,40 @@ export default function Dashboard() {
             </ResponsiveContainer>
           )}
         </div>
+      </div>
+
+      {/* Sentiment timeline */}
+      <div className={styles.chartCardFull}>
+        <h2 className={styles.chartTitle}>Sentiment Timeline (last 30 days)</h2>
+        {timeline.length === 0 ? (
+          <div className={styles.empty}>No timeline data yet.</div>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <LineChart data={timeline} margin={{ left: 0, right: 16, top: 8 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
+              <XAxis
+                dataKey="date"
+                tick={{ fill: '#94a3b8', fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                allowDecimals={false}
+                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{ background: '#111', border: '1px solid #222', borderRadius: 8 }}
+                itemStyle={{ color: '#f1f5f9' }}
+              />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Line type="monotone" dataKey="positive" stroke={SENTIMENT_COLORS.positive} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="neutral" stroke={SENTIMENT_COLORS.neutral} strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="negative" stroke={SENTIMENT_COLORS.negative} strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
       {/* Recent articles */}

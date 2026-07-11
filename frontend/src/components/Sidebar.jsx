@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { BookOpen, LayoutDashboard, Newspaper, Search, Zap } from 'lucide-react'
+import { BookOpen, LayoutDashboard, Newspaper, Search, Zap, MessageCircle } from 'lucide-react'
 import styles from './Sidebar.module.css'
 
 const links = [
@@ -7,6 +7,7 @@ const links = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/articles', label: 'Articles', icon: Newspaper },
   { to: '/search', label: 'Search', icon: Search },
+  { to: '/chat', label: 'Ask the news', icon: MessageCircle },
   { to: '/pipeline', label: 'Pipeline', icon: Zap },
 ]
 
