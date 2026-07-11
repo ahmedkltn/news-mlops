@@ -6,6 +6,12 @@ from scrapers.base import BaseScraper, Article
 logger = logging.getLogger(__name__)
 
 
+def fetch_og_image(html: str) -> Optional[str]:
+    from bs4 import BeautifulSoup
+    tag = BeautifulSoup(html, "lxml").find("meta", property="og:image")
+    return tag.get("content") if tag and tag.get("content") else None
+
+
 def _entry_to_article(entry, source: str, language: str) -> Optional[Article]:
     title = entry.get("title")
     link = entry.get("link")
