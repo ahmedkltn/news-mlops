@@ -3,6 +3,7 @@ requests
 beautifulsoup4
 lxml
 pydantic
+feedparser
 
 # Database
 psycopg2-binary
