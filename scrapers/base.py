@@ -2,23 +2,30 @@ import time
 import random
 import logging
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
 from typing import Optional
 import requests
 from bs4 import BeautifulSoup
+from pydantic import BaseModel, field_validator
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-@dataclass
-class Article:
+class Article(BaseModel):
     url: str
     source: str
     title: Optional[str] = None
     content: Optional[str] = None
     language: Optional[str] = None
-    categories: list[str] = field(default_factory=list)
+    categories: list[str] = []
     published_at: Optional[str] = None
+    image_url: Optional[str] = None
+
+    @field_validator("title", "content")
+    @classmethod
+    def _non_empty(cls, v):
+        if v is None or not v.strip():
+            raise ValueError("must be non-empty")
+        return v.strip()
 
 class BaseScraper(ABC):
     def __init__(self, source: str, base_url: str, language: str, max_pages: int = 5):
