@@ -22,6 +22,8 @@ POSTGRES_DB=news_db
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 PREFECT_API_URL=http://localhost:4200/api
+MLFLOW_TRACKING_URI=http://localhost:5000
+ANTHROPIC_API_KEY=sk-ant-REPLACE_ME
 ```
 
 Start everything:
