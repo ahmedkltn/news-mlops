@@ -14,7 +14,10 @@ MLOps platform for Tunisian news — scrape, analyse, explore.
 
 ## Run
 
-Copy `.env`:
+Copy `.env.example` to `.env` and fill in real values:
+```bash
+cp .env.example .env
+```
 ```env
 POSTGRES_USER=news_user
 POSTGRES_PASSWORD=yourpassword
