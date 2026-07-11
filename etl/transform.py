@@ -69,6 +69,18 @@ def get_sentiment(text: str) -> str:
         return "neutral"
 
 
+def get_sentiments(texts: list[str]) -> list[str]:
+    if not texts:
+        return []
+    try:
+        pipe = _get_sentiment_pipeline()
+        results = pipe([t[:1000] for t in texts], batch_size=16)
+        return [SENTIMENT_MAP.get(r["label"].lower(), "neutral") for r in results]
+    except Exception as e:
+        logger.warning(f"Batch sentiment failed: {e}")
+        return ["neutral"] * len(texts)
+
+
 def transform_articles(articles: list[Article]) -> list[dict]:
     model = _get_embedding_model()
 
@@ -85,15 +97,17 @@ def transform_articles(articles: list[Article]) -> list[dict]:
         show_progress_bar=True,
     )
 
+    sentiments = get_sentiments(
+        [f"{a.title or ''} {a.content or ''}" for a in articles]
+    )
+
     transformed = []
     for i, article in enumerate(articles):
         text = texts[i].replace("passage: ", "", 1)
         if not text.strip():
             continue
 
-        sentiment = get_sentiment(
-            f"{article.title or ''} {article.content or ''}"[:1000]
-        )
+        sentiment = sentiments[i]
 
         transformed.append({
             "url":        article.url,
