@@ -75,6 +75,7 @@ def get_sentiments(texts: list[str]) -> list[str]:
     try:
         pipe = _get_sentiment_pipeline()
         results = pipe([t[:1000] for t in texts], batch_size=16)
+        assert len(results) == len(texts)
         return [SENTIMENT_MAP.get(r["label"].lower(), "neutral") for r in results]
     except Exception as e:
         logger.warning(f"Batch sentiment failed: {e}")

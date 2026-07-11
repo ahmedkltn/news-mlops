@@ -9,7 +9,7 @@ Usage:
 import argparse
 import logging
 from etl.load import fetch_untransformed_articles, update_article_ml_fields
-from etl.transform import _get_embedding_model, get_sentiment
+from etl.transform import _get_embedding_model, get_sentiments
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -41,14 +41,16 @@ def main(batch_size: int = 16):
     )
 
     logger.info("Running sentiment analysis…")
+    sentiments = get_sentiments(
+        [f"{a['title'] or ''} {a['content'] or ''}" for a in articles]
+    )
+
+    # Per-row DB write is acceptable here — batching the writes is out of scope.
     for i, article in enumerate(articles):
-        sentiment = get_sentiment(
-            f"{article['title'] or ''} {article['content'] or ''}"[:1000]
-        )
         update_article_ml_fields(
             article_id=article["id"],
             embedding=embeddings[i].tolist(),
-            sentiment=sentiment,
+            sentiment=sentiments[i],
         )
         if (i + 1) % 10 == 0:
             logger.info(f"  {i + 1}/{len(articles)} done")
