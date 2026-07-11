@@ -23,7 +23,7 @@ def _get_embedding_model():
     if _embedding_model is None:
         from sentence_transformers import SentenceTransformer
         logger.info("Loading embedding model…")
-        _embedding_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+        _embedding_model = SentenceTransformer("intfloat/multilingual-e5-small")
     return _embedding_model
 
 
@@ -46,9 +46,17 @@ def _get_sentiment_pipeline():
 # ── Public helpers ─────────────────────────────────────────────────────────────
 
 def get_embedding(text: str) -> list[float]:
+    """Embed a SEARCH QUERY (e5 'query:' prefix)."""
     model = _get_embedding_model()
-    embedding = model.encode(f"passage: {text}", normalize_embeddings=True)
-    return embedding.tolist()
+    emb = model.encode(f"query: {text}", normalize_embeddings=True)
+    return emb.tolist()
+
+
+def get_passage_embedding(text: str) -> list[float]:
+    """Embed a DOCUMENT (e5 'passage:' prefix)."""
+    model = _get_embedding_model()
+    emb = model.encode(f"passage: {text}", normalize_embeddings=True)
+    return emb.tolist()
 
 
 def get_sentiment(text: str) -> str:
