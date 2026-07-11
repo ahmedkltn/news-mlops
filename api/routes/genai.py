@@ -2,6 +2,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from etl.load import get_connection
+from etl.transform import get_embedding
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -44,5 +45,26 @@ class ChatBody(BaseModel):
 
 @router.post("/chat")
 def chat(body: ChatBody):
-    # implemented in Task C2
-    raise HTTPException(501, "not implemented")
+    emb = get_embedding(body.q)
+    emb_str = f"[{','.join(map(str, emb))}]"
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, title, url, content
+        FROM articles
+        ORDER BY embedding <=> %s::vector
+        LIMIT 5
+    """, (emb_str,))
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    context = "\n\n".join(f"[{i+1}] {r[1]}\n{(r[3] or '')[:800]}" for i, r in enumerate(rows))
+    msg = _client().messages.create(
+        model="claude-haiku-4-5", max_tokens=512,
+        system="Tu réponds aux questions sur l'actualité tunisienne en te basant "
+               "UNIQUEMENT sur les articles fournis. Cite les numéros de source. "
+               "Si l'info manque, dis-le.",
+        messages=[{"role": "user", "content": f"Articles:\n{context}\n\nQuestion: {body.q}"}])
+    answer = next((b.text.strip() for b in msg.content if b.type == "text"), "")
+    return {"answer": answer,
+            "sources": [{"id": r[0], "title": r[1], "url": r[2]} for r in rows]}
