@@ -2,9 +2,12 @@ import logging
 from etl.extract import run_extraction
 from etl.transform import transform_articles
 from etl.load import save_articles
+from etl.metrics import record_pipeline_metrics
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+EMBED_MODEL = "intfloat/multilingual-e5-small"
 
 def run_pipeline(max_pages: int = 5) -> dict:
     logger.info("=== Pipeline started ===")
@@ -23,6 +26,24 @@ def run_pipeline(max_pages: int = 5) -> dict:
     # Load
     logger.info("Step 3: Load")
     saved = save_articles(transformed)
+
+    # Metrics (never break the pipeline on a write failure)
+    try:
+        sentiment_pos = sum(1 for a in transformed if a.get("sentiment") == "positive")
+        sentiment_neu = sum(1 for a in transformed if a.get("sentiment") == "neutral")
+        sentiment_neg = sum(1 for a in transformed if a.get("sentiment") == "negative")
+        record_pipeline_metrics({
+            "source": "all",
+            "articles_new": saved,
+            "n_topics": None,
+            "outlier_pct": None,
+            "sentiment_pos": sentiment_pos,
+            "sentiment_neu": sentiment_neu,
+            "sentiment_neg": sentiment_neg,
+            "embed_model": EMBED_MODEL,
+        })
+    except Exception as e:
+        logger.warning(f"Failed to record pipeline metrics: {e}")
 
     result = {
         "extracted": len(articles),
