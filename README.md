@@ -34,6 +34,9 @@ docker-compose up --build
 | Dashboard | http://localhost:5173 |
 | API | http://localhost:8000/docs |
 | Prefect | http://localhost:4200 |
+| MLflow | http://localhost:5000 |
+
+`ANTHROPIC_API_KEY` (for GenAI features) and `MLFLOW_TRACKING_URI` (experiment tracking) also belong in `.env` — see `.env` for the full list of variables.
 
 ## Pipeline (step by step)
 
