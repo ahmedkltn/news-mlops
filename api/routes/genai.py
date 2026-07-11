@@ -18,26 +18,36 @@ def _client():
 @router.get("/summary/{article_id}")
 def summary(article_id: int):
     conn = get_connection()
-    cur = conn.cursor()
     try:
+        cur = conn.cursor()
         cur.execute("SELECT summary, title, content FROM articles WHERE id=%s", (article_id,))
         row = cur.fetchone()
-        if not row:
-            raise HTTPException(404, "Article not found")
-        cached, title, content = row
-        if cached:
-            return {"summary": cached}
-        msg = _client().messages.create(
-            model="claude-haiku-4-5", max_tokens=160,
-            messages=[{"role": "user", "content":
-                f"Résume cet article tunisien en 2 phrases claires, en français :\n\n{title}\n{(content or '')[:2000]}"}])
-        text = next((b.text.strip() for b in msg.content if b.type == "text"), "")
+        cur.close()
+    finally:
+        conn.close()
+
+    if not row:
+        raise HTTPException(404, "Article not found")
+    cached, title, content = row
+    if cached:
+        return {"summary": cached}
+
+    msg = _client().messages.create(
+        model="claude-haiku-4-5", max_tokens=160,
+        messages=[{"role": "user", "content":
+            f"Résume cet article tunisien en 2 phrases claires, en français :\n\n{title}\n{(content or '')[:2000]}"}])
+    text = next((b.text.strip() for b in msg.content if b.type == "text"), "")
+
+    conn = get_connection()
+    try:
+        cur = conn.cursor()
         cur.execute("UPDATE articles SET summary=%s WHERE id=%s", (text, article_id))
         conn.commit()
-        return {"summary": text}
-    finally:
         cur.close()
+    finally:
         conn.close()
+
+    return {"summary": text}
 
 
 class ChatBody(BaseModel):
