@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Newspaper, Search, Zap } from 'lucide-react'
+import { BookOpen, LayoutDashboard, Newspaper, Search, Zap } from 'lucide-react'
 import styles from './Sidebar.module.css'
 
 const links = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/', label: 'Reader', icon: BookOpen },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/articles', label: 'Articles', icon: Newspaper },
   { to: '/search', label: 'Search', icon: Search },
   { to: '/pipeline', label: 'Pipeline', icon: Zap },

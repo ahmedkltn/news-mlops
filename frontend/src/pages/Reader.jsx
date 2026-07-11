@@ -1,0 +1,84 @@
+import { useEffect, useMemo, useState } from 'react'
+import client from '../api/client'
+import ArticleCard from '../components/ArticleCard'
+import ArticleModal from '../components/ArticleModal'
+import HeroCard from '../components/HeroCard'
+import styles from './Reader.module.css'
+
+const ALL_TAB = 'All'
+
+export default function Reader() {
+  const [articles, setArticles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedArticle, setSelectedArticle] = useState(null)
+  const [activeTab, setActiveTab] = useState(ALL_TAB)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await client.get('/articles/', { params: { limit: 21 } })
+        setArticles(res.data || [])
+      } catch (err) {
+        console.error('Reader load error', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  const heroArticle = articles[0]
+  const restArticles = useMemo(() => articles.slice(1), [articles])
+
+  const tabs = useMemo(() => {
+    const sources = [...new Set(articles.map(a => a.source).filter(Boolean))]
+    return [ALL_TAB, ...sources]
+  }, [articles])
+
+  const gridArticles = useMemo(() => {
+    if (activeTab === ALL_TAB) return restArticles
+    return restArticles.filter(a => a.source === activeTab)
+  }, [restArticles, activeTab])
+
+  if (loading) return <div className={styles.loading}>Loading...</div>
+
+  if (articles.length === 0) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.empty}>No articles found.</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.page}>
+      <div className={styles.tabBar}>
+        {tabs.map(tab => (
+          <button
+            key={tab}
+            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab(tab)}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      <HeroCard article={heroArticle} onClick={setSelectedArticle} />
+
+      {gridArticles.length === 0 ? (
+        <div className={styles.empty}>No articles in this category.</div>
+      ) : (
+        <div className={styles.grid}>
+          {gridArticles.map(a => (
+            <ArticleCard key={a.id} article={a} onClick={setSelectedArticle} />
+          ))}
+        </div>
+      )}
+
+      {selectedArticle && (
+        <ArticleModal article={selectedArticle} onClose={() => setSelectedArticle(null)} />
+      )}
+    </div>
+  )
+}

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
+import Reader from './pages/Reader'
 import Dashboard from './pages/Dashboard'
 import Articles from './pages/Articles'
 import Search from './pages/Search'
@@ -13,7 +14,8 @@ export default function App() {
         <Sidebar />
         <main className={styles.main}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Reader />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/articles" element={<Articles />} />
             <Route path="/search" element={<Search />} />
             <Route path="/pipeline" element={<Pipeline />} />

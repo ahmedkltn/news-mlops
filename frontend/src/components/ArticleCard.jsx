@@ -11,6 +11,15 @@ function formatDate(str) {
 export default function ArticleCard({ article, onClick }) {
   return (
     <div className={styles.card} onClick={() => onClick(article)}>
+      {article.image_url && (
+        <img
+          src={article.image_url}
+          alt=""
+          className={styles.image}
+          loading="lazy"
+          onError={(e) => { e.currentTarget.remove() }}
+        />
+      )}
       <div className={styles.top}>
         <SentimentBadge sentiment={article.sentiment} />
         {article.topic_label && (
