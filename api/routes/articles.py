@@ -32,7 +32,7 @@ def get_articles(
 
     cur.execute(f"""
         SELECT id, url, source, title, language, sentiment,
-               topic_id, topic_label, scraped_at
+               topic_id, topic_label, scraped_at, image_url, published_at
         FROM articles
         {where}
         ORDER BY scraped_at DESC
@@ -54,6 +54,8 @@ def get_articles(
             "topic_id": r[6],
             "topic_label": r[7],
             "scraped_at": r[8],
+            "image_url": r[9],
+            "published_at": r[10],
         }
         for r in rows
     ]
@@ -129,7 +131,8 @@ def get_article(article_id: int):
 
     cur.execute("""
         SELECT id, url, source, title, content, language,
-               sentiment, topic_id, topic_label, scraped_at
+               sentiment, topic_id, topic_label, scraped_at,
+               image_url, published_at
         FROM articles WHERE id = %s
     """, (article_id,))
 
@@ -152,4 +155,6 @@ def get_article(article_id: int):
         "topic_id": row[7],
         "topic_label": row[8],
         "scraped_at": row[9],
+        "image_url": row[10],
+        "published_at": row[11],
     }

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import SentimentBadge from './SentimentBadge'
 import styles from './ArticleCard.module.css'
 
@@ -9,15 +10,17 @@ function formatDate(str) {
 }
 
 export default function ArticleCard({ article, onClick }) {
+  const [imgFailed, setImgFailed] = useState(false)
+
   return (
     <div className={styles.card} onClick={() => onClick(article)}>
-      {article.image_url && (
+      {article.image_url && !imgFailed && (
         <img
           src={article.image_url}
           alt=""
           className={styles.image}
           loading="lazy"
-          onError={(e) => { e.currentTarget.remove() }}
+          onError={() => setImgFailed(true)}
         />
       )}
       <div className={styles.top}>
