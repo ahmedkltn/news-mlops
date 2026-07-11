@@ -73,7 +73,7 @@ export default function ArticleModal({ article, onClose }) {
           {article.topic_label && (
             <span className={styles.topic}>{article.topic_label}</span>
           )}
-          <span className={styles.metaItem}>{formatDate(article.scraped_at)}</span>
+          <span className={styles.metaItem}>{formatDate(article.published_at || article.scraped_at)}</span>
         </div>
 
         {article.id != null && <ArticleSummary key={article.id} articleId={article.id} />}

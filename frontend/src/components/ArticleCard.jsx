@@ -32,7 +32,7 @@ export default function ArticleCard({ article, onClick }) {
       <h3 className={styles.title}>{article.title}</h3>
       <div className={styles.footer}>
         <span className={styles.source}>{article.source}</span>
-        <span className={styles.date}>{formatDate(article.scraped_at)}</span>
+        <span className={styles.date}>{formatDate(article.published_at || article.scraped_at)}</span>
       </div>
     </div>
   )
