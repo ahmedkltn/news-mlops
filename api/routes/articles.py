@@ -106,6 +106,22 @@ def get_topics():
         for r in rows
     ]
 
+@router.get("/timeline")
+def timeline(days: int = Query(30, le=365)):
+    conn = get_connection(); cur = conn.cursor()
+    cur.execute("""
+        SELECT COALESCE(published_at::date, scraped_at::date) AS d,
+               COUNT(*) FILTER (WHERE sentiment='positive') AS pos,
+               COUNT(*) FILTER (WHERE sentiment='neutral')  AS neu,
+               COUNT(*) FILTER (WHERE sentiment='negative') AS neg
+        FROM articles
+        WHERE COALESCE(published_at, scraped_at) >= NOW() - (%s || ' days')::interval
+        GROUP BY d ORDER BY d
+    """, (days,))
+    rows = cur.fetchall(); cur.close(); conn.close()
+    return [{"date": str(r[0]), "positive": r[1], "neutral": r[2], "negative": r[3]}
+            for r in rows]
+
 @router.get("/{article_id}")
 def get_article(article_id: int):
     conn = get_connection()
