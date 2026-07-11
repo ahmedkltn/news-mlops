@@ -4,6 +4,7 @@ import os
 import numpy as np
 from dotenv import load_dotenv
 from etl.load import get_connection
+from etl.labels import label_topics
 
 load_dotenv(override=False)
 logger = logging.getLogger(__name__)
@@ -112,6 +113,16 @@ def run_clustering(min_cluster_size: int = 3) -> dict:
     logger.info(f"Found {len(topic_labels)} topics")
     for tid, label in topic_labels.items():
         logger.info(f"  Topic {tid}: {label}")
+
+    try:
+        topic_keywords = {
+            tid: [w for w, _ in topic_model.get_topic(tid)]
+            for tid in topic_labels
+        }
+        topic_labels = label_topics(topic_keywords)
+        logger.info("Generated human-readable topic labels via Claude Haiku")
+    except Exception:
+        logger.warning("Failed to generate LLM topic labels, falling back to raw BERTopic names", exc_info=True)
 
     os.makedirs("models", exist_ok=True)
     topic_model.save("models/bertopic_model")

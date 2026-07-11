@@ -17,6 +17,7 @@ hdbscan
 transformers
 torch
 spacy
+anthropic
 
 # MLOps
 prefect>=3.0.0
