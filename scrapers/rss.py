@@ -26,7 +26,7 @@ def _entry_to_article(entry, source: str, language: str) -> Optional[Article]:
         image_url = entry["media_content"][0].get("url")
     elif entry.get("links"):
         for l in entry["links"]:
-            if l.get("type", "").startswith("image"):
+            if (l.get("type") or "").startswith("image"):
                 image_url = l.get("href"); break
 
     if not link or not title or not content:
