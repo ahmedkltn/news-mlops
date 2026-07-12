@@ -15,14 +15,14 @@ def fetch_og_image(html: str) -> Optional[str]:
 def _entry_to_article(entry, source: str, language: str) -> Optional[Article]:
     title = entry.get("title")
     link = entry.get("link")
-    # Prefer full content, fall back to summary
-    content = ""
-    if entry.get("content"):
-        content = entry["content"][0].get("value", "")
-    content = content or entry.get("summary", "")
-    # Strip HTML tags
+    # Some feeds (e.g. Mosaïque FM) put a short caption in <content> and the
+    # real teaser in <summary>. Take whichever carries more text.
     from bs4 import BeautifulSoup
-    content = " ".join(BeautifulSoup(content, "lxml").get_text(" ").split())
+    content_raw = entry["content"][0].get("value", "") if entry.get("content") else ""
+    summary_raw = entry.get("summary", "")
+    content_txt = " ".join(BeautifulSoup(content_raw, "lxml").get_text(" ").split())
+    summary_txt = " ".join(BeautifulSoup(summary_raw, "lxml").get_text(" ").split())
+    content = content_txt if len(content_txt) >= len(summary_txt) else summary_txt
 
     categories = [t.get("term") for t in entry.get("tags", []) if t.get("term")]
     published_at = entry.get("published") or entry.get("updated")
