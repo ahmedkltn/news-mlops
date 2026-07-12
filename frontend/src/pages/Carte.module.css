@@ -40,7 +40,15 @@
 }
 
 .mapCol { width: 100%; max-width: 640px; }
-.panelCol { min-height: 400px; position: sticky; top: 130px; }
+
+/* Panel sticks below the masthead and is capped to the viewport, so its
+   article list is the scroll container — wheeling it moves the list, not
+   the page (with overscroll-behavior: contain on the list). */
+.split .panelCol {
+  position: sticky;
+  top: 88px;
+  align-self: start;
+}
 
 .footerRow {
   display: flex;
@@ -83,5 +91,5 @@
 
 @media (max-width: 860px) {
   .split { grid-template-columns: 1fr; }
-  .panelCol { position: static; }
+  .split .panelCol { position: static; }
 }

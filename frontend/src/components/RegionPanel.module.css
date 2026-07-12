@@ -6,7 +6,9 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
-  height: 100%;
+  /* Cap to the viewport (below the sticky masthead) so the article list is a
+     bounded scroll container — the list scrolls, not the page. */
+  max-height: calc(100dvh - 108px);
 }
 
 .head {
@@ -14,6 +16,11 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+  flex-shrink: 0;
+}
+
+.sentiment {
+  flex-shrink: 0;
 }
 
 .kicker {
@@ -79,7 +86,18 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  flex: 1;
+  min-height: 0;              /* let the list shrink so overflow-y scrolls */
   overflow-y: auto;
+  overscroll-behavior: contain; /* keep the wheel inside the panel */
+  margin: 0 -6px;             /* room for the scrollbar without clipping cards */
+  padding: 0 6px;
+}
+
+/* Cards must keep their natural height (image + text) — otherwise the flex
+   column shrinks them, collapsing the image, instead of scrolling. */
+.list > * {
+  flex-shrink: 0;
 }
 
 .empty {
