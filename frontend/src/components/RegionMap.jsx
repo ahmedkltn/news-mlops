@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { geoMercator, geoPath } from 'd3-geo'
+import { geoIdentity, geoPath } from 'd3-geo'
 import geojson from '../assets/tunisia-governorates.json'
 import styles from './RegionMap.module.css'
 
@@ -16,7 +16,10 @@ export default function RegionMap({ data, metric, selected, onSelect }) {
   const [hover, setHover] = useState(null) // { name, count, dominant, x, y }
 
   const { paths, byslug, maxCount } = useMemo(() => {
-    const projection = geoMercator().fitSize([W, H], geojson)
+    // geoIdentity (planar) — winding-agnostic, unlike geoMercator which
+    // treats geoBoundaries' ring order as the globe's complement and
+    // collapses the map. reflectY flips lat (screen Y grows downward).
+    const projection = geoIdentity().reflectY(true).fitSize([W, H], geojson)
     const path = geoPath(projection)
     const paths = geojson.features.map(f => ({
       slug: f.properties.slug,
