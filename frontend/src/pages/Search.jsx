@@ -3,6 +3,7 @@ import { Search as SearchIcon, Loader2 } from 'lucide-react'
 import client from '../api/client'
 import SentimentBadge from '../components/SentimentBadge'
 import ArticleModal from '../components/ArticleModal'
+import PageHeader from '../components/PageHeader'
 import styles from './Search.module.css'
 
 export default function Search() {
@@ -31,8 +32,10 @@ export default function Search() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Semantic Search</h1>
-      <p className={styles.subtitle}>Search articles by meaning using vector similarity</p>
+      <PageHeader
+        title="Recherche"
+        subtitle="Trouvez des articles par sujet, événement ou mot-clé à travers toutes les sources."
+      />
 
       <form className={styles.searchForm} onSubmit={handleSearch}>
         <div className={styles.inputWrapper}>
@@ -42,26 +45,26 @@ export default function Search() {
             className={styles.input}
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search for topics, events, or concepts..."
+            placeholder="Rechercher un sujet, un événement, un concept…"
             autoFocus
           />
         </div>
         <button type="submit" className={styles.searchBtn} disabled={loading || !query.trim()}>
-          {loading ? <Loader2 size={16} className={styles.spin} /> : 'Search'}
+          {loading ? <Loader2 size={16} className={styles.spin} /> : 'Rechercher'}
         </button>
       </form>
 
       {loading && (
-        <div className={styles.loading}>Searching...</div>
+        <div className={styles.loading}>Recherche en cours…</div>
       )}
 
       {!loading && searched && results.length === 0 && (
-        <div className={styles.empty}>No results found for "{query}".</div>
+        <div className={styles.empty}>Aucun résultat pour «&nbsp;{query}&nbsp;».</div>
       )}
 
       {!loading && results.length > 0 && (
         <div className={styles.results}>
-          <div className={styles.resultsCount}>{results.length} results</div>
+          <div className={styles.resultsCount}>{results.length} résultat{results.length > 1 ? 's' : ''}</div>
           {results.map((item, i) => {
             const article = item.article || item
             const score = item.score ?? item.similarity ?? null

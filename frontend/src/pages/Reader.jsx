@@ -5,7 +5,7 @@ import ArticleModal from '../components/ArticleModal'
 import HeroCard from '../components/HeroCard'
 import styles from './Reader.module.css'
 
-const ALL_TAB = 'All'
+const ALL_TAB = 'Toutes'
 
 export default function Reader() {
   const [articles, setArticles] = useState([])
@@ -40,34 +40,51 @@ export default function Reader() {
     return restArticles.filter(a => a.source === activeTab)
   }, [restArticles, activeTab])
 
-  if (loading) return <div className={styles.loading}>Loading...</div>
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.skeletonHero} />
+        <div className={styles.grid}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className={styles.skeletonCard} />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (articles.length === 0) {
     return (
       <div className={styles.page}>
-        <div className={styles.empty}>No articles found.</div>
+        <div className={styles.empty}>
+          <h2 className={styles.emptyTitle}>Aucun article pour le moment</h2>
+          <p>Lancez le pipeline pour récupérer les dernières actualités.</p>
+        </div>
       </div>
     )
   }
 
   return (
     <div className={styles.page}>
-      <div className={styles.tabBar}>
-        {tabs.map(tab => (
-          <button
-            key={tab}
-            className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
+      {heroArticle && <HeroCard article={heroArticle} onClick={setSelectedArticle} />}
+
+      <div className={styles.sectionHead}>
+        <h2 className={styles.sectionTitle}>Dernières actualités</h2>
+        <div className={styles.filters}>
+          {tabs.map(tab => (
+            <button
+              key={tab}
+              className={`${styles.chip} ${activeTab === tab ? styles.chipActive : ''}`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <HeroCard article={heroArticle} onClick={setSelectedArticle} />
-
       {gridArticles.length === 0 ? (
-        <div className={styles.empty}>No articles in this category.</div>
+        <div className={styles.empty}>Aucun article pour cette source.</div>
       ) : (
         <div className={styles.grid}>
           {gridArticles.map(a => (

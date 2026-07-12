@@ -3,7 +3,10 @@ import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react'
 import client from '../api/client'
 import ArticleCard from '../components/ArticleCard'
 import ArticleModal from '../components/ArticleModal'
+import PageHeader from '../components/PageHeader'
 import styles from './Articles.module.css'
+
+const SENTIMENT_FR = { positive: 'Positif', neutral: 'Neutre', negative: 'Négatif' }
 
 const PAGE_SIZE = 20
 
@@ -60,9 +63,10 @@ export default function Articles() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <h1 className={styles.pageTitle}>Articles</h1>
-      </div>
+      <PageHeader
+        title="Tous les articles"
+        subtitle="Parcourez et filtrez l'ensemble des articles collectés."
+      />
 
       {/* Filters */}
       <div className={styles.filterBar}>
@@ -72,9 +76,9 @@ export default function Articles() {
           value={filters.sentiment}
           onChange={e => handleFilterChange('sentiment', e.target.value)}
         >
-          <option value="">All sentiments</option>
+          <option value="">Tous les sentiments</option>
           {SENTIMENTS.filter(Boolean).map(s => (
-            <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+            <option key={s} value={s}>{SENTIMENT_FR[s] || s}</option>
           ))}
         </select>
 
@@ -83,15 +87,15 @@ export default function Articles() {
           value={filters.topic_id}
           onChange={e => handleFilterChange('topic_id', e.target.value)}
         >
-          <option value="">All topics</option>
+          <option value="">Tous les thèmes</option>
           {topics.map(t => (
-            <option key={t.topic_id} value={t.topic_id}>{t.label || `Topic ${t.topic_id}`}</option>
+            <option key={t.topic_id} value={t.topic_id}>{t.label || `Thème ${t.topic_id}`}</option>
           ))}
         </select>
 
         <input
           className={styles.input}
-          placeholder="Filter by source..."
+          placeholder="Filtrer par source…"
           value={filters.source}
           onChange={e => handleFilterChange('source', e.target.value)}
         />
@@ -99,9 +103,9 @@ export default function Articles() {
 
       {/* Grid */}
       {loading ? (
-        <div className={styles.loading}>Loading articles...</div>
+        <div className={styles.loading}>Chargement des articles…</div>
       ) : articles.length === 0 ? (
-        <div className={styles.empty}>No articles found.</div>
+        <div className={styles.empty}>Aucun article trouvé.</div>
       ) : (
         <div className={styles.grid}>
           {articles.map(a => (
