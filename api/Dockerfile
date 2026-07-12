@@ -8,6 +8,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
+# Big ML wheels; slow mirrors time out on the default 15s. Give pip room.
+ENV PIP_DEFAULT_TIMEOUT=180 PIP_RETRIES=8
+# CPU-only torch first (no GPU in container) — avoids the ~2.5GB CUDA wheel
+# stack. requirements.txt's unpinned `torch` is then already satisfied.
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
