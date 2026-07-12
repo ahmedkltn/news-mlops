@@ -2,7 +2,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from etl.load import get_connection
-from etl.transform import get_embedding
+from etl.transform import get_embedding, embeddings_available
 from etl.llm import complete, model_for, FAST_MODEL, DEFAULT_MODEL
 
 logger = logging.getLogger(__name__)
@@ -48,16 +48,32 @@ class ChatBody(BaseModel):
 
 @router.post("/chat")
 def chat(body: ChatBody):
-    emb = get_embedding(body.q)
-    emb_str = f"[{','.join(map(str, emb))}]"
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("""
-        SELECT id, title, url, content
-        FROM articles
-        ORDER BY embedding <=> %s::vector
-        LIMIT 5
-    """, (emb_str,))
+    if embeddings_available():
+        emb = get_embedding(body.q)
+        emb_str = f"[{','.join(map(str, emb))}]"
+        cur.execute("""
+            SELECT id, title, url, content
+            FROM articles
+            WHERE embedding IS NOT NULL
+            ORDER BY embedding <=> %s::vector
+            LIMIT 5
+        """, (emb_str,))
+    else:
+        # No embedding model cached — rank by keyword relevance, but always
+        # return the top 5 (relevance then recency) so the model has real
+        # articles to ground its answer even on a loose/no-match query.
+        cur.execute("""
+            SELECT id, title, url, content
+            FROM articles
+            ORDER BY ts_rank(
+                        to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(content,'')),
+                        plainto_tsquery('simple', %s)
+                     ) DESC,
+                     COALESCE(published_at, scraped_at) DESC
+            LIMIT 5
+        """, (body.q,))
     rows = cur.fetchall()
     cur.close()
     conn.close()

@@ -63,9 +63,23 @@ class RSSScraper(BaseScraper):
     def parse_article(self, url: str):
         return None
 
+    def _enrich_image(self, article: Article) -> None:
+        """Best-effort og:image from the article page when the feed has none."""
+        if article.image_url:
+            return
+        try:
+            resp = self.session.get(article.url, timeout=8)
+            if resp.ok:
+                article.image_url = fetch_og_image(resp.text)
+        except Exception as e:  # network/parse issues must not break the scrape
+            logger.debug(f"[{self.source}] og:image fetch failed for {article.url}: {e}")
+
     def scrape(self) -> list[Article]:
         resp = self.session.get(self.feed_url, timeout=15)
         resp.raise_for_status()
         articles = parse_feed(resp.text, self.source, self.language)
-        logger.info(f"[{self.source}] RSS: {len(articles)} articles")
+        for article in articles:
+            self._enrich_image(article)
+        n_img = sum(1 for a in articles if a.image_url)
+        logger.info(f"[{self.source}] RSS: {len(articles)} articles, {n_img} with image")
         return articles

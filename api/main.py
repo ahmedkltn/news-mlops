@@ -1,7 +1,7 @@
 import logging
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import pipeline, articles, search, genai
+from api.routes import pipeline, articles, search, genai, img
 
 logging.basicConfig(level=logging.INFO)
 
@@ -27,6 +27,7 @@ app.include_router(pipeline.router, prefix="/pipeline", tags=["pipeline"])
 app.include_router(articles.router, prefix="/articles", tags=["articles"])
 app.include_router(search.router, prefix="/search", tags=["search"])
 app.include_router(genai.router, prefix="/genai", tags=["genai"])
+app.include_router(img.router, prefix="/img", tags=["img"])
 
 @app.get("/health")
 def health():

@@ -9,6 +9,7 @@ RSS_FEEDS = [
     ("lapresse",     "https://lapresse.tn/feed/",                 "fr"),
     ("businessnews", "https://www.businessnews.com.tn/rss.xml",   "fr"),
     ("kapitalis",    "https://kapitalis.com/tunisie/feed/",       "fr"),
+    ("mosaique",     "https://www.mosaiquefm.net/fr/rss",         "fr"),
 ]
 
 def build_scrapers(max_pages: int = 5):

@@ -14,8 +14,30 @@ SENTIMENT_MAP = {
 #   • the API can start without loading ML deps
 #   • individual scripts only pay the cost for the step they run
 
+EMBED_MODEL_NAME = "intfloat/multilingual-e5-small"
+
 _embedding_model = None
 _sentiment_pipeline = None
+_embeddings_available = None
+
+
+def embeddings_available() -> bool:
+    """True iff the embedding model weights are already in the local HF cache.
+
+    Cheap, offline check — never triggers a download, so callers (search,
+    chat) can degrade to keyword search instead of hanging for minutes when
+    the model has not been fetched yet. Result is memoised for the process;
+    restart the API after the model finishes downloading to pick it up.
+    """
+    global _embeddings_available
+    if _embeddings_available is None:
+        try:
+            from huggingface_hub import try_to_load_from_cache
+            hit = try_to_load_from_cache(EMBED_MODEL_NAME, "model.safetensors")
+            _embeddings_available = isinstance(hit, str)
+        except Exception:
+            _embeddings_available = False
+    return _embeddings_available
 
 
 def _get_embedding_model():
@@ -23,7 +45,7 @@ def _get_embedding_model():
     if _embedding_model is None:
         from sentence_transformers import SentenceTransformer
         logger.info("Loading embedding model…")
-        _embedding_model = SentenceTransformer("intfloat/multilingual-e5-small")
+        _embedding_model = SentenceTransformer(EMBED_MODEL_NAME)
     return _embedding_model
 
 
