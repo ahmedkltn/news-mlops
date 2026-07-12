@@ -7,6 +7,26 @@ import styles from './Reader.module.css'
 
 const ALL_TAB = 'Toutes'
 
+// Round-robin by source so À la une shows a mix, not just the source with the
+// most recent scrape batch.
+function interleaveBySource(list) {
+  const bySrc = new Map()
+  for (const a of list) {
+    if (!bySrc.has(a.source)) bySrc.set(a.source, [])
+    bySrc.get(a.source).push(a)
+  }
+  const queues = [...bySrc.values()]
+  const out = []
+  let added = true
+  while (added) {
+    added = false
+    for (const q of queues) {
+      if (q.length) { out.push(q.shift()); added = true }
+    }
+  }
+  return out
+}
+
 export default function Reader() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
@@ -16,8 +36,8 @@ export default function Reader() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await client.get('/articles/', { params: { limit: 21 } })
-        setArticles(res.data || [])
+        const res = await client.get('/articles/', { params: { limit: 60 } })
+        setArticles(interleaveBySource(res.data || []).slice(0, 21))
       } catch (err) {
         console.error('Reader load error', err)
       } finally {
