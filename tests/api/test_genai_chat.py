@@ -12,10 +12,8 @@ def test_chat_returns_answer_and_sources(monkeypatch):
         def cursor(self): return FakeCur()
         def close(self): ...
     monkeypatch.setattr(genai, "get_connection", lambda: FakeConn())
-    class FakeText: type="text"; text="Réponse fondée sur les sources."
-    class FakeMsg: content=[FakeText()]
-    monkeypatch.setattr(genai, "_client",
-        lambda: type("C", (), {"messages": type("M", (), {"create": lambda s, **k: FakeMsg()})()})())
+    monkeypatch.setattr(genai, "complete",
+        lambda **kw: "Réponse fondée sur les sources.", raising=False)
     client = TestClient(app)
     r = client.post("/genai/chat", json={"q": "Que se passe-t-il en Tunisie ?"})
     assert r.status_code == 200

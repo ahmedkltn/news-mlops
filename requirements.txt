@@ -17,7 +17,9 @@ hdbscan
 transformers
 torch
 spacy
-anthropic
+
+# GenAI (OpenAI-compatible client — Groq / Gemini / OpenRouter)
+openai
 
 # MLOps
 prefect>=3.0.0

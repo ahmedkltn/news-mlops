@@ -3,17 +3,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from etl.load import get_connection
 from etl.transform import get_embedding
+from etl.llm import complete
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
-
-_client_singleton = None
-def _client():
-    global _client_singleton
-    if _client_singleton is None:
-        import anthropic
-        _client_singleton = anthropic.Anthropic()
-    return _client_singleton
 
 @router.get("/summary/{article_id}")
 def summary(article_id: int):
@@ -32,11 +25,10 @@ def summary(article_id: int):
     if cached:
         return {"summary": cached}
 
-    msg = _client().messages.create(
-        model="claude-haiku-4-5", max_tokens=160,
-        messages=[{"role": "user", "content":
-            f"Résume cet article tunisien en 2 phrases claires, en français :\n\n{title}\n{(content or '')[:2000]}"}])
-    text = next((b.text.strip() for b in msg.content if b.type == "text"), "")
+    text = complete(
+        user=f"Résume cet article tunisien en 2 phrases claires, en français :\n\n{title}\n{(content or '')[:2000]}",
+        max_tokens=160,
+    )
 
     conn = get_connection()
     try:
@@ -69,12 +61,12 @@ def chat(body: ChatBody):
     cur.close()
     conn.close()
     context = "\n\n".join(f"[{i+1}] {r[1]}\n{(r[3] or '')[:800]}" for i, r in enumerate(rows))
-    msg = _client().messages.create(
-        model="claude-haiku-4-5", max_tokens=512,
+    answer = complete(
         system="Tu réponds aux questions sur l'actualité tunisienne en te basant "
                "UNIQUEMENT sur les articles fournis. Cite les numéros de source. "
                "Si l'info manque, dis-le.",
-        messages=[{"role": "user", "content": f"Articles:\n{context}\n\nQuestion: {body.q}"}])
-    answer = next((b.text.strip() for b in msg.content if b.type == "text"), "")
+        user=f"Articles:\n{context}\n\nQuestion: {body.q}",
+        max_tokens=512,
+    )
     return {"answer": answer,
             "sources": [{"id": r[0], "title": r[1], "url": r[2]} for r in rows]}

@@ -1,14 +1,15 @@
 from etl import labels
 
+
 def test_label_topics_maps_ids(monkeypatch):
-    class FakeText:
-        type = "text"; text = "Politique nationale"
-    class FakeMsg:
-        content = [FakeText()]
-    class FakeMessages:
-        def create(self, **kw): return FakeMsg()
-    class FakeClient:
-        messages = FakeMessages()
-    monkeypatch.setattr(labels, "_client", lambda: FakeClient())
+    monkeypatch.setattr(labels, "complete", lambda **kw: "Politique nationale")
     out = labels.label_topics({0: ["tunisie", "gouvernement", "loi"]})
     assert out[0] == "Politique nationale"
+
+
+def test_label_topics_falls_back_on_failure(monkeypatch):
+    def boom(**kw):
+        raise RuntimeError("provider down")
+    monkeypatch.setattr(labels, "complete", boom)
+    out = labels.label_topics({3: ["a", "b"]})
+    assert out[3] == "Topic 3"

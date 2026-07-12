@@ -26,7 +26,10 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 PREFECT_API_URL=http://localhost:4200/api
 MLFLOW_TRACKING_URI=http://localhost:5000
-ANTHROPIC_API_KEY=sk-ant-REPLACE_ME
+# GenAI — any OpenAI-compatible provider (default = Groq free tier)
+LLM_API_KEY=REPLACE_ME
+LLM_BASE_URL=https://api.groq.com/openai/v1
+LLM_MODEL=llama-3.3-70b-versatile
 ```
 
 Start everything:
@@ -41,7 +44,7 @@ docker-compose up --build
 | Prefect | http://localhost:4200 |
 | MLflow | http://localhost:5000 |
 
-`ANTHROPIC_API_KEY` (for GenAI features) and `MLFLOW_TRACKING_URI` (experiment tracking) also belong in `.env` — see `.env` for the full list of variables.
+GenAI features (summaries, "ask the news" chat, topic labels) use any OpenAI-compatible provider via `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` — default is the **Groq** free tier; switch to Gemini or OpenRouter by changing those two URLs/model values (see `.env.example`). `MLFLOW_TRACKING_URI` drives experiment tracking.
 
 ## Pipeline (step by step)
 
