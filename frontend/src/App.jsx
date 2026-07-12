@@ -6,6 +6,7 @@ import Articles from './pages/Articles'
 import Search from './pages/Search'
 import Pipeline from './pages/Pipeline'
 import Chat from './pages/Chat'
+import Carte from './pages/Carte'
 import styles from './App.module.css'
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/articles" element={<Articles />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/carte" element={<Carte />} />
           <Route path="/pipeline" element={<Pipeline />} />
           <Route path="/chat" element={<Chat />} />
         </Routes>

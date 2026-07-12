@@ -1,0 +1,61 @@
+:root {
+  --map-empty: #e7e6e3;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --map-empty: #26262a; }
+}
+
+.wrap {
+  position: relative;
+  width: 100%;
+}
+
+.svg {
+  width: 100%;
+  height: auto;
+  max-height: 72vh;
+  display: block;
+}
+
+.region {
+  stroke: var(--card);
+  stroke-width: 0.75;
+  cursor: pointer;
+  transition: fill 0.2s, opacity 0.15s;
+  outline: none;
+}
+
+.region:hover {
+  opacity: 0.82;
+}
+
+.region:focus-visible {
+  stroke: var(--brand);
+  stroke-width: 1.6;
+}
+
+.selected {
+  stroke: var(--text);
+  stroke-width: 1.8;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  background: var(--text);
+  color: var(--bg);
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+}
+
+.tooltip strong {
+  font-family: var(--font-sans);
+  font-weight: 600;
+}

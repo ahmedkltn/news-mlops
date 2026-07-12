@@ -124,6 +124,8 @@ def transform_articles(articles: list[Article]) -> list[dict]:
         [f"{a.title or ''} {a.content or ''}" for a in articles]
     )
 
+    from etl.regions import tag_region
+
     transformed = []
     for i, article in enumerate(articles):
         text = texts[i].replace("passage: ", "", 1)
@@ -143,6 +145,7 @@ def transform_articles(articles: list[Article]) -> list[dict]:
             "categories": article.categories,
             "embedding":  embeddings[i].tolist(),
             "sentiment":  sentiment,
+            "region":     tag_region(article.title or "", article.content or "", use_llm=False),
             "topic_id":   None,
             "topic_label": None,
         })
