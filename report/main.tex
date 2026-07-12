@@ -1,0 +1,98 @@
+
+
+%\documentclass[pfe]{./tpl/isipfe}
+\documentclass[]{./tpl/isipfe}
+\graphicspath{{./img/}}
+
+%\usepackage{hyperref}
+
+\input{./tpl/new_commands}
+
+% Force English names for document lists (class defaults are French)
+\renewcommand{\contentsname}{Table of Contents}
+\renewcommand{\listfigurename}{List of Figures}
+\renewcommand{\listtablename}{List of Tables}
+
+% Fix footer spacing warning from fancyhdr
+\setlength{\footskip}{12pt}
+
+
+\makeindex
+
+\begin{document}
+\input{global_config}
+
+\frontmatter
+\input{tpl/cover_page}
+% (removed empty black cover)
+%\include{tpl/cover_page_black}
+
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+\dominitoc
+\tableofcontents
+\adjustmtc
+\thispagestyle{frontmatter}
+
+\listoffigures
+
+\thispagestyle{frontmatter}
+
+\input{acronymes}
+\thispagestyle{frontmatter}
+
+\mainmatter
+% (Chapter 1 starts below; removed separate unnumbered introduction)
+%\input{introduction}
+%\clearpage
+
+\input{chap_01_newsinsight}
+\clearpage
+
+\input{chap_02_newsinsight}
+\clearpage
+
+\input{chap_03_newsinsight}
+\clearpage
+
+\input{chap_04_newsinsight}
+\clearpage
+
+\input{chap_05_newsinsight}
+\clearpage
+
+\input{chap_06_newsinsight}
+\clearpage
+
+\input{chap_07_newsinsight}
+\clearpage
+
+\input{chap_08_newsinsight}
+\clearpage
+
+\input{chap_09_newsinsight}
+\clearpage
+
+\input{chap_10_newsinsight}
+\clearpage
+
+\input{chap_11_newsinsight}
+\clearpage
+
+
+\input{webo_newsinsight}
+\clearpage
+
+% (Disabled: currently no bib entries; avoids "Empty bibliography" warning)
+%\printbibliography[title={Webography},heading=bibintoc]
+
+
+
+% \input{annexes}
+% \clearpage
+
+\backmatter
+\input{./tpl/resume}
+
+\end{document}

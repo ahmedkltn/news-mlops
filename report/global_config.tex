@@ -1,0 +1,77 @@
+
+%=== File containing Global Configuration of the report ===%
+%                                                          %
+% Copyright (C) ISI - All Rights Reserved                  %
+% Proprietary                                              %
+% Written by Med Hossam <med.hossam@gmail.com>, April 2016 %
+%                                                          %
+% @author: HEDHILI Med Houssemeddine                       %
+% @linkedin: http://tn.linkedin.com/in/medhossam           %
+%==========================================================%
+
+%=========== You MUST type your information here ==========%
+% global_config.tex file is designed to configure your     %
+% cover pages (main, back and black covers)                %
+%==========================================================%
+
+%============= Config new columns type ==============%
+\newcolumntype{L}{>{\raggedright\arraybackslash}}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}}
+\newcolumntype{C}{>{\centering\arraybackslash}}
+%==================================================%
+
+%========= Config the cover section ==========%
+
+\title{News Insight: An MLOps Platform for Tunisian News Analysis}
+
+\author{Ahmed Klabi}
+%%% if necessary
+% If you have multiple authors, set isBinomal to true and fill the extra names
+\setboolean{isBinomal}{true}
+\secondAuthor{Mariem Smadhi}
+\thirdAuthor{Hichem Sboui}
+\fourthAuthor{}
+
+\diplomaName{End-of-Semester Project}
+\speciality{Data Science and AI}
+
+%% No company / no professional supervisor
+\proFramerName{}
+\proFramerSpeciality{}
+
+%% Academic supervisor
+\academicFramerName{Sawssen Jalel}
+\academicFramerSpeciality{}
+
+%% Company (not used)
+\companyName{}
+
+%% Academic year / semester
+\collegeYear{2025-2026}
+
+%%%%%% Signatures section %%%%%%
+
+\proSignSentence{}
+
+\academicSignSentence{I authorize the student to submit this report for evaluation.}
+
+%%% (Optional) French abstract left empty for an English-only report
+\frenchAbstract{}
+
+\frenchAbstractKeywords{}
+
+%%% EN
+\englishAbstract{News Insight scrapes Tunisian news sources, stores them in PostgreSQL with pgvector, and analyses them with embeddings, sentiment analysis, and BERTopic topic modeling.
+
+The platform adds a GenAI layer (summaries, an ask-the-news chat assistant, LLM-generated topic labels) on top of an MLOps stack built with Prefect, MLflow, FastAPI, React, and Docker.}
+
+\englishAbstractKeywords{News Analysis, MLOps, Web Scraping, NLP, BERTopic, Sentence Transformers, pgvector, FastAPI, Prefect, MLflow, GenAI, RAG}
+
+%% Company address disabled
+\setboolean{wantToTypeCompanyAddress}{false}
+
+\companyEmail{}
+\companyTel{}
+\companyFax{}
+\companyAddressAR{}
+\companyAddressFR{}
