@@ -61,19 +61,21 @@ def chat(body: ChatBody):
             LIMIT 5
         """, (emb_str,))
     else:
-        # No embedding model cached — rank by keyword relevance, but always
-        # return the top 5 (relevance then recency) so the model has real
-        # articles to ground its answer even on a loose/no-match query.
+        # No embedding model cached — rank by French full-text relevance
+        # (unaccent + stemming, OR-joined terms), but always return the top 5
+        # (relevance then recency) so the model has real articles to ground
+        # its answer even on a loose/no-match query.
+        or_q = " or ".join(body.q.split()) or body.q
         cur.execute("""
             SELECT id, title, url, content
             FROM articles
             ORDER BY ts_rank(
-                        to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(content,'')),
-                        plainto_tsquery('simple', %s)
+                        to_tsvector('french', unaccent(coalesce(title,'') || ' ' || coalesce(content,''))),
+                        websearch_to_tsquery('french', unaccent(%s))
                      ) DESC,
                      COALESCE(published_at, scraped_at) DESC
             LIMIT 5
-        """, (body.q,))
+        """, (or_q,))
     rows = cur.fetchall()
     cur.close()
     conn.close()

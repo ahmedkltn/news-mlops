@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS unaccent;  -- accent-insensitive full-text search
 
 CREATE TABLE IF NOT EXISTS articles (
     id           SERIAL PRIMARY KEY,

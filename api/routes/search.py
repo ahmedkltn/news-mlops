@@ -24,20 +24,22 @@ def semantic_search(
             LIMIT %s
         """, (embedding_str, embedding_str, limit))
     else:
-        # No embedding model cached — degrade to keyword search so the
-        # feature still works (lower relevance, no semantic ranking).
+        # No embedding model cached — French full-text with accent folding
+        # (unaccent) and stemming. Query terms are OR-joined for recall;
+        # ts_rank still surfaces the best (multi-term) matches first.
+        or_q = " or ".join(q.split()) or q
         cur.execute("""
             SELECT id, url, source, title, sentiment, topic_label,
                    ts_rank(
-                       to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(content,'')),
-                       plainto_tsquery('simple', %s)
+                       to_tsvector('french', unaccent(coalesce(title,'') || ' ' || coalesce(content,''))),
+                       websearch_to_tsquery('french', unaccent(%s))
                    ) AS similarity
             FROM articles
-            WHERE to_tsvector('simple', coalesce(title,'') || ' ' || coalesce(content,''))
-                  @@ plainto_tsquery('simple', %s)
+            WHERE to_tsvector('french', unaccent(coalesce(title,'') || ' ' || coalesce(content,'')))
+                  @@ websearch_to_tsquery('french', unaccent(%s))
             ORDER BY similarity DESC
             LIMIT %s
-        """, (q, q, limit))
+        """, (or_q, or_q, limit))
 
     rows = cur.fetchall()
     cur.close()
