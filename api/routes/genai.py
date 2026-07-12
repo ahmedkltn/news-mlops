@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from etl.load import get_connection
 from etl.transform import get_embedding
-from etl.llm import complete
+from etl.llm import complete, model_for, FAST_MODEL, DEFAULT_MODEL
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -28,6 +28,7 @@ def summary(article_id: int):
     text = complete(
         user=f"Résume cet article tunisien en 2 phrases claires, en français :\n\n{title}\n{(content or '')[:2000]}",
         max_tokens=160,
+        model=model_for("summary", FAST_MODEL),
     )
 
     conn = get_connection()
@@ -67,6 +68,7 @@ def chat(body: ChatBody):
                "Si l'info manque, dis-le.",
         user=f"Articles:\n{context}\n\nQuestion: {body.q}",
         max_tokens=512,
+        model=model_for("chat", DEFAULT_MODEL),
     )
     return {"answer": answer,
             "sources": [{"id": r[0], "title": r[1], "url": r[2]} for r in rows]}
