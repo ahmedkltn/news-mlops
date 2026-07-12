@@ -8,12 +8,26 @@ import { Newspaper, TrendingUp, Activity } from 'lucide-react'
 import client from '../api/client'
 import ArticleCard from '../components/ArticleCard'
 import ArticleModal from '../components/ArticleModal'
+import PageHeader from '../components/PageHeader'
 import styles from './Dashboard.module.css'
 
 const SENTIMENT_COLORS = {
-  positive: '#22c55e',
+  positive: '#16a34a',
   neutral: '#64748b',
   negative: '#ef4444',
+}
+
+const SENTIMENT_FR = {
+  positive: 'Positif',
+  neutral: 'Neutre',
+  negative: 'Négatif',
+}
+
+const TOOLTIP_STYLE = {
+  background: 'var(--card)',
+  border: '1px solid var(--border-strong)',
+  borderRadius: 8,
+  color: 'var(--text)',
 }
 
 export default function Dashboard() {
@@ -47,19 +61,22 @@ export default function Dashboard() {
     load()
   }, [])
 
-  if (loading) return <div className={styles.loading}>Loading...</div>
+  if (loading) return <div className={styles.loading}>Chargement…</div>
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Dashboard</h1>
+      <PageHeader
+        title="Analyses"
+        subtitle="Vue d'ensemble du sentiment, des thèmes et du volume d'articles."
+      />
 
       {/* Stat cards */}
       <div className={styles.statGrid}>
         <div className={styles.statCard}>
-          <Newspaper size={20} color="var(--accent)" />
+          <Newspaper size={20} color="var(--brand)" />
           <div>
             <div className={styles.statValue}>{stats?.total ?? '—'}</div>
-            <div className={styles.statLabel}>Total Articles</div>
+            <div className={styles.statLabel}>Articles au total</div>
           </div>
         </div>
         <div className={styles.statCard}>
@@ -68,7 +85,7 @@ export default function Dashboard() {
             <div className={styles.statValue} style={{ color: 'var(--positive)' }}>
               {stats?.sentiments.find(s => s.name === 'positive')?.value ?? 0}
             </div>
-            <div className={styles.statLabel}>Positive</div>
+            <div className={styles.statLabel}>Positifs</div>
           </div>
         </div>
         <div className={styles.statCard}>
@@ -77,7 +94,7 @@ export default function Dashboard() {
             <div className={styles.statValue} style={{ color: 'var(--negative)' }}>
               {stats?.sentiments.find(s => s.name === 'negative')?.value ?? 0}
             </div>
-            <div className={styles.statLabel}>Negative</div>
+            <div className={styles.statLabel}>Négatifs</div>
           </div>
         </div>
       </div>
@@ -85,7 +102,7 @@ export default function Dashboard() {
       {/* Charts */}
       <div className={styles.chartsGrid}>
         <div className={styles.chartCard}>
-          <h2 className={styles.chartTitle}>Sentiment Distribution</h2>
+          <h2 className={styles.chartTitle}>Répartition des sentiments</h2>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
@@ -96,7 +113,7 @@ export default function Dashboard() {
                 outerRadius={90}
                 paddingAngle={3}
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${SENTIMENT_FR[name] || name} ${(percent * 100).toFixed(0)}%`}
                 labelLine={false}
               >
                 {stats?.sentiments.map(entry => (
@@ -107,34 +124,34 @@ export default function Dashboard() {
                 ))}
               </Pie>
               <Tooltip
-                contentStyle={{ background: '#111', border: '1px solid #222', borderRadius: 8 }}
-                itemStyle={{ color: '#f1f5f9' }}
+                contentStyle={TOOLTIP_STYLE}
+                itemStyle={{ color: 'var(--text)' }}
               />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
         <div className={styles.chartCard}>
-          <h2 className={styles.chartTitle}>Top 10 Topics</h2>
+          <h2 className={styles.chartTitle}>Top 10 des thèmes</h2>
           {topics.length === 0 ? (
-            <div className={styles.empty}>No topics yet. Run clustering first.</div>
+            <div className={styles.empty}>Aucun thème pour l’instant. Lancez le clustering.</div>
           ) : (
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={topics} layout="vertical" margin={{ left: 8, right: 16 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#222" horizontal={false} />
-                <XAxis type="number" tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" horizontal={false} />
+                <XAxis type="number" tick={{ fill: 'var(--text-subtle)', fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis
                   type="category"
                   dataKey="topic_label"
                   width={110}
-                  tick={{ fill: '#94a3b8', fontSize: 11 }}
+                  tick={{ fill: 'var(--text-subtle)', fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={v => v && v.length > 14 ? v.slice(0, 14) + '…' : v}
                 />
                 <Tooltip
-                  contentStyle={{ background: '#111', border: '1px solid #222', borderRadius: 8 }}
-                  itemStyle={{ color: '#f1f5f9' }}
+                  contentStyle={TOOLTIP_STYLE}
+                  itemStyle={{ color: 'var(--text)' }}
                   cursor={{ fill: 'rgba(59,130,246,0.06)' }}
                 />
                 <Bar dataKey="count" fill="var(--accent)" radius={[0, 4, 4, 0]} />
@@ -146,28 +163,28 @@ export default function Dashboard() {
 
       {/* Sentiment timeline */}
       <div className={styles.chartCardFull}>
-        <h2 className={styles.chartTitle}>Sentiment Timeline (last 30 days)</h2>
+        <h2 className={styles.chartTitle}>Évolution du sentiment (30 derniers jours)</h2>
         {timeline.length === 0 ? (
-          <div className={styles.empty}>No timeline data yet.</div>
+          <div className={styles.empty}>Pas encore de données.</div>
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={timeline} margin={{ left: 0, right: 16, top: 8 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#222" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis
                 dataKey="date"
-                tick={{ fill: '#94a3b8', fontSize: 11 }}
+                tick={{ fill: 'var(--text-subtle)', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
                 allowDecimals={false}
-                tick={{ fill: '#94a3b8', fontSize: 12 }}
+                tick={{ fill: 'var(--text-subtle)', fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{ background: '#111', border: '1px solid #222', borderRadius: 8 }}
-                itemStyle={{ color: '#f1f5f9' }}
+                contentStyle={TOOLTIP_STYLE}
+                itemStyle={{ color: 'var(--text)' }}
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
               <Line type="monotone" dataKey="positive" stroke={SENTIMENT_COLORS.positive} strokeWidth={2} dot={false} />
@@ -180,7 +197,7 @@ export default function Dashboard() {
 
       {/* Recent articles */}
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Recent Articles</h2>
+        <h2 className={styles.sectionTitle}>Articles récents</h2>
         <div className={styles.articleGrid}>
           {recentArticles.map(a => (
             <ArticleCard key={a.id} article={a} onClick={setSelectedArticle} />

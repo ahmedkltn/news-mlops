@@ -5,33 +5,70 @@
 }
 
 :root {
-  --bg: #f7f7f5;
+  /* ── Surfaces ─────────────────────────────────────────── */
+  --bg: #f4f4f3;
   --card: #ffffff;
-  --card-hover: #f0efec;
-  --border: #e3e1dc;
-  --accent: #c1440e;
-  --accent-hover: #a53a0c;
-  --text: #1a1a1a;
-  --text-muted: #666666;
-  --positive: #22c55e;
+  --card-hover: #fafaf9;
+  --border: #e5e4e2;
+  --border-strong: #d3d2ce;
+
+  /* ── Brand & links ────────────────────────────────────── */
+  --brand: #dc2626;          /* breaking-news red */
+  --brand-hover: #b91c1c;
+  --brand-soft: #fef2f2;     /* tint background */
+  --link: #1d4ed8;           /* editorial link blue */
+  --accent: var(--brand);    /* back-compat alias for existing pages */
+  --accent-hover: var(--brand-hover);
+
+  /* ── Text ─────────────────────────────────────────────── */
+  --text: #18181b;
+  --text-muted: #52525b;
+  --text-subtle: #71717a;
+
+  /* ── Sentiment ────────────────────────────────────────── */
+  --positive: #16a34a;
   --neutral: #64748b;
   --negative: #ef4444;
-  --sidebar-width: 220px;
+
+  /* ── Type ─────────────────────────────────────────────── */
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* ── Shape & elevation (flat, editorial) ──────────────── */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+
+  --header-height: 60px;
+  --content-max: 1160px;
+
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0d0d0f;
-    --card: #161618;
-    --card-hover: #1f1f22;
-    --border: #27272a;
-    --accent: #f97316;
-    --accent-hover: #ea580c;
-    --text: #f1f5f9;
-    --text-muted: #94a3b8;
+    --bg: #0f0f10;
+    --card: #18181b;
+    --card-hover: #202023;
+    --border: #2a2a2e;
+    --border-strong: #3a3a40;
+
+    --brand: #f05252;
+    --brand-hover: #ef4444;
+    --brand-soft: #2a1416;
+    --link: #60a5fa;
+
+    --text: #f4f4f5;
+    --text-muted: #a1a1aa;
+    --text-subtle: #8b8b93;
+
     --positive: #22c55e;
-    --neutral: #64748b;
-    --negative: #ef4444;
+    --neutral: #94a3b8;
+    --negative: #f87171;
+
+    color-scheme: dark;
   }
 }
 
@@ -40,10 +77,21 @@ html, body, #root {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
 
 a {
@@ -60,21 +108,42 @@ button {
   color: inherit;
 }
 
-input, select {
+input, select, textarea {
   font-family: inherit;
   font-size: inherit;
 }
 
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brand) 22%, transparent);
+}
+
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: var(--border-strong);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #333;
+  background: var(--text-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

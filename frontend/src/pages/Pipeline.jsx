@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Play, GitMerge, CheckCircle, XCircle } from 'lucide-react'
 import client from '../api/client'
 import ConfirmDialog from '../components/ConfirmDialog'
+import PageHeader from '../components/PageHeader'
 import styles from './Pipeline.module.css'
 
 function StatusMessage({ status }) {
@@ -24,16 +25,16 @@ export default function Pipeline() {
   function handleScrapeClick() {
     setConfirm({
       action: 'scrape',
-      title: 'Trigger Scraping Pipeline',
-      message: `This will scrape up to ${maxPages} pages from Kapitalis and run the full ETL pipeline. Continue?`,
+      title: 'Lancer la collecte',
+      message: `Cela va collecter jusqu'à ${maxPages} pages de la presse tunisienne et exécuter tout le pipeline ETL. Continuer ?`,
     })
   }
 
   function handleClusterClick() {
     setConfirm({
       action: 'cluster',
-      title: 'Run BERTopic Clustering',
-      message: 'This will re-run BERTopic clustering on all stored articles and update topic assignments. Continue?',
+      title: 'Lancer le regroupement thématique',
+      message: 'Cela va relancer le clustering BERTopic sur tous les articles et mettre à jour les thèmes. Continuer ?',
     })
   }
 
@@ -46,13 +47,13 @@ export default function Pipeline() {
     try {
       if (action === 'scrape') {
         const res = await client.post('/pipeline/trigger', null, { params: { max_pages: maxPages } })
-        setStatus(s => ({ ...s, scrape: { type: 'success', text: res.data?.message || 'Pipeline triggered successfully.' } }))
+        setStatus(s => ({ ...s, scrape: { type: 'success', text: res.data?.message || 'Pipeline lancé avec succès.' } }))
       } else {
         const res = await client.post('/pipeline/cluster')
-        setStatus(s => ({ ...s, cluster: { type: 'success', text: res.data?.message || 'Clustering completed successfully.' } }))
+        setStatus(s => ({ ...s, cluster: { type: 'success', text: res.data?.message || 'Clustering terminé avec succès.' } }))
       }
     } catch (err) {
-      const text = err.response?.data?.detail || err.message || 'An error occurred.'
+      const text = err.response?.data?.detail || err.message || 'Une erreur est survenue.'
       setStatus(s => ({ ...s, [action]: { type: 'error', text } }))
     } finally {
       setLoading(l => ({ ...l, [action]: false }))
@@ -61,23 +62,25 @@ export default function Pipeline() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Pipeline</h1>
-      <p className={styles.subtitle}>Trigger data ingestion and model operations</p>
+      <PageHeader
+        title="Pipeline de données"
+        subtitle="Déclenchez la collecte des articles et les traitements du modèle."
+      />
 
       <div className={styles.grid}>
         {/* Scraping card */}
         <div className={styles.card}>
-          <div className={styles.cardIcon} style={{ background: 'rgba(59,130,246,0.1)' }}>
-            <Play size={24} color="var(--accent)" />
+          <div className={styles.cardIcon} style={{ background: 'var(--brand-soft)' }}>
+            <Play size={24} color="var(--brand)" />
           </div>
-          <h2 className={styles.cardTitle}>Trigger Scraping</h2>
+          <h2 className={styles.cardTitle}>Collecte des articles</h2>
           <p className={styles.cardDesc}>
-            Scrapes Tunisian news articles from Kapitalis and runs the full ETL pipeline
-            including embedding generation and sentiment analysis.
+            Récupère les articles de la presse tunisienne et exécute tout le pipeline ETL :
+            génération des embeddings et analyse de sentiment.
           </p>
 
           <div className={styles.field}>
-            <label className={styles.label}>Max pages to scrape</label>
+            <label className={styles.label}>Nombre max de pages</label>
             <input
               type="number"
               className={styles.numberInput}
@@ -95,19 +98,19 @@ export default function Pipeline() {
             onClick={handleScrapeClick}
             disabled={loading.scrape}
           >
-            {loading.scrape ? 'Running...' : 'Run Scraping Pipeline'}
+            {loading.scrape ? 'En cours…' : 'Lancer la collecte'}
           </button>
         </div>
 
         {/* Clustering card */}
         <div className={styles.card}>
-          <div className={styles.cardIcon} style={{ background: 'rgba(34,197,94,0.1)' }}>
+          <div className={styles.cardIcon} style={{ background: 'color-mix(in srgb, var(--positive) 12%, transparent)' }}>
             <GitMerge size={24} color="var(--positive)" />
           </div>
-          <h2 className={styles.cardTitle}>Run Clustering</h2>
+          <h2 className={styles.cardTitle}>Regroupement thématique</h2>
           <p className={styles.cardDesc}>
-            Runs BERTopic clustering on all stored articles to discover and assign
-            topic clusters. Updates topic labels for all articles.
+            Exécute le clustering BERTopic sur tous les articles stockés pour découvrir
+            et assigner les thèmes. Met à jour les libellés de thème.
           </p>
 
           <StatusMessage status={status.cluster} />
@@ -117,7 +120,7 @@ export default function Pipeline() {
             onClick={handleClusterClick}
             disabled={loading.cluster}
           >
-            {loading.cluster ? 'Running...' : 'Run BERTopic Clustering'}
+            {loading.cluster ? 'En cours…' : 'Lancer le clustering'}
           </button>
         </div>
       </div>
