@@ -13,4 +13,5 @@
 *.fdb_latexmk
 *.run.xml
 *.synctex*
+main-blx.bib
 main.pdf

@@ -12,6 +12,8 @@
 \renewcommand{\contentsname}{Table of Contents}
 \renewcommand{\listfigurename}{List of Figures}
 \renewcommand{\listtablename}{List of Tables}
+% English minitoc heading (class default is French "Plan")
+\mtcsettitle{minitoc}{Chapter outline}
 
 % Fix footer spacing warning from fancyhdr
 \setlength{\footskip}{12pt}
@@ -43,9 +45,8 @@
 \thispagestyle{frontmatter}
 
 \mainmatter
-% (Chapter 1 starts below; removed separate unnumbered introduction)
-%\input{introduction}
-%\clearpage
+\input{introduction}
+\clearpage
 
 \input{chap_01_newsinsight}
 \clearpage
