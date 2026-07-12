@@ -4,7 +4,7 @@ import re
 from fastapi import APIRouter, Query
 from etl.load import get_connection
 from etl.transform import get_embedding, embeddings_available
-from etl.llm import complete, FAST_MODEL
+from etl.llm import complete, DEFAULT_MODEL
 
 router = APIRouter()
 
@@ -17,8 +17,8 @@ def _row_dict(r, similarity=None):
             "sentiment": r[4], "topic_label": r[5], "similarity": similarity}
 
 
-def _candidates(cur, q):
-    """Text-match candidates, topped up with recent articles, for the LLM to rank."""
+def _text_matches(cur, q):
+    """Articles whose text matches the query (French, accent-folded, OR terms)."""
     or_q = " or ".join(q.split()) or q
     cur.execute(f"""
         SELECT {COLS}
@@ -31,40 +31,38 @@ def _candidates(cur, q):
                  ) DESC
         LIMIT %s
     """, (or_q, or_q, CAND_LIMIT))
-    rows = cur.fetchall()
-    seen = {r[0] for r in rows}
-    if len(rows) < CAND_LIMIT:
-        cur.execute(f"""
-            SELECT {COLS} FROM articles
-            ORDER BY COALESCE(published_at, scraped_at) DESC
-            LIMIT %s
-        """, (CAND_LIMIT,))
-        for r in cur.fetchall():
-            if r[0] not in seen:
-                rows.append(r); seen.add(r[0])
-            if len(rows) >= CAND_LIMIT:
-                break
-    return rows
+    return cur.fetchall()
+
+
+def _recent(cur, n):
+    cur.execute(f"""
+        SELECT {COLS} FROM articles
+        ORDER BY COALESCE(published_at, scraped_at) DESC
+        LIMIT %s
+    """, (n,))
+    return cur.fetchall()
 
 
 def _ai_rank(q, rows, limit):
-    """Ask the LLM which candidates are relevant, ranked. Returns ordered ids."""
+    """LLM picks ONLY the genuinely relevant candidates, ranked. Ordered ids."""
     listing = "\n".join(f"{r[0]}: {r[3]}" for r in rows)
     prompt = (
-        f'Requête de recherche : "{q}"\n\n'
-        f"Articles disponibles (id: titre) :\n{listing}\n\n"
-        f"Renvoie UNIQUEMENT un tableau JSON des id des articles pertinents pour "
-        f"la requête, du plus au moins pertinent (maximum {limit}). "
-        f"Sois inclusif sur le sens (ex: « sport » couvre football, match, club). "
-        f"Si aucun n'est pertinent, renvoie []."
+        f'Requête : "{q}"\n\n'
+        f"Articles (id: titre) :\n{listing}\n\n"
+        "Renvoie un tableau JSON des id des articles VRAIMENT pertinents pour la "
+        "requête, du plus pertinent au moins pertinent. Comprends le sens (ex : "
+        "« sport » = football, match, club, EST, ESS…). N'inclus AUCUN article "
+        "hors sujet — la liste peut être courte, ou vide [] si rien ne correspond. "
+        "Réponds uniquement par le tableau JSON."
     )
     try:
         out = complete(
-            system="Tu es un moteur de recherche sémantique. Tu réponds UNIQUEMENT par un tableau JSON d'entiers.",
-            user=prompt, max_tokens=200, model=FAST_MODEL,
+            system="Tu es un moteur de recherche sémantique précis. Tu réponds UNIQUEMENT par un tableau JSON d'entiers, sans texte autour.",
+            user=prompt, max_tokens=200, model=DEFAULT_MODEL,
         )
         m = re.search(r"\[[\d,\s]*\]", out)
-        return json.loads(m.group(0)) if m else []
+        ids = json.loads(m.group(0)) if m else []
+        return [int(i) for i in ids][:limit]
     except Exception:
         return []
 
@@ -91,14 +89,23 @@ def semantic_search(
         cur.close(); conn.close()
         return [_row_dict(r, round(r[6], 4)) for r in rows]
 
-    # No embedding model — AI-powered ranking over text+recent candidates.
-    candidates = _candidates(cur, q)
+    # No embedding model — AI ranking. Candidates = text matches (precise)
+    # plus recent articles (so the LLM can catch semantic matches the text
+    # search misses, e.g. a football club acronym for "sport").
+    text_rows = _text_matches(cur, q)
+    seen = {r[0] for r in text_rows}
+    candidates = list(text_rows)
+    for r in _recent(cur, CAND_LIMIT):
+        if r[0] not in seen and len(candidates) < CAND_LIMIT:
+            candidates.append(r); seen.add(r[0])
     cur.close(); conn.close()
+
     if not candidates:
         return []
     by_id = {r[0]: r for r in candidates}
-    ranked_ids = _ai_rank(q, candidates, limit)
-    ranked = [by_id[i] for i in ranked_ids if i in by_id][:limit]
-    if not ranked:  # LLM gave nothing usable → fall back to text-rank order
-        ranked = candidates[:limit]
+    ranked = [by_id[i] for i in _ai_rank(q, candidates, limit) if i in by_id][:limit]
+    if not ranked:
+        # LLM found nothing usable → return only genuine text matches, never
+        # unrelated recent articles.
+        ranked = list(text_rows)[:limit]
     return [_row_dict(r) for r in ranked]
