@@ -125,6 +125,7 @@ def transform_articles(articles: list[Article]) -> list[dict]:
     )
 
     from etl.regions import tag_region
+    from etl.themes import classify_theme, theme_id
 
     transformed = []
     for i, article in enumerate(articles):
@@ -133,6 +134,7 @@ def transform_articles(articles: list[Article]) -> list[dict]:
             continue
 
         sentiment = sentiments[i]
+        theme = classify_theme(article.title or "", article.content or "")
 
         transformed.append({
             "url":        article.url,
@@ -146,8 +148,8 @@ def transform_articles(articles: list[Article]) -> list[dict]:
             "embedding":  embeddings[i].tolist(),
             "sentiment":  sentiment,
             "region":     tag_region(article.title or "", article.content or "", use_llm=False),
-            "topic_id":   None,
-            "topic_label": None,
+            "topic_id":   theme_id(theme),
+            "topic_label": theme,
         })
 
     logger.info(f"Transformed {len(transformed)} articles")

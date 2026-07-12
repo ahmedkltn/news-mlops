@@ -34,7 +34,7 @@ export default function Search() {
     <div className={styles.page}>
       <PageHeader
         title="Recherche"
-        subtitle="Trouvez des articles par sujet, événement ou mot-clé à travers toutes les sources."
+        subtitle="Recherche assistée par IA : trouvez des articles par sens, pas seulement par mot-clé."
       />
 
       <form className={styles.searchForm} onSubmit={handleSearch}>

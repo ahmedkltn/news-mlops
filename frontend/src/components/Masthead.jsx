@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Flame, Newspaper, Search, Sparkles, BarChart3, Map, Zap } from 'lucide-react'
+import { Flame, Newspaper, Search, BarChart3, Map, Zap } from 'lucide-react'
 import { todayLong } from '../utils/time'
 import styles from './Masthead.module.css'
 
@@ -8,7 +8,6 @@ const links = [
   { to: '/articles', label: 'Articles', icon: Newspaper },
   { to: '/carte', label: 'Carte', icon: Map },
   { to: '/search', label: 'Recherche', icon: Search },
-  { to: '/chat', label: 'Assistant IA', icon: Sparkles },
   { to: '/dashboard', label: 'Analyses', icon: BarChart3 },
 ]
 
