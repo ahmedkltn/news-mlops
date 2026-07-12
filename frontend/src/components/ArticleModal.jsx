@@ -62,7 +62,7 @@ export default function ArticleModal({ article, onClose }) {
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
           <h2 className={styles.title}>{article.title}</h2>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Close">
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Fermer">
             <X size={18} />
           </button>
         </div>
@@ -79,7 +79,7 @@ export default function ArticleModal({ article, onClose }) {
         {article.id != null && <ArticleSummary key={article.id} articleId={article.id} />}
 
         <div className={styles.content}>
-          {article.content || 'No content available.'}
+          {article.content || 'Contenu non disponible.'}
         </div>
 
         {article.url && (
@@ -90,7 +90,7 @@ export default function ArticleModal({ article, onClose }) {
             className={styles.externalLink}
           >
             <ExternalLink size={14} />
-            Open original article
+            Lire l'article original
           </a>
         )}
       </div>

@@ -1,23 +1,48 @@
+/* ── Pill variant ──────────────────────────────────────── */
 .badge {
   display: inline-block;
-  padding: 2px 9px;
-  border-radius: 20px;
-  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.3px;
-  text-transform: capitalize;
-  color: #0a0a0a;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
 }
 
-.positive {
-  background: var(--positive);
+.badge.positive {
+  color: var(--positive);
+  background: color-mix(in srgb, var(--positive) 14%, transparent);
+}
+.badge.neutral {
+  color: var(--neutral);
+  background: color-mix(in srgb, var(--neutral) 16%, transparent);
+}
+.badge.negative {
+  color: var(--negative);
+  background: color-mix(in srgb, var(--negative) 15%, transparent);
 }
 
-.neutral {
-  background: var(--neutral);
-  color: var(--text);
+/* ── Dot variant ───────────────────────────────────────── */
+.dotWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
-.negative {
-  background: var(--negative);
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot.positive { background: var(--positive); }
+.dot.neutral  { background: var(--neutral); }
+.dot.negative { background: var(--negative); }
+
+.dotLabel {
+  line-height: 1;
 }

@@ -1,7 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, Loader2, MessageCircle, ExternalLink, Bot, User } from 'lucide-react'
 import client from '../api/client'
+import PageHeader from '../components/PageHeader'
 import styles from './Chat.module.css'
+
+const SUGGESTIONS = [
+  'Que se passe-t-il en Tunisie cette semaine ?',
+  "Résume l'actualité économique récente",
+  'Quelles sont les dernières nouvelles sportives ?',
+]
 
 export default function Chat() {
   const [messages, setMessages] = useState([])
@@ -13,9 +20,8 @@ export default function Chat() {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const q = input.trim()
+  async function ask(text) {
+    const q = (text || '').trim()
     if (!q || loading) return
 
     setMessages(prev => [...prev, { role: 'user', text: q }])
@@ -26,7 +32,7 @@ export default function Chat() {
       const res = await client.post('/genai/chat', { q })
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: res.data?.answer || 'No answer returned.',
+        text: res.data?.answer || 'Aucune réponse renvoyée.',
         sources: res.data?.sources || [],
       }])
     } catch (err) {
@@ -34,24 +40,38 @@ export default function Chat() {
       setMessages(prev => [...prev, {
         role: 'assistant',
         error: true,
-        text: "Sorry, something went wrong answering that question. Please try again.",
+        text: "Désolé, une erreur est survenue. Veuillez réessayer.",
       }])
     } finally {
       setLoading(false)
     }
   }
 
+  function handleSubmit(e) {
+    e.preventDefault()
+    ask(input)
+  }
+
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Ask the news</h1>
-      <p className={styles.subtitle}>Ask a question and get an answer grounded in recent articles</p>
+      <PageHeader
+        title="Assistant IA"
+        subtitle="Posez une question et obtenez une réponse fondée sur les articles récents, avec ses sources."
+      />
 
       <div className={styles.chatBox}>
         <div className={styles.messages}>
           {messages.length === 0 && !loading && (
             <div className={styles.empty}>
               <MessageCircle size={28} className={styles.emptyIcon} />
-              <p>Ask something like "What's happening in Tunisian politics this week?"</p>
+              <p>Essayez une question comme&nbsp;:</p>
+              <div className={styles.suggestions}>
+                {SUGGESTIONS.map(s => (
+                  <button key={s} type="button" className={styles.suggestion} onClick={() => ask(s)}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -69,7 +89,7 @@ export default function Chat() {
                 </div>
                 {m.sources && m.sources.length > 0 && (
                   <div className={styles.sources}>
-                    <div className={styles.sourcesLabel}>Sources</div>
+                    <div className={styles.sourcesLabel}>Sources citées</div>
                     <ul className={styles.sourcesList}>
                       {m.sources.map((source) => (
                         <li key={source.id}>
@@ -96,7 +116,7 @@ export default function Chat() {
               <div className={styles.messageIcon}><Bot size={16} /></div>
               <div className={styles.messageBody}>
                 <div className={styles.loadingText}>
-                  <Loader2 size={14} className={styles.spin} /> Thinking...
+                  <Loader2 size={14} className={styles.spin} /> Réflexion…
                 </div>
               </div>
             </div>
@@ -110,7 +130,7 @@ export default function Chat() {
             className={styles.input}
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Ask a question about the news..."
+            placeholder="Posez une question sur l'actualité…"
             disabled={loading}
             autoFocus
           />
