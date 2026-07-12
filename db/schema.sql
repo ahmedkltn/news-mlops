@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS articles (
     image_url    TEXT,
     categories   TEXT[],
     summary      TEXT,
-    story_id     INTEGER
+    story_id     INTEGER,
+    region       TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_articles_topic ON articles(topic_id);
@@ -24,6 +25,7 @@ CREATE INDEX IF NOT EXISTS idx_articles_source ON articles(source);
 CREATE INDEX IF NOT EXISTS idx_articles_scraped_at ON articles(scraped_at);
 CREATE INDEX IF NOT EXISTS idx_articles_published_at ON articles(published_at);
 CREATE INDEX IF NOT EXISTS idx_articles_story ON articles(story_id);
+CREATE INDEX IF NOT EXISTS idx_articles_region ON articles(region);
 
 CREATE TABLE IF NOT EXISTS entities (
     id          SERIAL PRIMARY KEY,

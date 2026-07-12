@@ -117,6 +117,7 @@ def save_articles(articles: list[dict]) -> int:
             a.get("topic_id"), a.get("topic_label"),
             a.get("sentiment"), a.get("embedding"),
             a.get("published_at"), a.get("image_url"), a.get("categories"),
+            a.get("region"),
         )
         for a in articles
     ]
@@ -125,7 +126,7 @@ def save_articles(articles: list[dict]) -> int:
         INSERT INTO articles (
             url, source, title, content, language,
             topic_id, topic_label, sentiment, embedding,
-            published_at, image_url, categories
+            published_at, image_url, categories, region
         )
         VALUES %s
         ON CONFLICT (url) DO UPDATE SET
@@ -135,7 +136,8 @@ def save_articles(articles: list[dict]) -> int:
             embedding   = EXCLUDED.embedding,
             published_at = EXCLUDED.published_at,
             image_url   = EXCLUDED.image_url,
-            categories  = EXCLUDED.categories
+            categories  = EXCLUDED.categories,
+            region      = EXCLUDED.region
     """
 
     try:

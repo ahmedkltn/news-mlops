@@ -8,6 +8,7 @@ def get_articles(
     source: str = Query(None),
     sentiment: str = Query(None),
     topic_id: int = Query(None),
+    region: str = Query(None),
     limit: int = Query(20, le=100),
     offset: int = Query(0),
 ):
@@ -26,13 +27,20 @@ def get_articles(
     if topic_id is not None:
         filters.append("topic_id = %s")
         params.append(topic_id)
+    if region is not None:
+        # region=national selects the untagged bucket
+        if region in ("national", "null", ""):
+            filters.append("region IS NULL")
+        else:
+            filters.append("region = %s")
+            params.append(region)
 
     where = f"WHERE {' AND '.join(filters)}" if filters else ""
     params.extend([limit, offset])
 
     cur.execute(f"""
         SELECT id, url, source, title, language, sentiment,
-               topic_id, topic_label, scraped_at, image_url, published_at
+               topic_id, topic_label, scraped_at, image_url, published_at, region
         FROM articles
         {where}
         ORDER BY scraped_at DESC
@@ -56,6 +64,7 @@ def get_articles(
             "scraped_at": r[8],
             "image_url": r[9],
             "published_at": r[10],
+            "region": r[11],
         }
         for r in rows
     ]
@@ -124,6 +133,37 @@ def timeline(days: int = Query(30, ge=1, le=365)):
     return [{"date": str(r[0]), "positive": r[1], "neutral": r[2], "negative": r[3]}
             for r in rows]
 
+@router.get("/regions")
+def regions_aggregate():
+    """Per-governorate counts + sentiment split for the map (incl. NULL bucket)."""
+    conn = get_connection(); cur = conn.cursor()
+    cur.execute("""
+        SELECT region,
+               COUNT(*)                                        AS total,
+               COUNT(*) FILTER (WHERE sentiment = 'positive')  AS pos,
+               COUNT(*) FILTER (WHERE sentiment = 'neutral')   AS neu,
+               COUNT(*) FILTER (WHERE sentiment = 'negative')  AS neg
+        FROM articles
+        GROUP BY region
+    """)
+    rows = cur.fetchall()
+    cur.close(); conn.close()
+
+    def dominant(pos, neu, neg):
+        pairs = {"positive": pos, "neutral": neu, "negative": neg}
+        return max(pairs, key=pairs.get) if (pos or neu or neg) else None
+
+    return [
+        {
+            "region": r[0],  # None => national bucket
+            "count": r[1],
+            "sentiments": {"positive": r[2], "neutral": r[3], "negative": r[4]},
+            "dominant": dominant(r[2], r[3], r[4]),
+        }
+        for r in rows
+    ]
+
+
 @router.get("/{article_id}")
 def get_article(article_id: int):
     conn = get_connection()
@@ -132,7 +172,7 @@ def get_article(article_id: int):
     cur.execute("""
         SELECT id, url, source, title, content, language,
                sentiment, topic_id, topic_label, scraped_at,
-               image_url, published_at
+               image_url, published_at, region
         FROM articles WHERE id = %s
     """, (article_id,))
 
@@ -157,4 +197,5 @@ def get_article(article_id: int):
         "scraped_at": row[9],
         "image_url": row[10],
         "published_at": row[11],
+        "region": row[12],
     }
