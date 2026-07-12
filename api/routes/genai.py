@@ -26,7 +26,11 @@ def summary(article_id: int):
         return {"summary": cached}
 
     text = complete(
-        user=f"Résume cet article tunisien en 2 phrases claires, en français :\n\n{title}\n{(content or '')[:2000]}",
+        system="Tu résumes des actualités tunisiennes en français, en 1 à 2 "
+               "phrases claires. Base-toi UNIQUEMENT sur le titre et le texte "
+               "fournis, même s'ils sont courts. Ne demande jamais d'autres "
+               "informations et n'ajoute aucun commentaire — donne seulement le résumé.",
+        user=f"Titre : {title}\n\nTexte : {(content or '').strip()[:2000] or '(aucun corps fourni)'}",
         max_tokens=160,
         model=model_for("summary", FAST_MODEL),
     )
