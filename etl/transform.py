@@ -23,7 +23,7 @@ def _get_embedding_model():
     if _embedding_model is None:
         from sentence_transformers import SentenceTransformer
         logger.info("Loading embedding model…")
-        _embedding_model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+        _embedding_model = SentenceTransformer("intfloat/multilingual-e5-small")
     return _embedding_model
 
 
@@ -46,9 +46,17 @@ def _get_sentiment_pipeline():
 # ── Public helpers ─────────────────────────────────────────────────────────────
 
 def get_embedding(text: str) -> list[float]:
+    """Embed a SEARCH QUERY (e5 'query:' prefix)."""
     model = _get_embedding_model()
-    embedding = model.encode(f"passage: {text}", normalize_embeddings=True)
-    return embedding.tolist()
+    emb = model.encode(f"query: {text}", normalize_embeddings=True)
+    return emb.tolist()
+
+
+def get_passage_embedding(text: str) -> list[float]:
+    """Embed a DOCUMENT (e5 'passage:' prefix)."""
+    model = _get_embedding_model()
+    emb = model.encode(f"passage: {text}", normalize_embeddings=True)
+    return emb.tolist()
 
 
 def get_sentiment(text: str) -> str:
@@ -59,6 +67,19 @@ def get_sentiment(text: str) -> str:
     except Exception as e:
         logger.warning(f"Sentiment failed: {e}")
         return "neutral"
+
+
+def get_sentiments(texts: list[str]) -> list[str]:
+    if not texts:
+        return []
+    try:
+        pipe = _get_sentiment_pipeline()
+        results = pipe([t[:1000] for t in texts], batch_size=16)
+        assert len(results) == len(texts)
+        return [SENTIMENT_MAP.get(r["label"].lower(), "neutral") for r in results]
+    except Exception as e:
+        logger.warning(f"Batch sentiment failed: {e}")
+        return ["neutral"] * len(texts)
 
 
 def transform_articles(articles: list[Article]) -> list[dict]:
@@ -77,15 +98,17 @@ def transform_articles(articles: list[Article]) -> list[dict]:
         show_progress_bar=True,
     )
 
+    sentiments = get_sentiments(
+        [f"{a.title or ''} {a.content or ''}" for a in articles]
+    )
+
     transformed = []
     for i, article in enumerate(articles):
         text = texts[i].replace("passage: ", "", 1)
         if not text.strip():
             continue
 
-        sentiment = get_sentiment(
-            f"{article.title or ''} {article.content or ''}"[:1000]
-        )
+        sentiment = sentiments[i]
 
         transformed.append({
             "url":        article.url,
@@ -94,6 +117,8 @@ def transform_articles(articles: list[Article]) -> list[dict]:
             "content":    article.content,
             "language":   article.language,
             "published_at": article.published_at,
+            "image_url":  article.image_url,
+            "categories": article.categories,
             "embedding":  embeddings[i].tolist(),
             "sentiment":  sentiment,
             "topic_id":   None,

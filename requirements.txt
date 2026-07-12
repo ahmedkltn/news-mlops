@@ -2,6 +2,8 @@
 requests
 beautifulsoup4
 lxml
+pydantic
+feedparser
 
 # Database
 psycopg2-binary
@@ -15,6 +17,9 @@ hdbscan
 transformers
 torch
 spacy
+
+# GenAI (OpenAI-compatible client — Groq / Gemini / OpenRouter)
+openai
 
 # MLOps
 prefect>=3.0.0

@@ -4,9 +4,26 @@ import os
 import numpy as np
 from dotenv import load_dotenv
 from etl.load import get_connection
+from etl.labels import label_topics
 
 load_dotenv(override=False)
 logger = logging.getLogger(__name__)
+
+mlflow = None
+
+
+def log_clustering_run(n_topics: int, outlier_pct: float, min_cluster_size: int):
+    global mlflow
+    if mlflow is None:
+        import mlflow as _mlflow
+        mlflow = _mlflow
+    mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000"))
+    mlflow.set_experiment("news-clustering")
+    with mlflow.start_run():
+        mlflow.log_params({"embed_model": "intfloat/multilingual-e5-small",
+                           "min_cluster_size": min_cluster_size})
+        mlflow.log_metrics({"n_topics": n_topics, "outlier_pct": outlier_pct})
+        (mlflow.log_artifacts if os.path.isdir("models/bertopic_model") else mlflow.log_artifact)("models/bertopic_model")
 
 
 def load_articles_for_clustering() -> tuple[list[int], list[str], list[list[float]]]:
@@ -97,11 +114,27 @@ def run_clustering(min_cluster_size: int = 3) -> dict:
     for tid, label in topic_labels.items():
         logger.info(f"  Topic {tid}: {label}")
 
+    try:
+        topic_keywords = {
+            tid: [w for w, _ in topic_model.get_topic(tid)]
+            for tid in topic_labels
+        }
+        topic_labels = label_topics(topic_keywords)
+        logger.info("Generated human-readable topic labels via Claude Haiku")
+    except Exception:
+        logger.warning("Failed to generate LLM topic labels, falling back to raw BERTopic names", exc_info=True)
+
     os.makedirs("models", exist_ok=True)
     topic_model.save("models/bertopic_model")
     logger.info("Model saved to models/bertopic_model")
 
     update_topics(ids, topics, topic_labels)
+
+    outlier_pct = topics.count(-1) / max(len(topics), 1)
+    try:
+        log_clustering_run(len(topic_labels), outlier_pct, min_cluster_size)
+    except Exception:
+        logger.warning("Failed to log clustering run to MLflow", exc_info=True)
 
     return {
         "status": "done",

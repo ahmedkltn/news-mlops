@@ -32,7 +32,7 @@ def get_articles(
 
     cur.execute(f"""
         SELECT id, url, source, title, language, sentiment,
-               topic_id, topic_label, scraped_at
+               topic_id, topic_label, scraped_at, image_url, published_at
         FROM articles
         {where}
         ORDER BY scraped_at DESC
@@ -54,6 +54,8 @@ def get_articles(
             "topic_id": r[6],
             "topic_label": r[7],
             "scraped_at": r[8],
+            "image_url": r[9],
+            "published_at": r[10],
         }
         for r in rows
     ]
@@ -106,6 +108,22 @@ def get_topics():
         for r in rows
     ]
 
+@router.get("/timeline")
+def timeline(days: int = Query(30, ge=1, le=365)):
+    conn = get_connection(); cur = conn.cursor()
+    cur.execute("""
+        SELECT COALESCE(published_at::date, scraped_at::date) AS d,
+               COUNT(*) FILTER (WHERE sentiment='positive') AS pos,
+               COUNT(*) FILTER (WHERE sentiment='neutral')  AS neu,
+               COUNT(*) FILTER (WHERE sentiment='negative') AS neg
+        FROM articles
+        WHERE COALESCE(published_at, scraped_at) >= NOW() - (%s || ' days')::interval
+        GROUP BY d ORDER BY d
+    """, (days,))
+    rows = cur.fetchall(); cur.close(); conn.close()
+    return [{"date": str(r[0]), "positive": r[1], "neutral": r[2], "negative": r[3]}
+            for r in rows]
+
 @router.get("/{article_id}")
 def get_article(article_id: int):
     conn = get_connection()
@@ -113,7 +131,8 @@ def get_article(article_id: int):
 
     cur.execute("""
         SELECT id, url, source, title, content, language,
-               sentiment, topic_id, topic_label, scraped_at
+               sentiment, topic_id, topic_label, scraped_at,
+               image_url, published_at
         FROM articles WHERE id = %s
     """, (article_id,))
 
@@ -136,4 +155,6 @@ def get_article(article_id: int):
         "topic_id": row[7],
         "topic_label": row[8],
         "scraped_at": row[9],
+        "image_url": row[10],
+        "published_at": row[11],
     }

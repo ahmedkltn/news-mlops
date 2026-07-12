@@ -1,0 +1,71 @@
+import logging
+import feedparser
+from typing import Optional
+from scrapers.base import BaseScraper, Article
+
+logger = logging.getLogger(__name__)
+
+
+def fetch_og_image(html: str) -> Optional[str]:
+    from bs4 import BeautifulSoup
+    tag = BeautifulSoup(html, "lxml").find("meta", property="og:image")
+    return tag.get("content") if tag and tag.get("content") else None
+
+
+def _entry_to_article(entry, source: str, language: str) -> Optional[Article]:
+    title = entry.get("title")
+    link = entry.get("link")
+    # Prefer full content, fall back to summary
+    content = ""
+    if entry.get("content"):
+        content = entry["content"][0].get("value", "")
+    content = content or entry.get("summary", "")
+    # Strip HTML tags
+    from bs4 import BeautifulSoup
+    content = " ".join(BeautifulSoup(content, "lxml").get_text(" ").split())
+
+    categories = [t.get("term") for t in entry.get("tags", []) if t.get("term")]
+    published_at = entry.get("published") or entry.get("updated")
+
+    image_url = None
+    if entry.get("media_content"):
+        image_url = entry["media_content"][0].get("url")
+    elif entry.get("links"):
+        for l in entry["links"]:
+            if (l.get("type") or "").startswith("image"):
+                image_url = l.get("href"); break
+
+    if not link or not title or not content:
+        return None
+    try:
+        return Article(url=link, source=source, title=title, content=content,
+                       language=language, categories=categories,
+                       published_at=published_at, image_url=image_url)
+    except Exception as e:
+        logger.warning(f"[{source}] skip entry: {e}")
+        return None
+
+
+def parse_feed(xml: str, source: str, language: str) -> list[Article]:
+    feed = feedparser.parse(xml)
+    out = [_entry_to_article(e, source, language) for e in feed.entries]
+    return [a for a in out if a]
+
+
+class RSSScraper(BaseScraper):
+    def __init__(self, source: str, feed_url: str, language: str):
+        super().__init__(source=source, base_url=feed_url, language=language, max_pages=1)
+        self.feed_url = feed_url
+
+    def get_article_urls(self, page: int) -> list[str]:
+        return []  # not used — RSS scrape is overridden below
+
+    def parse_article(self, url: str):
+        return None
+
+    def scrape(self) -> list[Article]:
+        resp = self.session.get(self.feed_url, timeout=15)
+        resp.raise_for_status()
+        articles = parse_feed(resp.text, self.source, self.language)
+        logger.info(f"[{self.source}] RSS: {len(articles)} articles")
+        return articles
