@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>News Insight Presentation</title>
+<style>
+:root{
+  --ink:#172033; --ink-soft:#3d4a5e; --muted:#6b7889;
+  --bg:#ffffff; --panel:#f4f6fa; --line:#d7dde6; --line-2:#b9c2d1;
+  --accent:#1f3a5f; --accent-2:#2f5a86; --accent-soft:#eaeff6;
+  --serif:Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--ink);background:#dfe4ea;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+#deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+.slide{position:absolute;inset:0;background:var(--bg);padding:60px 84px;display:none;flex-direction:column;overflow:hidden}
+.slide.active{display:flex}
+
+/* headline (assertion) — serif with a hairline + short accent rule */
+.assert{font-family:var(--serif);font-size:31px;font-weight:700;line-height:1.16;color:var(--ink);max-width:1090px;
+  padding-bottom:15px;margin-bottom:26px;border-bottom:1px solid var(--line);position:relative}
+.assert::after{content:"";position:absolute;left:0;bottom:-1px;width:62px;height:3px;background:var(--accent)}
+.assert.sm{font-size:27px}
+.eyebrow{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-2);margin-bottom:10px}
+.cap{font-family:var(--sans);font-size:15.5px;line-height:1.45;color:var(--ink-soft);text-align:center;max-width:1000px;margin:18px auto 0}
+.cap b{color:var(--ink);font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;justify-content:center;z-index:2}
+code{font-family:ui-monospace,"Cascadia Code",Consolas,monospace;background:var(--panel);color:var(--accent);padding:1px 6px;border-radius:4px;font-size:.9em;border:1px solid var(--line)}
+
+/* title slide */
+.title-slide{justify-content:center;align-items:center;text-align:center;padding:0 96px}
+.title-head{display:flex;align-items:center;justify-content:space-between;position:absolute;top:52px;left:96px;right:96px;
+  padding-bottom:18px;border-bottom:1px solid var(--line)}
+.title-head .inst{font-family:var(--serif);font-weight:700;font-size:19px;color:var(--ink)}
+.title-head .prog{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.title-slide h1{font-family:var(--serif);font-size:56px;font-weight:700;color:var(--ink);line-height:1.05;margin:6px 0 14px}
+.title-sub{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--accent-2);margin-bottom:26px}
+.title-rule{width:100%;height:1px;background:var(--line);margin-bottom:26px}
+.people{display:flex;gap:80px;justify-content:center}
+.people .col span{display:block;font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+.people .col li{list-style:none;font-size:19px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.title-foot{position:absolute;bottom:48px;left:96px;right:96px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:15px;font-weight:600;color:var(--ink-soft)}
+
+/* agenda */
+.agenda-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 56px;z-index:2}
+.ag{display:flex;gap:20px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line)}
+.ag .n{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--accent);line-height:1;min-width:46px}
+.ag .t{font-size:22px;font-weight:700;color:var(--ink)}
+.ag .d{font-size:15px;color:var(--muted);font-weight:500;margin-top:3px}
+
+/* divider — solid navy */
+.divider{background:var(--accent);color:#fff;justify-content:center;padding-left:96px}
+.divider .act-k{font-family:var(--sans);font-size:15px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:rgba(255,255,255,.6);margin-bottom:16px}
+.divider h2{font-family:var(--serif);font-size:52px;font-weight:700;color:#fff;line-height:1.05}
+.divider .sub-note{font-family:var(--serif);font-style:italic;font-size:20px;color:rgba(255,255,255,.82);margin-top:18px;max-width:680px}
+.divider .drule{width:70px;height:3px;background:rgba(255,255,255,.7);margin-bottom:22px}
+
+/* node diagrams */
+.dg{display:flex;flex-direction:column;align-items:center;gap:11px;width:100%;z-index:2}
+.dg-row{display:flex;align-items:stretch;justify-content:center;gap:11px;width:100%}
+.dbox{flex:1;background:#fff;border:1px solid var(--line-2);border-radius:6px;padding:13px 12px;text-align:center;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.dbox .t{font-size:18px;font-weight:700;color:var(--ink);line-height:1.15}
+.dbox .s{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:4px;line-height:1.25}
+.dbox.db{background:var(--accent-soft);border-color:#c4d1e2}.dbox.db .t{color:var(--accent)}
+.dbox.acc{background:var(--accent);border-color:var(--accent)}.dbox.acc .t{color:#fff}.dbox.acc .s{color:#c7d3e3}
+.dbox.ghost{border-style:dashed;background:var(--panel)}.dbox.ghost .t{color:var(--ink-soft)}
+.dg-down{display:flex;flex-direction:column;align-items:center;color:var(--accent)}
+.dg-down .dl{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:1px}
+.dg-down .ar{font-size:19px;font-weight:800;line-height:.7}
+.dg-lane{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--accent-2);align-self:flex-start}
+.dg.arch{gap:7px}
+.dg.arch .dbox{padding:10px 12px}
+.dg.arch .dbox .t{font-size:17px}
+.dg.arch .dbox .s{font-size:12px;margin-top:2px}
+.dg.arch .dg-lane{margin:0}
+
+/* labelled arrows (fix "how things connect") */
+.da{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 auto;color:var(--accent);min-width:46px}
+.da .dl{font-size:10.5px;font-weight:600;color:var(--muted);margin-bottom:1px;white-space:nowrap;text-transform:none}
+.da .ar{font-size:20px;font-weight:800;line-height:1}
+.hflow{display:flex;align-items:stretch;justify-content:center;gap:6px;flex-wrap:nowrap;z-index:2}
+.hflow .dbox{flex:1 1 0;min-width:0;max-width:196px;padding:20px 12px}
+.hflow .dbox .t{font-size:18px}
+.hflow .dbox .s{font-size:12px;margin-top:5px}
+
+/* icon flow (problem/solution) */
+.flow{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;z-index:2}
+.node{background:#fff;border:1px solid var(--line-2);border-radius:8px;padding:24px 26px;min-width:190px;text-align:center}
+.node .ic{width:56px;height:56px;margin:0 auto 12px;border-radius:8px;background:var(--panel);border:1px solid var(--line);display:grid;place-items:center}
+.node .ic svg{width:30px;height:30px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.node .lbl{font-size:20px;font-weight:700;color:var(--ink)}
+.node .sub{font-size:13.5px;color:var(--muted);margin-top:4px}
+.node.accent{background:var(--accent);border-color:var(--accent)}
+.node.accent .lbl{color:#fff}.node.accent .sub{color:#c7d3e3}.node.accent .ic{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25)}
+.node.accent .ic svg{stroke:#fff}
+.arrow{color:var(--accent);font-size:26px;font-weight:800}
+
+/* orchestration rail + monitoring strip */
+.rail{display:flex;gap:9px;justify-content:center;flex-wrap:wrap}
+.rail .pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink-soft);background:#fff;border:1px solid var(--line-2);border-radius:5px;padding:6px 12px}
+.rail .pill b{color:var(--accent);font-weight:700}
+.rail .pill.ext{color:#7a5b12;background:#fbf6e9;border-color:#e6d9b3}
+.monitor{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;z-index:2}
+.monitor .mlabel{font-family:ui-monospace,monospace;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-soft);border:1px solid #c4d1e2;border-radius:5px;padding:6px 12px}
+.monitor .mchip{font-family:ui-monospace,monospace;font-size:12.5px;font-weight:500;color:var(--ink-soft);background:#fff;border:1px solid var(--line-2);border-radius:5px;padding:6px 11px}
+
+/* legend */
+.legend{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:14px;z-index:2}
+.legend .li{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:600}
+.legend .sw{width:26px;border-top:2px solid var(--accent)}
+.legend .sw.dash{border-top:2px dashed var(--muted)}
+.legend .sw.ext{border-top:2px dashed #b8901f}
+
+/* figure (screenshots, report style) */
+.fig{margin:2px auto 0;max-width:880px;width:100%;z-index:2}
+.fig img{display:block;width:100%;height:auto;border:1px solid var(--line-2);border-radius:4px}
+.fig figcaption{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--muted);text-align:center;margin-top:12px}
+
+/* schema */
+.schema{width:100%;display:flex;flex-direction:column;gap:12px;z-index:2}
+.tbl{border:1px solid var(--line-2);border-radius:6px;overflow:hidden;background:#fff}
+.tbl .hd{background:var(--accent);color:#fff;font-weight:700;font-size:17px;padding:9px 15px;display:flex;justify-content:space-between;align-items:center;font-family:ui-monospace,monospace}
+.tbl .hd .pill{font-size:11px;font-weight:600;background:rgba(255,255,255,.16);padding:2px 9px;border-radius:4px}
+.grp{padding:8px 14px}.grp+.grp{border-top:1px solid var(--line)}
+.grp .gl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.cols{display:flex;flex-wrap:wrap;gap:6px}
+.cc{font-family:ui-monospace,monospace;font-size:12.5px;font-weight:500;color:var(--ink-soft);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:3px 9px}
+.cc.key{background:var(--accent-soft);border-color:#c4d1e2;color:var(--accent);font-weight:600}
+.cc.vec{background:#eef4ee;border-color:#c3ddc3;color:#2f6b34;font-weight:600}
+.side-tbls{display:flex;gap:12px}
+.mini{flex:1;border:1px solid var(--line-2);border-radius:6px;overflow:hidden;background:#fff}
+.mini .mh{background:var(--panel);font-weight:700;font-size:14px;padding:7px 11px;color:var(--accent);font-family:ui-monospace,monospace}
+.mini .mb{padding:8px 11px;font-size:12.5px;color:var(--ink-soft);line-height:1.55}
+
+/* containers */
+.containers{display:flex;gap:13px;justify-content:center;flex-wrap:wrap;z-index:2}
+.ctr{border:1px solid var(--line-2);border-radius:6px;background:#fff;width:200px;overflow:hidden}
+.ctr .ch{background:var(--ink);color:#cfd8e4;font-size:12.5px;font-weight:600;padding:8px 13px;font-family:ui-monospace,monospace;display:flex;gap:8px;align-items:center}
+.ctr .ch::before{content:"";width:8px;height:8px;border-radius:50%;background:#4f9a52}
+.ctr .cb{padding:20px 12px;text-align:center}
+.ctr .cb .n{font-size:18px;font-weight:700;color:var(--ink)}
+.ctr .cb .p{font-size:12.5px;color:var(--muted);font-family:ui-monospace,monospace;margin-top:5px}
+
+/* logos */
+.logos{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:center;z-index:2}
+.logos .lg{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line-2);border-radius:6px;padding:13px 19px}
+.logos .lg img{height:28px;width:auto}
+.logos .lg span{font-size:15px;font-weight:600;color:var(--ink-soft)}
+
+/* stats */
+.bigstats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);z-index:2}
+.bigstat{padding:26px 18px;text-align:center;border-right:1px solid var(--line)}
+.bigstat:last-child{border-right:none}
+.bigstat .k{font-family:var(--serif);font-size:46px;font-weight:700;color:var(--accent);line-height:1}
+.bigstat .v{font-size:14px;color:var(--ink-soft);font-weight:500;margin-top:10px;line-height:1.3}
+
+/* future / conclusion */
+.fgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 40px;z-index:2}
+.fchip{padding:20px 0;border-top:1px solid var(--line)}
+.fchip .ft{font-size:19px;font-weight:700;color:var(--ink)}
+.fchip .fp{font-size:14px;color:var(--muted);font-weight:500;margin-top:6px}
+.concl{display:flex;flex-direction:column;gap:0;z-index:2;max-width:1000px}
+.concl li{list-style:none;font-size:20px;line-height:1.4;color:var(--ink-soft);padding:15px 0 15px 26px;border-bottom:1px solid var(--line);position:relative}
+.concl li::before{content:"";position:absolute;left:0;top:23px;width:10px;height:10px;background:var(--accent)}
+.concl li b{color:var(--ink);font-weight:700}
+.contrib{display:flex;flex-direction:column;z-index:2;max-width:1020px;margin:0 auto;width:100%}
+.citem{display:flex;gap:24px;align-items:baseline;padding:17px 0;border-bottom:1px solid var(--line)}
+.citem:first-child{border-top:1px solid var(--line)}
+.citem .cn{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--accent);min-width:36px;line-height:1}
+.citem .ct{font-size:20px;font-weight:700;color:var(--ink)}
+.citem .cd{font-size:15.5px;color:var(--ink-soft);margin-top:3px;line-height:1.35}
+
+.thanks{background:var(--accent);color:#fff;align-items:center;justify-content:center;text-align:center}
+.thanks h1{font-family:var(--serif);font-size:68px;color:#fff}
+.thanks p{color:rgba(255,255,255,.82);font-size:21px;margin-top:12px;font-family:var(--serif);font-style:italic}
+
+/* chrome */
+#bar{position:fixed;left:0;bottom:0;height:3px;background:var(--accent);z-index:50;transition:width .25s ease}
+#hud{position:fixed;bottom:13px;right:18px;z-index:50;display:flex;align-items:center;gap:13px;font-family:var(--sans);color:#5b6b7f;font-size:13px;font-weight:600}
+#hud button{background:#fff;border:1px solid var(--line-2);color:var(--ink-soft);width:30px;height:30px;border-radius:5px;cursor:pointer;font-size:15px;line-height:1}
+#count{min-width:52px;text-align:center}#tocbtn{cursor:pointer}
+#toc{position:fixed;inset:0;background:rgba(23,32,51,.96);z-index:60;display:none;padding:70px 8vw;overflow:auto;color:#e7ecf3}
+#toc.open{display:block}
+#toc h3{font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:#8fabce;margin-bottom:24px}
+#toc ol{list-style:none;columns:2;column-gap:60px}
+#toc li{padding:9px 0;font-size:17px;font-weight:500;cursor:pointer;color:#cfd8e4;border-bottom:1px solid rgba(255,255,255,.08)}
+#toc li:hover{color:#fff}#toc li b{color:#8fabce;margin-right:12px;font-variant-numeric:tabular-nums}
+.hint{position:fixed;bottom:13px;left:18px;z-index:50;color:#93a0b2;font-size:12px;font-family:var(--sans)}
+@media print{body{background:#fff}#bar,#hud,.hint,#toc{display:none}}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck">
+
+<!-- 1 · TITLE -->
+<section class="slide title-slide active">
+  <div class="title-head">
+    <div class="inst">TEK-UP University</div>
+    <div class="prog">Data Science &amp; AI · 2025-2026</div>
+  </div>
+  <div class="eyebrow">End-of-Semester Project · MLOps</div>
+  <h1>News Insight</h1>
+  <div class="title-sub">An MLOps platform for Tunisian news analysis</div>
+  <div class="title-rule"></div>
+  <div class="people">
+    <div class="col"><span>Prepared by</span><ul><li>Ahmed Klabi</li><li>Mariem Smadhi</li><li>Hichem Sboui</li></ul></div>
+    <div class="col"><span>Supervisor</span><ul><li>Sawssen Jalel</li></ul></div>
+  </div>
+</section>
+
+<!-- 2 · AGENDA -->
+<section class="slide">
+  <div class="assert">Agenda</div>
+  <div class="agenda-grid">
+    <div class="ag"><div class="n">1</div><div><div class="t">Problem &amp; solution</div><div class="d">what we built, and why</div></div></div>
+    <div class="ag"><div class="n">2</div><div><div class="t">The product</div><div class="d">a tour of the working app</div></div></div>
+    <div class="ag"><div class="n">3</div><div><div class="t">Architecture &amp; pipeline</div><div class="d">how it works, end to end</div></div></div>
+    <div class="ag"><div class="n">4</div><div><div class="t">Contributions &amp; future work</div><div class="d">what we demonstrated, and next steps</div></div></div>
+  </div>
+</section>
+
+<!-- 3 · PROBLEM -->
+<section class="slide">
+  <div class="assert">Tunisian news is scattered across sites, and hard to search or analyse.</div>
+  <div class="body">
+    <div class="flow">
+      <div class="node"><div class="ic"><svg viewBox="0 0 24 24"><path d="M5 5h11v14H6a2 2 0 0 1-2-2z"/><path d="M16 8h4v9a2 2 0 0 1-2 2h-2"/><line x1="8" y1="9" x2="13" y2="9"/><line x1="8" y1="12.5" x2="13" y2="12.5"/><line x1="8" y1="16" x2="11" y2="16"/></svg></div><div class="lbl">4+ sites</div><div class="sub">French &amp; Arabic</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.4"/><rect x="14" y="7" width="6.5" height="6.5" rx="1.4"/><rect x="6" y="14" width="6.5" height="6.5" rx="1.4"/></svg></div><div class="lbl">Fragmented</div><div class="sub">no shared index</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="20.5" y1="20.5" x2="16" y2="16"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div><div class="lbl">No overview</div><div class="sub">no search · no mood · no map</div></div>
+    </div>
+    <div class="cap">To follow the news you visit each site by hand, and still can't search <b>by meaning</b>, see the overall <b>mood</b>, or ask a question.</div>
+  </div>
+</section>
+
+<!-- 4 · SOLUTION -->
+<section class="slide">
+  <div class="assert">One pipeline collects the news, understands it, and serves it.</div>
+  <div class="body">
+    <div class="flow">
+      <div class="node accent"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 14v3a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-3"/><polyline points="8 11 12 15 16 11"/><line x1="12" y1="3.5" x2="12" y2="15"/></svg></div><div class="lbl">Collect</div><div class="sub">scrape 4 sources</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic"><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M10 3.5v3.5M14 3.5v3.5M10 17v3.5M14 17v3.5M3.5 10h3.5M3.5 14h3.5M17 10h3.5M17 14h3.5"/></svg></div><div class="lbl">Understand</div><div class="sub">meaning · mood · topic · region</div></div>
+      <div class="arrow">→</div>
+      <div class="node accent"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12.5" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16.5" x2="12" y2="20"/></svg></div><div class="lbl">Explore</div><div class="sub">read · search · map · ask</div></div>
+    </div>
+    <div class="cap">Automated end to end and usable from one web app, so no step is manual once it runs.</div>
+  </div>
+</section>
+
+<!-- 5 · DIVIDER product -->
+<section class="slide divider"><div class="act-k">Part 02</div><div class="drule"></div><h2>The product</h2>
+  <div class="sub-note">A tour of the working app. The interface is in French, for a Tunisian audience.</div></section>
+
+<!-- 6 · TOUR HOME -->
+<section class="slide">
+  <div class="assert sm">Every source in one feed, tagged by topic and mood.</div>
+  <div class="body"><figure class="fig"><img src="img/shot-home.png" alt="Home feed">
+    <figcaption>Figure 1. One feed across all four sources; each card shows its source, topic and sentiment.</figcaption></figure></div>
+</section>
+
+<!-- 7 · TOUR DASHBOARD -->
+<section class="slide">
+  <div class="assert sm">Sentiment, top topics and trends, at a glance.</div>
+  <div class="body"><figure class="fig"><img src="img/shot-dashboard.png" alt="Dashboard">
+    <figcaption>Figure 2. Sentiment split, the most-covered topics, and a 30-day sentiment trend.</figcaption></figure></div>
+</section>
+
+<!-- 8 · TOUR MAP -->
+<section class="slide">
+  <div class="assert sm">Coverage mapped across all 24 governorates.</div>
+  <div class="body"><figure class="fig"><img src="img/shot-map.png" alt="Map">
+    <figcaption>Figure 3. Each governorate is shaded by article volume or by average sentiment.</figcaption></figure></div>
+</section>
+
+<!-- 9 · TOUR SEARCH -->
+<section class="slide">
+  <div class="assert sm">Search finds articles by meaning, not just keywords.</div>
+  <div class="body"><figure class="fig"><img src="img/shot-search.png" alt="Search">
+    <figcaption>Figure 4. Results are ranked by semantic similarity; each shows its source and sentiment.</figcaption></figure></div>
+</section>
+
+<!-- 10 · TOUR CHAT -->
+<section class="slide">
+  <div class="assert sm">The assistant answers from real articles, and cites its sources.</div>
+  <div class="body"><figure class="fig"><img src="img/shot-chat.png" alt="AI chat">
+    <figcaption>Figure 5. The answer references the exact articles it used, listed as numbered sources.</figcaption></figure></div>
+</section>
+
+<!-- 11 · DIVIDER how it works -->
+<section class="slide divider"><div class="act-k">Part 03</div><div class="drule"></div><h2>Architecture &amp; pipeline</h2>
+  <div class="sub-note">From a web page to a searchable, answerable news feed.</div></section>
+
+<!-- 12 · ARCHITECTURE -->
+<section class="slide">
+  <div class="assert sm">A layered pipeline turns live news sites into a searchable app.</div>
+  <div class="body">
+    <div class="dg arch">
+      <div class="dg-lane">Sources</div>
+      <div class="dg-row">
+        <div class="dbox"><div class="t">RSS scrapers ×4</div><div class="s">La Presse · Business News · Kapitalis · Mosaïque</div></div>
+        <div class="dbox ghost"><div class="t">Kapitalis HTML</div><div class="s">deep-crawl fallback</div></div>
+      </div>
+      <div class="dg-down"><span class="dl">Prefect · scrape → transform → load</span><span class="ar">↓</span></div>
+      <div class="dg-row"><div class="dbox db"><div class="t">PostgreSQL + pgvector</div><div class="s">one articles table · stores text + 384-dim vectors</div></div></div>
+      <div class="dg-lane">Enrichment &nbsp;<span style="color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0">· reads each row, writes back columns</span></div>
+      <div class="dg-row">
+        <div class="dbox"><div class="t">Embeddings</div><div class="s">e5-small · meaning vector</div></div>
+        <div class="dbox"><div class="t">Sentiment</div><div class="s">XLM-R · pos/neu/neg</div></div>
+        <div class="dbox"><div class="t">Topics</div><div class="s">BERTopic · auto-groups</div></div>
+        <div class="dbox"><div class="t">Regions</div><div class="s">gazetteer · place names</div></div>
+        <div class="dbox"><div class="t">GenAI</div><div class="s">LLM · summaries, chat</div></div>
+      </div>
+      <div class="rail"><span class="pill ext"><b>Groq</b> · external LLM</span><span class="pill"><b>MLflow</b> · logs each clustering run</span></div>
+      <div class="dg-down"><span class="dl">FastAPI serves the enriched data</span><span class="ar">↓</span></div>
+      <div class="dg-row"><div class="dbox acc"><div class="t">FastAPI → React + Vite dashboard</div><div class="s">5 routers · articles, search, genai, img, pipeline</div></div></div>
+    </div>
+    <div class="legend">
+      <span class="li"><span class="sw"></span> data flow</span>
+      <span class="li"><span class="sw dash"></span> orchestration / tracking</span>
+      <span class="li"><span class="sw ext"></span> external service</span>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · PIPELINE + MLOps -->
+<section class="slide">
+  <div class="assert sm">Prefect runs the pipeline on a schedule, and logs every run.</div>
+  <div class="body" style="gap:20px">
+    <div style="text-align:center">
+      <div class="dg-lane" style="display:inline-block;color:var(--accent-2);margin-bottom:9px">Orchestration · Prefect flow</div>
+      <div class="rail">
+        <span class="pill"><b>cron</b> 06:00 Africa/Tunis</span>
+        <span class="pill">or HTTP trigger</span>
+        <span class="pill"><b>retries</b> 2× / 60s</span>
+        <span class="pill">idempotent · upsert</span>
+      </div>
+    </div>
+    <div class="hflow">
+      <div class="dbox"><div class="t">Scrape</div><div class="s">RSS / HTML</div></div>
+      <div class="da"><span class="dl">new rows</span><span class="ar">→</span></div>
+      <div class="dbox"><div class="t">Dedup</div><div class="s">ON CONFLICT (url)</div></div>
+      <div class="da"><span class="dl">store</span><span class="ar">→</span></div>
+      <div class="dbox db"><div class="t">articles</div><div class="s">one table</div></div>
+      <div class="da"><span class="dl">enrich</span><span class="ar">→</span></div>
+      <div class="dbox"><div class="t">4 models</div><div class="s">embed · sentiment · theme · region</div></div>
+      <div class="da"><span class="dl">group</span><span class="ar">→</span></div>
+      <div class="dbox"><div class="t">Cluster</div><div class="s">BERTopic · periodic</div></div>
+      <div class="da"><span class="dl">serve</span><span class="ar">→</span></div>
+      <div class="dbox acc"><div class="t">API → UI</div><div class="s">FastAPI</div></div>
+    </div>
+    <div style="text-align:center">
+      <div class="dg-lane" style="display:inline-block;color:var(--accent-2);margin-bottom:9px">Monitoring · one row per run</div>
+      <div class="monitor">
+        <span class="mlabel">pipeline_metrics</span>
+        <span class="mchip">articles_new</span>
+        <span class="mchip">n_topics</span>
+        <span class="mchip">outlier_pct</span>
+        <span class="mchip">sentiment pos/neu/neg</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 · ML & NLP -->
+<section class="slide">
+  <div class="assert sm">Four models label every article; BERTopic finds the topics.</div>
+  <div class="body">
+    <div class="dg">
+      <div class="dg-lane">Per article · each model writes one column</div>
+      <div class="dg-row">
+        <div class="dbox"><div class="t">Embeddings</div><div class="s">text → 384-dim meaning vector<br>(e5-small)</div></div>
+        <div class="dbox"><div class="t">Sentiment</div><div class="s">positive / neutral / negative<br>(XLM-RoBERTa)</div></div>
+        <div class="dbox"><div class="t">Theme</div><div class="s">1 of 10 fixed themes<br>(LLM)</div></div>
+        <div class="dbox"><div class="t">Region</div><div class="s">match place names → governorate<br>(gazetteer + LLM)</div></div>
+      </div>
+      <div class="dg-down"><span class="dl">written to</span><span class="ar">↓</span></div>
+      <div class="dg-row"><div class="dbox db"><div class="t">articles table</div></div></div>
+      <div class="dg-lane" style="margin-top:4px">Periodically · discover topics across the corpus</div>
+      <div class="dg-row">
+        <div class="dbox"><div class="t">BERTopic</div><div class="s">clusters similar articles</div></div>
+        <div class="da"><span class="dl">name</span><span class="ar">→</span></div>
+        <div class="dbox"><div class="t">LLM labels</div><div class="s">human topic names</div></div>
+        <div class="da"><span class="dl">write</span><span class="ar">→</span></div>
+        <div class="dbox"><div class="t">Update</div><div class="s">topic_id · label</div></div>
+        <div class="da"><span class="dl">log</span><span class="ar">→</span></div>
+        <div class="dbox acc"><div class="t">MLflow</div><div class="s">params · metrics · model</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 · RAG -->
+<section class="slide">
+  <div class="assert sm">The assistant answers from the 5 nearest articles, not the model's memory.</div>
+  <div class="body">
+    <div class="hflow" style="gap:4px">
+      <div class="dbox"><div class="t">Question</div><div class="s">plain language</div></div>
+      <div class="da"><span class="dl">e5 embed</span><span class="ar">→</span></div>
+      <div class="dbox"><div class="t">Query vector</div><div class="s">384-dim</div></div>
+      <div class="da"><span class="dl">cosine &lt;=&gt;</span><span class="ar">→</span></div>
+      <div class="dbox db"><div class="t">pgvector search</div><div class="s">5 nearest articles</div></div>
+      <div class="da"><span class="dl">as context</span><span class="ar">→</span></div>
+      <div class="dbox"><div class="t">Groq LLM</div><div class="s">reads only those 5</div></div>
+      <div class="da"><span class="dl">grounded</span><span class="ar">→</span></div>
+      <div class="dbox acc"><div class="t">Answer</div><div class="s">+ cited sources</div></div>
+    </div>
+    <div class="cap"><b>Retrieval-augmented generation (RAG):</b> the model only sees the retrieved articles, so every answer is grounded in the corpus and can cite exactly where it came from.</div>
+  </div>
+</section>
+
+<!-- 16 · ENGINEERING & REPRODUCIBILITY -->
+<section class="slide">
+  <div class="assert sm">Simple to run: one table, one command, all open-source.</div>
+  <div class="body" style="gap:24px">
+    <div>
+      <div class="dg-lane">Data model</div>
+      <div class="cap" style="text-align:left;margin:7px 0 0;max-width:none">A single <code>articles</code> table: enrichment stored as columns, plus a 384-dim vector for search.</div>
+      <div class="cols" style="margin-top:11px">
+        <span class="cc key">id</span><span class="cc key">url</span><span class="cc">source</span><span class="cc">title</span><span class="cc">sentiment</span><span class="cc">topic_label</span><span class="cc">region</span><span class="cc">summary</span><span class="cc vec">embedding vector(384)</span><span class="cc">cosine &lt;=&gt;</span>
+      </div>
+    </div>
+    <div>
+      <div class="dg-lane">Deployment</div>
+      <div class="cap" style="text-align:left;margin:7px 0 0;max-width:none">One <code>docker-compose up</code> starts five services on one network:</div>
+      <div class="cols" style="margin-top:11px">
+        <span class="cc">news_postgres :5432</span><span class="cc">news_api :8000</span><span class="cc">news_frontend :5173</span><span class="cc">news_prefect :4200</span><span class="cc">news_mlflow :5000</span>
+      </div>
+    </div>
+    <div>
+      <div class="dg-lane">Stack · open-source throughout</div>
+      <div class="logos" style="justify-content:flex-start;margin-top:11px">
+        <div class="lg"><img src="img/python.png">Python</div>
+        <div class="lg"><img src="img/postgresql.png">PostgreSQL + pgvector</div>
+        <div class="lg"><img src="img/huggingface.png" style="height:24px"></div>
+        <div class="lg"><img src="img/prefect.png">Prefect</div>
+        <div class="lg"><img src="img/mlflow.png">MLflow</div>
+        <div class="lg"><img src="img/fastapi.png" style="height:22px"></div>
+        <div class="lg"><img src="img/react.png">React</div>
+        <div class="lg"><img src="img/vite.png">Vite</div>
+        <div class="lg"><img src="img/docker.png">Docker</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 19 · CONTRIBUTIONS -->
+<section class="slide">
+  <div class="assert sm">What this project demonstrates.</div>
+  <div class="body">
+    <div class="contrib">
+      <div class="citem"><div class="cn">1</div><div><div class="ct">A complete end-to-end platform</div><div class="cd">From live news sites to a searchable, answerable web app, running today.</div></div></div>
+      <div class="citem"><div class="cn">2</div><div><div class="ct">Search by meaning</div><div class="cd">Semantic retrieval over French and Arabic articles, using pgvector and multilingual embeddings.</div></div></div>
+      <div class="citem"><div class="cn">3</div><div><div class="ct">An assistant that cites its sources</div><div class="cd">Retrieval-augmented answers grounded in the corpus, so nothing is invented.</div></div></div>
+      <div class="citem"><div class="cn">4</div><div><div class="ct">Reproducible MLOps</div><div class="cd">A scheduled, tracked and monitored pipeline; the whole stack starts with one command.</div></div></div>
+    </div>
+    <div class="cap">Current limits: four sources and French-first; Arabic dialect and more sources are the next step.</div>
+  </div>
+</section>
+
+<!-- 20 · FUTURE -->
+<section class="slide">
+  <div class="assert sm">Future work</div>
+  <div class="body">
+    <div class="fgrid" style="grid-template-columns:1fr 1fr;gap:0 48px;max-width:1000px;margin:0 auto">
+      <div class="fchip"><div class="ft">More sources</div><div class="fp">beyond the four feeds</div></div>
+      <div class="fchip"><div class="ft">Arabic dialect</div><div class="fp">content &amp; sentiment</div></div>
+      <div class="fchip"><div class="ft">Named-entity extraction</div><div class="fp">people · places · organisations</div></div>
+      <div class="fchip"><div class="ft">Continuous scheduler</div><div class="fp">run the pipeline in production</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 21 · THANKS -->
+<section class="slide thanks"><h1>Thank you</h1><p>Questions &amp; discussion</p></section>
+
+</div></div>
+
+<div id="bar"></div>
+<div class="hint">← → · Space · F fullscreen · O outline</div>
+<div id="hud">
+  <button id="prev" title="Previous">‹</button>
+  <span id="count">1 / 19</span>
+  <button id="next" title="Next">›</button>
+  <button id="tocbtn" title="Outline">☰</button>
+</div>
+<div id="toc"><h3>Outline · jump to slide</h3><ol id="toclist"></ol></div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const deck=document.getElementById('deck');
+let i=0;
+const titles=["Title","Agenda","Problem","Solution",
+"Part 2 · The product","Home feed","Dashboard","Map","Search","Assistant",
+"Part 3 · How it works","Architecture","Pipeline & ops","ML & NLP","RAG search","Engineering","Contributions","Future work","Thank you"];
+function fit(){const s=Math.min(window.innerWidth/1280,window.innerHeight/720);deck.style.transform=`scale(${s})`;}
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  document.getElementById('count').textContent=`${i+1} / ${slides.length}`;
+  document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';}
+function next(){show(i+1)} function prev(){show(i-1)}
+document.getElementById('next').onclick=next;document.getElementById('prev').onclick=prev;
+window.addEventListener('resize',fit);
+addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();next()}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
+  else if(e.key==='Home')show(0);else if(e.key==='End')show(slides.length-1);
+  else if(e.key.toLowerCase()==='f'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+  else if(e.key.toLowerCase()==='o')toc.classList.toggle('open');
+  else if(e.key==='Escape')toc.classList.remove('open');});
+deck.addEventListener('click',e=>{if(e.target.closest('a,button'))return;const mid=window.innerWidth/2;(e.clientX<mid?prev:next)();});
+const toc=document.getElementById('toc'),tl=document.getElementById('toclist');
+titles.forEach((t,k)=>{const li=document.createElement('li');li.innerHTML=`<b>${String(k+1).padStart(2,'0')}</b>${t}`;
+  li.onclick=()=>{show(k);toc.classList.remove('open')};tl.appendChild(li);});
+document.getElementById('tocbtn').onclick=()=>toc.classList.toggle('open');
+toc.addEventListener('click',e=>{if(e.target===toc)toc.classList.remove('open')});
+let x0=null;addEventListener('touchstart',e=>x0=e.touches[0].clientX,{passive:true});
+addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)(dx<0?next:prev)();x0=null;});
+fit();show(0);
+</script>
+</body>
+</html>
