@@ -1,0 +1,23 @@
+flowchart TB
+    START(["run_extraction() → for scraper<br/>in build_scrapers() (etl/extract.py)"])
+
+    START -->|"active: RSS x4"| R1
+    START -.->|"dormant — commented out<br/>in build_scrapers()"| K1
+
+    R1["GET feed_url<br/>lapresse, businessnews,<br/>kapitalis, mosaique"] --> R2["parse_feed(xml)<br/>feedparser → Article/entry"]
+    R2 --> R3["_enrich_image()<br/>fallback: og:image"]
+    R3 --> VALID2["Article (pydantic)"]
+
+    K1["KapitalisScraper — HTML pagination<br/>for page in 1..max_pages:<br/>get_article_urls(page)"]
+    K1 -->|urls found| K2{"parse_article(url):<br/>fetch() + BeautifulSoup —<br/>title &amp; content present?"}
+    K1 -->|no urls| KSTOP["stop pagination"]
+    K2 -->|"no, skip"| SAVE
+    K2 -->|yes| VALID["Article (pydantic)<br/>non-empty validator"]
+    VALID -.->|"polite_delay, next url"| K1
+
+    VALID --> SAVE
+    KSTOP --> SAVE
+    VALID2 --> SAVE
+
+    SAVE["save_raw_articles() /<br/>save_articles() — etl/load.py"]
+    SAVE --> DB[("PostgreSQL articles<br/>ON CONFLICT(url)")]

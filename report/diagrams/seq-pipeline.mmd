@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant PF as Prefect (news_flow)
+    participant TASK as pipeline_task
+    participant PIPE as run_pipeline (etl/pipeline.py)
+    participant EXT as run_extraction (etl/extract.py)
+    participant SCR as scrapers (Kapitalis, RSS)
+    participant TRF as transform_articles (etl/transform.py)
+    participant LOAD as save_articles (etl/load.py)
+    participant DB as PostgreSQL (articles)
+
+    PF->>TASK: pipeline_task(max_pages)
+    activate TASK
+    TASK->>PIPE: run_pipeline(max_pages)
+    activate PIPE
+    PIPE->>EXT: run_extraction(max_pages)
+    activate EXT
+    EXT->>SCR: scrape()
+    SCR-->>EXT: list[Article]
+    deactivate EXT
+    EXT-->>PIPE: articles
+
+    PIPE->>TRF: transform_articles(articles)
+    activate TRF
+    Note right of TRF: embeddings (e5-small)<br/>sentiment (cardiffnlp)<br/>theme + region (LLM)
+    TRF-->>PIPE: transformed dicts
+    deactivate TRF
+
+    PIPE->>LOAD: save_articles(transformed)
+    activate LOAD
+    LOAD->>DB: INSERT ... ON CONFLICT (url) DO UPDATE
+    DB-->>LOAD: rowcount
+    deactivate LOAD
+    LOAD-->>PIPE: saved
+
+    PIPE->>DB: record_pipeline_metrics(...)
+    PIPE-->>TASK: {extracted, transformed, loaded}
+    deactivate PIPE
+    TASK-->>PF: result
+    deactivate TASK
+    Note over PF,TASK: retries=2, retry_delay_seconds=60 on failure

@@ -1,0 +1,42 @@
+erDiagram
+    articles ||--o{ entities : "has extracted entities"
+
+    articles {
+        serial id PK
+        text url UK "NOT NULL"
+        text source "NOT NULL"
+        text title
+        text content
+        text language
+        timestamp scraped_at "DEFAULT NOW()"
+        int topic_id "idx_articles_topic"
+        text topic_label
+        text sentiment
+        vector384 embedding "pgvector, cosine search"
+        timestamp published_at "idx_articles_published_at"
+        text image_url
+        text_array categories
+        text summary
+        int story_id "idx_articles_story"
+        text region "idx_articles_region, NULL = national"
+    }
+
+    entities {
+        serial id PK
+        int article_id FK "ON DELETE CASCADE"
+        text text "NOT NULL"
+        text label "NOT NULL"
+    }
+
+    pipeline_metrics {
+        serial id PK
+        timestamp run_at "DEFAULT NOW()"
+        text source
+        int articles_new
+        int n_topics
+        real outlier_pct
+        int sentiment_pos
+        int sentiment_neu
+        int sentiment_neg
+        text embed_model
+    }

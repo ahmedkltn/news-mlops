@@ -1,0 +1,25 @@
+flowchart TB
+    Visitor((Visitor))
+    Operator((Operator))
+
+    UC1(["Browse articles<br/>Articles.jsx, Reader.jsx<br/>GET /articles"])
+    UC2(["Semantic search<br/>Search.jsx<br/>GET /search"])
+    UC3(["Ask-the-news chat<br/>ChatWidget.jsx<br/>POST /genai/chat"])
+    UC4(["View topics, themes<br/>&amp; sentiment dashboard<br/>Dashboard.jsx, Carte.jsx"])
+    UC5(["Trigger pipeline<br/>Pipeline.jsx<br/>POST /pipeline/trigger, /cluster"])
+    UC6(["Monitor pipeline runs<br/>Pipeline.jsx status panel"])
+
+    Visitor --> UC1
+    Visitor --> UC2
+    Visitor --> UC3
+    Visitor --> UC4
+
+    Operator --> UC1
+    Operator --> UC2
+    Operator --> UC3
+    Operator --> UC4
+    Operator --> UC5
+    Operator --> UC6
+
+    UC1 ~~~ UC5
+    UC2 ~~~ UC6
