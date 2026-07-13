@@ -1,0 +1,148 @@
+\chapter{Deployment and DevOps}
+
+\section{Introduction}
+\label{sec:deploy-intro}
+\begin{sloppypar}
+Chapter 1 named a containerized deployment ``that any team member can bring up with a single command'' as part of objective O4, and its technology-stack table already gave Docker and Docker Compose their one-line role: ``containerized, single-command deployment of the whole stack'' (Table~\ref{tab:tech-stack}). Every chapter since has read one fragment of that stack from its own vantage point rather than the whole of it: Chapter 4 closed its migrations section by pointing here for how \texttt{db/\allowbreak schema.sql} actually runs inside the container (Section~\ref{sec:migrations}); Chapter 7's monitoring section already read the \texttt{healthcheck} and \texttt{depends\_on} blocks for \texttt{postgres} and \texttt{prefect} (Section~\ref{sec:monitoring}) and its experiment-tracking section already named \texttt{mlflow}'s host-port remapping (Section~\ref{sec:mlflow-tracking}); and Chapter 8's security section read the \texttt{api} service's own host-port mapping, \texttt{"8001:8000"} (Section~\ref{sec:backend-security}), while its API-structure section traced the \texttt{nginx} proxy that lets the dashboard reach that same container without CORS (Section~\ref{sec:api-structure}). This chapter is the first to read \texttt{docker-compose.yml} as one whole artifact rather than five separate mentions: all five services it defines, the two Dockerfiles it builds from this project's own source rather than pulling ready-made (\texttt{api/\allowbreak Dockerfile}, \texttt{frontend/\allowbreak Dockerfile}), the \texttt{.env} file that configures all of them, and the Makefile that wraps the same stack (plus the standalone pipeline scripts it also runs) into the commands the team actually types day to day.
+\end{sloppypar}
+
+\section{Containerization strategy}
+\label{sec:containerization}
+\begin{sloppypar}
+Of the five services \texttt{docker-compose.yml} defines, only two carry a \texttt{build} block; the other three run an unmodified image pulled straight from a registry, because the whole server each one needs already ships inside that image and none of them embeds any of this project's own code. \texttt{postgres} runs \texttt{pgvector/\allowbreak pgvector:pg16}: a PostgreSQL 16 image with the \texttt{vector} extension \texttt{db/\allowbreak schema.sql} enables already compiled in, sparing the project a custom database image just to add one extension; \texttt{prefect} runs \texttt{prefecthq/\allowbreak prefect:3-latest}, matching the \texttt{prefect>=3.0.0} pin Chapter 7 already read from \texttt{requirements.txt} (Section~\ref{sec:orch-choice}); \texttt{mlflow} runs \texttt{ghcr.io/\allowbreak mlflow/\allowbreak mlflow:latest}. \texttt{api} and \texttt{frontend} are the only two built from a \texttt{Dockerfile} in this repository, precisely because they are the only two that carry this project's own source code rather than a generic server.
+\end{sloppypar}
+
+\begin{sloppypar}
+\texttt{api/\allowbreak Dockerfile} builds on \texttt{python:3.11-slim} and installs \texttt{build-essential} and \texttt{libpq-dev} before anything else: native build dependencies \texttt{psycopg2} needs to compile against \texttt{libpq} rather than install from a wheel. Its own comments explain the two decisions that follow: \texttt{PIP\_DEFAULT\_TIMEOUT=180} and \texttt{PIP\_RETRIES=8} are raised because ``big ML wheels; slow mirrors time out on the default 15s,'' and \texttt{torch} is installed in its own separate step, from PyTorch's CPU-only wheel index, before \texttt{requirements.txt} is installed at all, avoiding ``the \textasciitilde2.5GB CUDA wheel stack'' a plain \texttt{pip install} of the unpinned \texttt{torch} dependency in \texttt{requirements.txt} would otherwise pull in, on a container that has no GPU to use it. Only after both steps does the image \texttt{COPY} the rest of the source tree in and set \texttt{CMD} to the same \texttt{uvicorn} invocation Chapter 8 already quoted (Section~\ref{sec:backend-choice}). \texttt{frontend/\allowbreak Dockerfile} instead uses a two-stage build: a first, named stage on \texttt{node:20-alpine} runs \texttt{npm ci} against the committed \texttt{package-lock.json} for a reproducible install, then \texttt{npm run build}, producing a static \texttt{dist/} directory; a second, final stage on \texttt{nginx:alpine} copies only that \texttt{dist/} output and \texttt{nginx.conf} in, discarding the first stage entirely. The Node.js toolchain that compiled the React app (\texttt{node\_modules}, the npm CLI, the Node runtime itself) never reaches the image actually shipped and run; the container that serves the dashboard needs nothing more than \texttt{nginx} and a directory of static files.
+\end{sloppypar}
+
+\section{Service composition}
+\label{sec:service-composition}
+\begin{sloppypar}
+Table~\ref{tab:services} lists all five services \texttt{docker-compose.yml} defines, with the host-side port of each mapping already resolved: the side a developer's browser or \texttt{curl} command actually reaches, as opposed to the container-internal port services address each other by on the compose network. Every service is given an explicit \texttt{container\_name} under a shared \texttt{news\_} prefix (\texttt{news\_postgres}, \texttt{news\_prefect}, \texttt{news\_mlflow}, \texttt{news\_api}, \texttt{news\_frontend}) rather than the auto-generated name Compose would otherwise assign, and all five carry the same \texttt{restart: unless-stopped} policy, a single, uniform choice applied identically whether the service holds state (\texttt{postgres}) or none at all (\texttt{frontend}).
+\end{sloppypar}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{1.7cm}|p{4.6cm}|p{1.7cm}|p{5.9cm}|}
+\hline
+\textbf{Service} & \textbf{Image} & \textbf{Host port} & \textbf{Role} \\
+\hline
+postgres & \texttt{pgvector/\allowbreak pgvector:pg16} & 5433 & Primary datastore: the \texttt{articles} table and pgvector similarity search (Chapter 4). \\
+\hline
+prefect & \texttt{prefecthq/\allowbreak prefect:3-latest} & 4200 & Prefect server (API and UI) backing the \texttt{news-pipeline} flow (Chapter 7). \\
+\hline
+mlflow & \texttt{ghcr.io/\allowbreak mlflow/\allowbreak mlflow:latest} & 5001 & Experiment-tracking UI for BERTopic clustering runs (Chapter 7). \\
+\hline
+api & built from \texttt{api/\allowbreak Dockerfile} & 8001 & FastAPI backend; the five routers Chapter 8 traced. \\
+\hline
+frontend & built from \texttt{frontend/\allowbreak Dockerfile} & 5180 & React dashboard served by \texttt{nginx}, proxying \texttt{/api/} to \texttt{api:8000}. \\
+\hline
+\end{tabular}
+\caption{The five services defined in \texttt{docker-compose.yml}, with each one's host-side port mapping.}
+\label{tab:services}
+\end{table}
+
+\begin{sloppypar}
+The two \texttt{depends\_on} blocks in the file encode a real startup order rather than a cosmetic one. \texttt{api} lists both \texttt{postgres} and \texttt{prefect}, each with \texttt{condition: service\_healthy}, so \texttt{api} only starts once \texttt{postgres}'s \texttt{pg\_isready} check and \texttt{prefect}'s own \texttt{/api/\allowbreak health} check (Chapter 7, Section~\ref{sec:monitoring}) both report healthy, not merely once their containers exist. \texttt{mlflow} is absent from that list entirely, the same asymmetry Chapter 7 already read from the \texttt{healthcheck} side: a slow or crashed \texttt{mlflow} container never blocks \texttt{api} from starting. \texttt{frontend} depends on \texttt{api} with no condition at all: the default, plain \texttt{depends\_on} form only waits for the \texttt{api} container process to start, not for its \texttt{/health} route to actually respond, which matters because, as Chapter 8 already noted, that route is defined directly on the FastAPI app with no corresponding \texttt{healthcheck} block for \texttt{api} to be waited on by (Section~\ref{sec:backend-choice}).
+\end{sloppypar}
+
+\begin{verbatim}
+api:
+  build:
+    context: .
+    dockerfile: api/Dockerfile
+  container_name: news_api
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    POSTGRES_HOST: postgres
+    POSTGRES_PORT: 5432
+    PREFECT_API_URL: http://prefect:4200/api
+    MLFLOW_TRACKING_URI: http://mlflow:5000
+  ports:
+    - "8001:8000"
+  depends_on:
+    postgres:
+      condition: service_healthy
+    prefect:
+      condition: service_healthy
+\end{verbatim}
+\begin{center}
+\textit{Listing~9.1: the \texttt{api} service definition (\texttt{docker-compose.yml}): built from source, its environment overridden to compose-network hostnames, and gated on two dependencies' health rather than their mere existence.}
+\end{center}
+
+\section{Environment configuration}
+\label{sec:env-config}
+\begin{sloppypar}
+\texttt{.env.example} is the single template for every configurable value the stack reads, grouped under three headings: database credentials and connection settings (\texttt{POSTGRES\_USER}, \texttt{POSTGRES\_PASSWORD}, \texttt{POSTGRES\_DB}, \texttt{POSTGRES\_HOST}, \texttt{POSTGRES\_PORT}); the two orchestration and tracking URLs (\texttt{PREFECT\_API\_URL}, \texttt{MLFLOW\_TRACKING\_URI}); and the GenAI provider settings (\texttt{LLM\_API\_KEY}, \texttt{LLM\_BASE\_URL}, an optional \texttt{LLM\_MODEL} plus the three per-feature overrides \texttt{LLM\_MODEL\_SUMMARY}, \texttt{LLM\_MODEL\_LABELS}, \texttt{LLM\_MODEL\_CHAT} Chapter 6 already described). The README's own instructions are explicit that this file is copied, not read directly: \texttt{cp .env.example .env}, then filled in with real values before anything else is started.
+\end{sloppypar}
+
+\begin{sloppypar}
+Only two of the five services reference that file at all: \texttt{postgres} and \texttt{api} both declare \texttt{env\_file: .env}; \texttt{prefect}, \texttt{mlflow}, and \texttt{frontend} need none of its variables and omit the line entirely. \texttt{postgres}'s own \texttt{environment} block additionally re-declares \texttt{POSTGRES\_USER}, \texttt{POSTGRES\_PASSWORD}, and \texttt{POSTGRES\_DB} as \texttt{\${POSTGRES\_USER}}-style references, a second, distinct mechanism from \texttt{env\_file}: Compose substitutes those \texttt{\$\{...\}} placeholders from the same top-level \texttt{.env} file at compose-file parse time, so the same three values reach the official \texttt{postgres} image's own expected variable names through variable substitution, layered on top of \texttt{env\_file} injecting the whole file into the container's process environment directly. \texttt{api}'s own \texttt{environment} block (Listing~9.1) is where the two-context problem Chapter 7 already named for \texttt{MLFLOW\_TRACKING\_URI} (Section~\ref{sec:mlflow-tracking}) is actually resolved: \texttt{.env.example}'s defaults are written for a process running directly on the host (\texttt{localhost} for every host and port), so \texttt{api}'s block overrides four of them (\texttt{POSTGRES\_HOST}, \texttt{POSTGRES\_PORT}, \texttt{PREFECT\_API\_URL}, \texttt{MLFLOW\_TRACKING\_URI}) to the compose-network service names \texttt{postgres}, \texttt{prefect}, and \texttt{mlflow}. The three \texttt{LLM\_*} variables are not among them: nothing in \texttt{docker-compose.yml} overrides \texttt{LLM\_API\_KEY} or \texttt{LLM\_BASE\_URL}, so the containerized \texttt{api} reads the GenAI provider configuration Chapter 6 described straight from \texttt{.env}, identically to a \texttt{make api} run on the host, only the infrastructure hostnames change between the two, never the LLM provider wiring.
+\end{sloppypar}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{3.4cm}|p{4.9cm}|p{5.2cm}|}
+\hline
+\textbf{Variable(s)} & \textbf{\texttt{.env.example} default} & \textbf{Overridden for \texttt{api} in Compose} \\
+\hline
+\texttt{POSTGRES\_HOST} / \texttt{\_PORT} & \texttt{localhost} / \texttt{5432} & \texttt{postgres} / \texttt{5432} \\
+\hline
+\texttt{PREFECT\_API\_URL} & \texttt{http://\allowbreak localhost:4200/\allowbreak api} & \texttt{http://\allowbreak prefect:4200/\allowbreak api} \\
+\hline
+\texttt{MLFLOW\_TRACKING\_URI} & \texttt{http://\allowbreak localhost:5000} & \texttt{http://\allowbreak mlflow:5000} \\
+\hline
+\texttt{LLM\_API\_KEY} / \texttt{\_BASE\_URL} & Groq free tier (\texttt{REPLACE\_ME} key) & not overridden \\
+\hline
+\end{tabular}
+\caption{Environment variables consumed by the \texttt{api} service: which ones Compose rewrites to a container hostname, and which pass through from \texttt{.env} unchanged.}
+\label{tab:envvars}
+\end{table}
+
+\section{Data persistence}
+\label{sec:persistence}
+\begin{sloppypar}
+\texttt{docker-compose.yml} declares exactly two named volumes, \texttt{pgdata} and \texttt{mlflow\_data}, each mounted by exactly one service: \texttt{postgres} mounts \texttt{pgdata} at \texttt{/var/\allowbreak lib/\allowbreak postgresql/\allowbreak data}, and \texttt{mlflow} mounts \texttt{mlflow\_data} at \texttt{/mlflow}: the single directory under which the service's own start command points both its backing store, \texttt{sqlite:///mlflow.db}, and its artifact root, \texttt{/mlflow/artifacts}, so one volume carries both the run metadata and every logged model artifact Chapter 7 described (Section~\ref{sec:mlflow-tracking}). \texttt{api} and \texttt{frontend} mount no volume at all: both are stateless application containers, rebuilt from source on demand rather than accumulating any data of their own between runs.
+\end{sloppypar}
+
+\begin{sloppypar}
+\texttt{postgres} also carries a third mount that is a bind mount rather than a named volume: \texttt{./db/\allowbreak schema.sql:/\allowbreak docker-entrypoint-initdb.d/\allowbreak schema.sql}. This is the mechanism Chapter 4 pointed to when it deferred the question of how the schema it described actually gets created (Section~\ref{sec:migrations}): the official \texttt{postgres}-family entrypoint executes every \texttt{.sql} or \texttt{.sh} file found under \texttt{/docker-entrypoint-initdb.d/} automatically, but only once, the first time the container starts against a data directory that is still empty. On a fresh \texttt{pgdata} volume, this runs \texttt{schema.sql} end to end with no manual step at all: the \texttt{CREATE EXTENSION IF NOT EXISTS vector}, the \texttt{unaccent} extension, and every \texttt{CREATE TABLE IF NOT EXISTS} statement Chapter 4 read in detail. Once that volume already holds a previous run's data, however, the same file is never executed again by the container, by the same official-image convention, so the two additive migration files under \texttt{db/\allowbreak migrations/}, which Chapter 4 already described as ``meant to be run against an already-deployed database'' (Section~\ref{sec:migrations}), have no Compose service, Makefile target, or README step that actually runs them; applying one against a running \texttt{news\_postgres} container is left to a manual \texttt{psql} session, a step the repository documents nowhere.
+\end{sloppypar}
+
+\begin{sloppypar}
+The two volumes also survive a stack teardown differently depending on which Makefile target is used. \texttt{make db-down} runs a plain \texttt{docker-compose down}, which removes containers and networks but leaves \texttt{pgdata} and \texttt{mlflow\_data} intact for the next \texttt{make db} or \texttt{make db-full}; \texttt{make docker-down}, by contrast, runs \texttt{docker-compose down -v}, and the \texttt{-v} flag deletes both named volumes along with the containers: the difference between pausing the stack and discarding every article and every logged clustering run it holds.
+\end{sloppypar}
+
+\section{Developer workflow}
+\label{sec:dev-workflow}
+\begin{sloppypar}
+The Makefile's own header comment states the two supported workflows in one line each. The first, and the one its own default targets are built around, keeps only \texttt{postgres} in Docker and runs everything else as a local process: \texttt{make db} starts just that one service (\texttt{docker-compose up -d postgres}), after which \texttt{make scrape}, \texttt{make transform}, and \texttt{make cluster} run the three pipeline scripts directly on the host, \texttt{make api} runs \texttt{uvicorn} with \texttt{-{}-reload} for live code changes, and \texttt{make frontend} runs the Vite dev server: the exact sequence the README's own ``Pipeline (step by step)'' section documents. Three variables tune the pipeline scripts without editing the Makefile itself: \texttt{PAGES} (default \texttt{5}, how many listing pages \texttt{scripts.scrape} fetches), \texttt{BATCH\_SIZE} (default \texttt{16}, the transform step's embedding/sentiment batch size), and \texttt{MIN\_CLUSTER} (default \texttt{3}, BERTopic's minimum cluster size, Chapter 5), each overridable on the command line, for example \texttt{make scrape PAGES=20}. \texttt{make pipeline} chains \texttt{scrape}, \texttt{transform}, and \texttt{cluster} as one target, the same three steps Chapter 7 was careful to distinguish from the Prefect flow of the same casual name (Section~\ref{sec:flow-design}).
+\end{sloppypar}
+
+\begin{verbatim}
+scrape:
+	python -m scripts.scrape --pages $(PAGES)
+
+transform:
+	python -m scripts.transform --batch-size $(BATCH_SIZE)
+
+cluster:
+	python -m scripts.cluster --min-cluster-size $(MIN_CLUSTER)
+
+# Run all three in sequence
+pipeline: scrape transform cluster
+\end{verbatim}
+\begin{center}
+\textit{Listing~9.2: the pipeline steps (\texttt{Makefile}): three scripts run directly on the host, chained by \texttt{make pipeline}, each tunable through one command-line variable.}
+\end{center}
+
+\begin{sloppypar}
+The second workflow runs the whole system in containers instead: \texttt{make db-full} is \texttt{docker-compose up -d} with no service named, bringing up all five without rebuilding any image, appropriate once the \texttt{api} and \texttt{frontend} images already exist and only their data services need to be (re)started; \texttt{make docker-up} instead runs \texttt{docker-compose up -{}-build}, forcing both custom images to rebuild from the current source tree first: the target to reach for after a change to \texttt{requirements.txt} or the frontend's own \texttt{package.json} or source, neither of which \texttt{db-full} would pick up. \texttt{make install} is the one-time setup step behind either workflow, running \texttt{pip install -r requirements.txt} and \texttt{npm install} under \texttt{frontend/} in sequence. \texttt{make logs} deliberately narrows rather than generalizes: it runs \texttt{docker-compose logs -f api}, tailing only the one service most likely to need debugging (LLM calls, database queries, pipeline triggers) rather than interleaving all five services' output. \texttt{make help} prints a short summary of the targets above; it is, together with the Makefile's own header comment, the closest thing the repository has to written onboarding documentation for a new team member's first day.
+\end{sloppypar}
+
+\section{Conclusion}
+\begin{sloppypar}
+This chapter read \texttt{docker-compose.yml} as the single artifact behind every fragment of it earlier chapters had already touched: two images built from this project's own source (\texttt{api}, on \texttt{python:3.11-slim} with a CPU-only \texttt{torch} install ahead of the rest of \texttt{requirements.txt}, and \texttt{frontend}, a two-stage build that ships only compiled static assets and \texttt{nginx}, never the Node toolchain that built them) alongside three vendor images needing no Dockerfile of their own; a health-gated startup order that lets \texttt{api} wait on \texttt{postgres} and \texttt{prefect} while never waiting on \texttt{mlflow}; a single \texttt{.env} file resolved two different ways depending on whether a variable needs to change between a host process and a container (four of them do, the LLM provider settings do not); and two named volumes, \texttt{pgdata} and \texttt{mlflow\_data}, that give the stack's only two stateful services persistence across a restart, backed by an initialization mechanism that runs \texttt{db/\allowbreak schema.sql} exactly once, on an empty volume, and never again, leaving the two additive migrations Chapter 4 introduced with no automated path onto an already-running database. The Makefile ties both of the workflows this chapter described (pipeline scripts run locally against a single containerized database, or the entire stack run and rebuilt in containers) into the small set of commands a new team member actually needs on their first day. The next chapter turns from how the dashboard is packaged and served to what it actually shows: the React frontend's own views, components, and data-visualization choices.
+\end{sloppypar}

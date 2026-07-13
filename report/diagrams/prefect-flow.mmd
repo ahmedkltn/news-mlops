@@ -1,0 +1,35 @@
+flowchart TD
+    subgraph SCHED["flows/schedule.py"]
+        DEPLOY["Deployment.build_from_flow<br/>name='daily-news-pipeline'<br/>CronSchedule('0 6 * * *', tz=Africa/Tunis)<br/>parameters: max_pages=5"]
+    end
+
+    subgraph MANUAL["Manual trigger"]
+        API["POST /pipeline/trigger<br/>api/routes/pipeline.py"]
+        BG["BackgroundTasks.add_task(news_flow, max_pages)"]
+        API --> BG
+    end
+
+    DEPLOY -->|cron fires 06:00| FLOW
+    BG -->|starts| FLOW
+
+    subgraph PREFECT["flows/news_flow.py"]
+        FLOW["@flow news-pipeline<br/>news_flow(max_pages)"]
+        TASK["@task run-news-pipeline<br/>pipeline_task(max_pages)<br/>retries=2, retry_delay_seconds=60"]
+        FLOW --> TASK
+    end
+
+    TASK -->|calls| PIPE["run_pipeline(max_pages)<br/>etl/pipeline.py"]
+    PIPE -->|extract, transform, load| DB[("PostgreSQL<br/>articles, pipeline_metrics")]
+    PIPE -->|returns| RESULT["{extracted, transformed, loaded}"]
+
+    TASK -.retry on exception<br/>up to 2x, 60s apart.-> TASK
+    RESULT --> TASK
+    TASK --> FLOW
+
+    subgraph OBSERVE["Observability"]
+        UI["Prefect UI<br/>news_prefect:4200"]
+        METRICS["pipeline_metrics table<br/>(articles_new, sentiment split, embed_model)"]
+    end
+
+    FLOW -.flow/task run state.-> UI
+    PIPE -.record_pipeline_metrics.-> METRICS

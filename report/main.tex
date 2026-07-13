@@ -1,0 +1,109 @@
+
+
+%\documentclass[pfe]{./tpl/isipfe}
+\documentclass[]{./tpl/isipfe}
+\graphicspath{{./img/}}
+
+%\usepackage{hyperref}
+
+\input{./tpl/new_commands}
+
+% Force English names for document lists (class defaults are French)
+\renewcommand{\contentsname}{Table of Contents}
+\renewcommand{\listfigurename}{List of Figures}
+\renewcommand{\listtablename}{List of Tables}
+% English minitoc heading (class default is French "Plan")
+\mtcsettitle{minitoc}{Chapter outline}
+
+% Fix footer spacing warning from fancyhdr
+\setlength{\footskip}{14pt}
+
+% Absorb hard-to-break lines (long monospace identifiers/URLs) so text
+% does not protrude into the right margin instead of overflowing as an
+% overfull hbox.
+\setlength{\emergencystretch}{3em}
+\hyphenpenalty=1000
+\sloppy
+
+% Slightly tighter cell padding so wide tables sit inside the text block.
+\setlength{\tabcolsep}{4pt}
+
+
+\makeindex
+
+\begin{document}
+\input{global_config}
+
+\frontmatter
+\input{tpl/cover_page}
+% (removed empty black cover)
+%\include{tpl/cover_page_black}
+
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+\dominitoc
+\tableofcontents
+\adjustmtc
+\thispagestyle{frontmatter}
+
+\listoffigures
+
+\thispagestyle{frontmatter}
+
+\input{acronymes}
+\thispagestyle{frontmatter}
+
+\mainmatter
+\input{introduction}
+\clearpage
+
+\input{chap_01_newsinsight}
+\clearpage
+
+\input{chap_02_newsinsight}
+\clearpage
+
+\input{chap_03_newsinsight}
+\clearpage
+
+\input{chap_04_newsinsight}
+\clearpage
+
+\input{chap_05_newsinsight}
+\clearpage
+
+\input{chap_06_newsinsight}
+\clearpage
+
+\input{chap_07_newsinsight}
+\clearpage
+
+\input{chap_08_newsinsight}
+\clearpage
+
+\input{chap_09_newsinsight}
+\clearpage
+
+\input{chap_10_newsinsight}
+\clearpage
+
+\input{chap_11_newsinsight}
+\clearpage
+
+
+\input{webo_newsinsight}
+\clearpage
+
+% (Disabled: currently no bib entries; avoids "Empty bibliography" warning)
+%\printbibliography[title={Webography},heading=bibintoc]
+
+
+
+% \input{annexes}
+% \clearpage
+
+\backmatter
+\input{./tpl/resume}
+
+\end{document}

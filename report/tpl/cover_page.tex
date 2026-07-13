@@ -1,0 +1,112 @@
+%== It's advised to not modify the content of this file ===%
+% To set your information, go to global_config.tex file    %
+%==========================================================%
+
+\thispagestyle{cover}%
+\newgeometry{bottom=25mm,left=20mm,top=15mm,right=20mm}
+
+% -------------------------
+% Header (logo + ministry)
+% -------------------------
+\noindent
+% Left logo (does not take horizontal space)
+\makebox[0pt][l]{\includegraphics[width=2.6cm]{img/tekup.png}}%
+
+% Centered institution block
+\begin{center}
+    \footnotesize
+    \textbf{Tunisian Republic}\\[1.5mm]
+    \textbf{Ministry of Higher Education and Scientific Research}\\[1.5mm]
+    \textbf{Private School of Engineering and Technology}\\[1.5mm]
+    \textbf{TEK-UP}
+\end{center}
+
+\vskip1.5cm
+
+% -------------------------
+% Report title block
+% -------------------------
+\begin{center}
+{\LARGE{\textbf{\textsc{End-of-Semester Project Report}}}}\\[0.5cm]
+\large
+{\textbf{Submitted in partial fulfillment of the requirements for}}\\[2mm]
+{\textbf{\@diplomaName}}\\
+{\textbf{Specialty: \@speciality}}\\
+\end{center}
+
+\vskip0.8cm
+
+% -------------------------
+% Authors
+% -------------------------
+\begin{center}
+\textrm{Prepared by}\\[0.3cm]
+{\ifthenelse{\boolean{isBinomal}}
+    {% IF TRUE (multiple authors)
+        \Large\textbf{\@author}\\
+        \Large\textbf{\@secondAuthor}%
+        \ifx\@thirdAuthor\@empty\else\\\Large\textbf{\@thirdAuthor}\fi%
+        \ifx\@fourthAuthor\@empty\else\\\Large\textbf{\@fourthAuthor}\fi%
+    }
+    {\Large\textbf{\@author}}% FALSE
+}
+\end{center}
+\vskip12mm
+
+% -------------------------
+% Project title in box
+% -------------------------
+\definecolor{isiBlue}{RGB}{31, 78, 121}
+
+\begin{center}
+\begin{minipage}{0.95\textwidth}
+\begin{tcolorbox}[
+    colframe=isiBlue,
+    colback=white,
+    boxrule=0pt,
+    toprule=3pt,
+    bottomrule=3pt,
+    arc=0pt,
+    top=0mm,right=0mm,left=0mm,bottom=0mm,
+    boxsep=0.5mm
+]
+    \begin{tcolorbox}[
+        colframe=isiBlue,
+        colback=white,
+        boxrule=0pt,
+        toprule=1pt,
+        bottomrule=1pt,
+        arc=0pt,
+        enlarge bottom by=-0.9mm,
+        auto outer arc
+    ]
+        \centering
+        {\huge\textbf{\@title}}
+    \end{tcolorbox}
+\end{tcolorbox}
+\end{minipage}
+\end{center}
+
+\vskip8mm
+
+% -------------------------
+% Supervisor
+% -------------------------
+\begin{center}
+\large
+\begin{minipage}[c]{0.35\textwidth}
+Academic supervisor:
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.40\textwidth}
+\textbf{\@academicFramerName}
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.20\textwidth}
+\@academicFramerSpeciality
+\end{minipage}
+\end{center}
+
+\vskip16mm
+
+\afterpage{\blankpage}

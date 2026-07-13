@@ -1,0 +1,39 @@
+flowchart TB
+    KAP["Kapitalis (HTML listing)<br/>→ KapitalisScraper"]
+    RSSF["RSS feeds: lapresse, businessnews,<br/>kapitalis, mosaique → RSSScraper"]
+
+    DB[("PostgreSQL + pgvector<br/>table: articles")]
+    KAP --> DB
+    RSSF --> DB
+
+    PREFECT{{"Prefect<br/>news-pipeline flow"}}
+
+    EMB["Embeddings<br/>e5-small"]
+    SENT["Sentiment<br/>cardiffnlp"]
+    BERT["Topic clustering<br/>BERTopic"]
+    LLML["LLM theme, region,<br/>topic labels"]
+
+    DB --> EMB
+    DB --> SENT
+    DB --> BERT
+    DB --> LLML
+    PREFECT -. orchestrates .-> EMB
+    PREFECT -. orchestrates .-> SENT
+    PREFECT -. orchestrates .-> BERT
+    PREFECT -. orchestrates .-> LLML
+
+    MLFLOW{{"MLflow<br/>news-clustering experiment"}}
+    BERT -. logs run .-> MLFLOW
+
+    API["FastAPI<br/>api/main.py"]
+    EMB --> API
+    SENT --> API
+    BERT --> API
+    LLML --> API
+
+    LLMEXT[/"Groq LLM provider<br/>(external)"/]
+    LLML -. chat completions .-> LLMEXT
+    API -. chat completions .-> LLMEXT
+
+    WEB["React frontend<br/>(Vite + nginx)"]
+    API <--> WEB

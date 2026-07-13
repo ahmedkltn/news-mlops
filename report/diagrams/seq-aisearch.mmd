@@ -1,0 +1,30 @@
+sequenceDiagram
+    actor U as User
+    participant FE as Search.jsx (React)
+    participant RT as search router (api/routes/search.py)
+    participant EMB as etl.transform
+    participant DB as PostgreSQL + pgvector
+    participant LLM as Groq LLM (etl.llm.complete)
+
+    U->>FE: type query q
+    FE->>RT: GET /search?q=...
+    RT->>EMB: embeddings_available()
+
+    alt embedding model cached
+        EMB-->>RT: true
+        RT->>EMB: get_embedding(q)
+        EMB-->>RT: query vector
+        RT->>DB: ORDER BY embedding <=> vector LIMIT n
+        DB-->>RT: ranked rows + similarity
+    else model not cached (fallback)
+        EMB-->>RT: false
+        RT->>DB: full-text tsvector / websearch_to_tsquery match
+        DB-->>RT: text-match candidates
+        RT->>DB: recent articles (fill candidate pool)
+        DB-->>RT: recent rows
+        RT->>LLM: rank candidates by relevance (_ai_rank)
+        LLM-->>RT: ordered article ids (JSON)
+    end
+
+    RT-->>FE: id, title, source, sentiment, topic_label, similarity
+    FE-->>U: render result cards

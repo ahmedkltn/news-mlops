@@ -1,0 +1,31 @@
+flowchart TB
+    subgraph PER["Per-article transform — etl/transform.py (called from etl/pipeline.py)"]
+        direction LR
+        A["Article<br/>title + content"] --> EMB["SentenceTransformer<br/>intfloat/multilingual-e5-small<br/>'passage:' prefix, normalized"]
+        EMB --> VEC["embedding: vector(384)"]
+        A --> SENT["cardiffnlp/twitter-xlm-roberta-<br/>base-sentiment (HF pipeline)"]
+        SENT --> SLAB["sentiment:<br/>positive / neutral / negative"]
+        A --> THEME["classify_theme()<br/>etl/themes.py — LLM (Groq FAST_MODEL)<br/>picks 1 of 10 fixed THEMES"]
+        THEME --> TLAB["topic_label + topic_id"]
+        A --> REG["tag_region()<br/>etl/regions.py — gazetteer match,<br/>LLM fallback for ambiguous cases"]
+        REG --> RLAB["region: governorate slug or NULL"]
+    end
+
+    VEC --> SAVE1["save_articles()<br/>etl/load.py"]
+    SLAB --> SAVE1
+    TLAB --> SAVE1
+    RLAB --> SAVE1
+    SAVE1 --> DB[("PostgreSQL<br/>articles")]
+
+    subgraph CLUST["Periodic topic clustering — etl/cluster.py::run_clustering<br/>(scripts/cluster.py, POST /pipeline/cluster)"]
+        direction LR
+        DB2[("articles WHERE<br/>embedding IS NOT NULL")] --> BT["BERTopic<br/>CountVectorizer (FR stop words)<br/>min_topic_size=3"]
+        BT --> TI["topic_info:<br/>cluster id to keywords"]
+        TI --> LBL["label_topics()<br/>etl/labels.py — LLM (Groq FAST_MODEL)<br/>names each cluster"]
+        LBL --> UPD["update_topics()<br/>writes topic_id / topic_label"]
+        BT --> MODEL["topic_model.save<br/>models/bertopic_model"]
+    end
+
+    DB --> DB2
+    UPD --> DB
+    BT --> MLF["log_clustering_run()<br/>MLflow — params: embed_model, min_cluster_size<br/>metrics: n_topics, outlier_pct<br/>artifact: bertopic_model"]

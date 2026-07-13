@@ -1,0 +1,89 @@
+\chapter{Data Ingestion and Web Scraping}
+
+\section{Introduction}
+Chapter 2 named the two collection mechanisms that feed News Insight (\texttt{RSSScraper} and \texttt{Kapitalis\allowbreak Scraper}) and placed them at the left edge of the architecture diagram. This chapter opens that box. It explains why a lightweight HTTP-plus-parsing approach was chosen over a browser-automation framework, walks through the shared \texttt{BaseScraper} contract both collectors implement, and details each concrete scraper: the HTML listing crawler for Kapitalis and the RSS-based collector used for all four sources. It then covers how the pipeline avoids storing the same article twice and how it degrades gracefully when a single page, feed, or source fails, rather than crashing the whole collection run.
+
+\section{Scraping technology choice}
+\label{sec:scrape-tech}
+Tunisian news outlets publish their content as conventional server-rendered HTML pages and, for every source used here, a standard RSS feed. Unlike the JavaScript-heavy, client-rendered catalogs typical of e-commerce sites, neither the listing pages nor the individual articles depend on client-side rendering to expose their text: the full title, body, and metadata are present in the HTML returned by a plain HTTP \texttt{GET}. This removes the main justification for a browser-automation tool such as Playwright or Selenium, which exists to execute JavaScript and wait for asynchronously loaded content, machinery that would add a full browser process, slower page loads, and a heavier dependency footprint for no corresponding benefit here.
+
+News Insight instead uses \texttt{requests} for HTTP transport and \texttt{BeautifulSoup} (with the \texttt{lxml} parser) for HTML parsing, the pairing already listed in Chapter 1's technology stack (Table~\ref{tab:tech-stack}). This combination is synchronous and single-threaded, which is deliberately traded off against the framework's simplicity: a scraper is a plain Python class with CSS-selector calls, easy to read, debug, and adapt when a source changes its markup, and easy to run unmodified inside a Prefect task without managing a browser's lifecycle. RSS parsing uses \texttt{feedparser}, a purpose-built library for the Atom/RSS XML dialects rather than hand-rolled XML parsing. Where a lighter-weight source can be scraped without a full page fetch, RSS is preferred for exactly that reason: Section~\ref{sec:rss} details why RSS became the primary channel for every source rather than an alternative to it.
+
+\section{Scraper architecture}
+\label{sec:scraper-arch}
+Every source-specific scraper is built on a common abstract base, \texttt{BaseScraper} (\texttt{scrapers/base.py}), which fixes the parts of a scraper that do not vary by source and leaves the parts that do as two abstract methods.
+
+\textbf{Shared state and helpers.} The constructor takes \texttt{source}, \texttt{base\_\allowbreak url}, \texttt{language}, and \texttt{max\_\allowbreak pages} (default 5), and opens a single \texttt{requests.Session} configured with a realistic desktop \texttt{User-Agent} and an \texttt{Accept-Language: fr-FR} header, reused across every request a scraper issues. Two helpers sit on top of that session: \texttt{fetch(url)} issues a \texttt{GET} with a 10-second timeout, raises on a non-2xx status, and returns a parsed \texttt{BeautifulSoup} tree, or \texttt{None} if the request fails, logging the error rather than propagating it (Section~\ref{sec:error-handling}); \texttt{polite\_delay()} sleeps a random 1.5--3.0 seconds, called between every article fetch and after every listing page, so a scraping run does not hammer a source's server with a tight request loop.
+
+\textbf{The contract.} Two methods are declared abstract and left to each subclass: \texttt{get\_\allowbreak article\_\allowbreak urls(page)}, which returns the list of article URLs found on one listing page, and \texttt{parse\_article(url)}, which fetches and parses a single article into an \texttt{Article} object or returns \texttt{None} if parsing fails. \texttt{Article} itself (a Pydantic \texttt{BaseModel} defined alongside \texttt{BaseScraper}) carries \texttt{url}, \texttt{source}, \texttt{title}, \texttt{content}, \texttt{language}, \texttt{categories}, \texttt{published\_at}, and \texttt{image\_url}, and enforces at construction time that \texttt{title} and \texttt{content} are non-empty after stripping whitespace, a validation guard that turns a malformed scrape into an explicit exception rather than a silently empty row.
+
+\textbf{The template method.} \texttt{BaseScraper.\allowbreak scrape()} is the one concrete, non-abstract entry point every caller invokes: it loops over pages \texttt{1..max\_pages}, calls \texttt{get\_article\_urls(page)} on each, stops early if a page returns no URLs, skips any URL already seen earlier in the same run (an in-memory \texttt{seen\_urls} set, a first layer of deduplication that exists purely to avoid re-parsing the same article twice within one crawl. Section~\ref{sec:dedup} covers the persistent, cross-run layer), calls \texttt{parse\_article(url)} for each new URL, and appends the result when parsing succeeds. \texttt{Kapitalis\allowbreak Scraper} uses this template method as-is; \texttt{RSSScraper} overrides \texttt{scrape()} entirely, for reasons explained in Section~\ref{sec:rss}. Figure~\ref{fig:scrape-flow} summarizes both paths from source to database row.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\columnwidth]{img/scrape-flow.png}
+\caption{Data ingestion flow: the HTML listing path (\texttt{Kapitalis\allowbreak Scraper}) and the RSS path (\texttt{RSSScraper}) both produce \texttt{Article} objects, deduplicated and stored through the same load step.}
+\label{fig:scrape-flow}
+\end{figure}
+
+\section{Kapitalis scraper}
+\label{sec:kapitalis}
+\texttt{Kapitalis\allowbreak Scraper} (\texttt{scrapers/kapitalis.py}) is the one concrete implementation of the full \texttt{BaseScraper} template: an HTML listing crawler that pages through Kapitalis's ``\`a la une'' category (\texttt{base\_url = https://kapitalis.com/\allowbreak tunisie/\allowbreak category/\allowbreak a-la-une}) rather than reading a feed.
+
+\texttt{get\_article\_urls(page)} builds the paginated listing URL \texttt{\{base\_url\}/page/\{page\}/}, fetches it, and selects every anchor matching the CSS path \texttt{article.post div h2.entry-title a}, returning their \texttt{href} attributes, one call per page, one article-URL list per call, exactly the contract \texttt{BaseScraper.\allowbreak scrape()} expects.
+
+\texttt{parse\_article(url)} fetches the article page and extracts four fields with dedicated CSS selectors, each written against Kapitalis's WordPress theme markup: the title from \texttt{h1.cmsmasters\_\allowbreak post\_\allowbreak title}; the body from \texttt{article div.\allowbreak cmsmasters\_\allowbreak post\_\allowbreak content.\allowbreak entry-content}, with all tags stripped and inner whitespace collapsed to single spaces (\texttt{tag.get\_text(separator=" ", strip=True)}, then \texttt{" ".join(...split())}); the category list from every \texttt{article span.cmsmasters\_post\_category a}; and the publication date from the \texttt{title} attribute of \texttt{article abbr.published} (falling back to its visible text). If either title or content is missing after extraction, the method returns \texttt{None} instead of constructing a partial \texttt{Article}.
+
+This scraper is source-specific by design: every selector above is tied to one theme's markup, so it would need rewriting if Kapitalis changed its template. As Chapter 2 already stated and Section~\ref{sec:rss} confirms from the extraction side, \texttt{Kapitalis\allowbreak Scraper} is kept in the codebase as a deeper-crawl fallback (able to page arbitrarily far back through the category archive, which RSS cannot do) but it is not part of the default extraction run: \texttt{build\_scrapers} only instantiates it in a commented-out line.
+
+\section{RSS ingestion}
+\label{sec:rss}
+All four active sources (\textit{La Presse}, \textit{Business News}, \textit{Kapitalis}, and \textit{Mosa\"{\i}que FM}) are collected through \texttt{RSSScraper} (\texttt{scrapers/rss.py}), configured from the \texttt{RSS\_FEEDS} list in \texttt{etl/extract.py}: four \texttt{(source, feed\_url, language)} tuples, all tagged \texttt{"fr"}. RSS is the primary channel for every source, including Kapitalis, because a feed already delivers a flat, machine-readable list of recent entries with no pagination or listing-page HTML to parse, cheaper to fetch and far less sensitive to a theme redesign than the CSS selectors in Section~\ref{sec:kapitalis}.
+
+\texttt{RSSScraper} still inherits its constructor, session, and \texttt{polite\_delay} from \texttt{BaseScraper}, but it does not use the inherited \texttt{scrape()} template: \texttt{get\_article\_urls} and \texttt{parse\_article} are both stubbed out (returning \texttt{[]} and \texttt{None}) because a feed is not paginated the way an HTML listing is, and \texttt{scrape()} itself is overridden with a single feed fetch (\texttt{max\_pages} is fixed to 1 in the constructor). The overridden \texttt{scrape()} issues one \texttt{GET} on \texttt{feed\_url}, hands the response body to \texttt{parse\_feed}, and then calls \texttt{\_enrich\_image} on every resulting article before returning the list.
+
+\texttt{parse\_feed} runs \texttt{feedparser.parse} on the feed body and maps every entry through \texttt{\_entry\_\allowbreak to\_\allowbreak article}, the function that turns one feed entry into an \texttt{Article}. Its content selection is the most source-specific piece of logic in the RSS path: some feeds (Mosa\"{\i}que FM among them) put only a short caption in the entry's \texttt{content} field and the fuller teaser text in \texttt{summary}, or the reverse, so \texttt{\_entry\_to\_article} strips HTML tags from both with \texttt{BeautifulSoup.get\_text} and keeps whichever yields more text (Listing 3.1). Categories come from each entry's \texttt{tags} list; \texttt{published\_at} falls back from \texttt{published} to \texttt{updated}; and \texttt{image\_url} is read from the entry's \texttt{media\_content} field, or, failing that, from any \texttt{link} whose type starts with \texttt{image}. An entry missing a link, title, or content is dropped before an \texttt{Article} is even constructed; if construction still raises (the same empty-field validator described in Section~\ref{sec:scraper-arch}), the exception is caught and the entry is skipped with a logged warning rather than aborting the whole feed.
+
+\begin{verbatim}
+content_raw = entry["content"][0].get("value", "") if entry.get("content") else ""
+summary_raw = entry.get("summary", "")
+content_txt = " ".join(BeautifulSoup(content_raw, "lxml").get_text(" ").split())
+summary_txt = " ".join(BeautifulSoup(summary_raw, "lxml").get_text(" ").split())
+content = content_txt if len(content_txt) >= len(summary_txt) else summary_txt
+\end{verbatim}
+\begin{center}
+\textit{Listing~3.1: \texttt{\_entry\_to\_article}, picking the longer of \texttt{content}/\texttt{summary} (\texttt{scrapers/rss.py}).}
+\end{center}
+
+Not every feed entry carries an image, so \texttt{\_enrich\_image} runs a best-effort fallback: if the \texttt{Article} already has an \texttt{image\_url} it is left untouched, otherwise the article's own page is fetched (an 8-second timeout, separate from the main feed fetch) and \texttt{fetch\_og\_image} looks for an Open Graph \texttt{<meta property="og:image">} tag in its HTML. Any failure here (network error, missing tag, malformed HTML) is caught and only logged at debug level, since a missing thumbnail is a cosmetic gap, not a reason to drop an otherwise valid article.
+
+\section{Deduplication and raw storage}
+\label{sec:dedup}
+Deduplication happens in two layers, one in memory and one durable. Within a single \texttt{BaseScraper.\allowbreak scrape()} run, the \texttt{seen\_urls} set (Section~\ref{sec:scraper-arch}) prevents the same URL from being parsed twice if it appears on more than one listing page, relevant to \texttt{Kapitalis\allowbreak Scraper}, not to \texttt{RSSScraper}, whose feed already lists each entry once. That in-memory set is discarded at the end of the run and offers no protection across runs; the durable guarantee comes from the database schema (\texttt{db/schema.sql}): \texttt{url} is declared \texttt{TEXT UNIQUE NOT NULL} on the \texttt{articles} table, so a second insert of an already-seen URL is rejected by PostgreSQL itself, independently of what any scraper does or does not remember.
+
+Two load paths write to that table, matching the two run modes introduced in Chapter 2. The lightweight, ML-free path (\texttt{scripts/scrape.py}, calling \texttt{save\_raw\_articles} in \texttt{etl/load.py}) is meant to persist freshly scraped articles quickly, with no embedding or sentiment fields yet computed; it inserts with \texttt{ON CONFLICT (url) DO NOTHING}, so a URL already in the table is left exactly as it is. A cheap re-run of the scraper never overwrites or duplicates a row it already has. The full pipeline path (\texttt{etl/pipeline.py}, calling \texttt{save\_articles}) is the one already traced in Chapter 2's sequence diagram (Figure~\ref{fig:seq-pipeline}): it inserts the same way but with \texttt{ON CONFLICT (url) DO UPDATE}, refreshing the enrichment columns (\texttt{topic\_id}, \texttt{sentiment}, \texttt{embedding}, and so on) computed for that run. Listing 3.2 shows the raw-insert side of that contrast.
+
+\begin{verbatim}
+query = """
+    INSERT INTO articles (url, source, title, content, language,
+                           published_at, image_url, categories)
+    VALUES %s
+    ON CONFLICT (url) DO NOTHING
+"""
+\end{verbatim}
+\begin{center}
+\textit{Listing~3.2: raw-article upsert, \texttt{save\_raw\_articles} (\texttt{etl/load.py}): URL uniqueness is enforced by the database, not by application logic.}
+\end{center}
+
+Because the constraint lives in the schema rather than in scraper code, both load paths, and any future one, get the same guarantee for free: no scraper needs to query the database before inserting to know whether a URL is new.
+
+\section{Error handling}
+\label{sec:error-handling}
+Failures are expected at every layer of the ingestion pipeline (a single page can 404, a feed can be temporarily unreachable, a template change can leave a selector matching nothing) and the pipeline is built to lose the smallest possible unit of work on each kind of failure rather than aborting the run.
+
+At the lowest level, \texttt{BaseScraper.fetch} catches \texttt{requests.RequestException} around every HTTP call, logs the error, and returns \texttt{None} instead of raising; every caller (\texttt{get\_article\_urls}, \texttt{parse\_article}) already treats a missing soup as ``nothing found on this page/article'' and moves on, so one bad page does not stop the crawl. \texttt{KapitalisScraper.parse\_article} adds a content-level guard on top: if the title or content selector matches nothing (for instance because the page uses a different template than expected), it returns \texttt{None} rather than constructing an \texttt{Article} with a blank field. The \texttt{Article} model itself provides a second, independent guard for the RSS path through its non-empty-field validator, which \texttt{\_entry\_to\_article} wraps in a \texttt{try/except} so one malformed feed entry produces a logged warning instead of stopping \texttt{parse\_feed} from processing the rest of the feed.
+
+At the source level, \texttt{run\_extraction} (\texttt{etl/extract.py}) wraps each scraper's \texttt{scrape()} call in its own \texttt{try/except}, logs the exception, and moves on to the next scraper in \texttt{RSS\_FEEDS}, so a completely unreachable feed (DNS failure, timeout, malformed XML) costs that one source for that run, not the whole extraction. At the orchestration level, Chapter 2 already described the outermost safety net: Prefect retries the whole pipeline task twice with a 60-second delay if it raises at all, which mainly protects against transient conditions (a momentary network outage, a source under maintenance) that a single retry is likely to clear. Finally, \texttt{polite\_delay}'s randomized pause between requests is itself a form of error avoidance rather than error recovery: keeping the request rate low against each source reduces the chance of ever triggering a rate limit or a block in the first place.
+
+\section{Conclusion}
+This chapter opened the sources box of Chapter 2's architecture diagram: a common \texttt{BaseScraper} contract shared by an HTML listing crawler (\texttt{Kapitalis\allowbreak Scraper}, dormant by default) and the RSS-based collector (\texttt{RSSScraper}) that actively feeds all four Tunisian sources, converging on the same validated \texttt{Article} shape and the same URL-uniqueness guarantee enforced by the database rather than by scraper code. Layered error handling (per-request, per-article, per-source, and, at the orchestration level, per-run) keeps a single bad page or unreachable feed from taking down an entire collection cycle. The next chapter follows these \texttt{Article} records into PostgreSQL and details the storage layer they land in.

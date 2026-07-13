@@ -1,0 +1,55 @@
+
+\chapter*{List of Acronyms}
+\addcontentsline{toc}{chapter}{List of Acronyms}
+\markboth{List of Acronyms}{}
+
+%=============== Glossary example ==============%
+% it's an enhanced sortitemize list to make it      %
+% sortable automatically.                       %
+%===============================================%
+
+% Override the class \sortitem: its three minipages sum to 1.0\columnwidth
+% and sit inside an itemize, so every row overflows the right margin by the
+% list indent. Narrow the description column so each row fits the text block.
+\renewcommand{\sortitem}[2][\relax]{%
+  \DTLnewrow{list}%
+  \DTLnewdbentry{list}{sortlabel}{#1}%
+  \DTLnewdbentry{list}{description}{%
+      \begin{minipage}[t]{0.12\columnwidth}~\textbf{#1}\end{minipage}%
+      \begin{minipage}[t]{0.03\columnwidth}\textbf{=}\end{minipage}%
+      \begin{minipage}[t]{0.75\columnwidth}#2\end{minipage}%
+  }%
+}
+
+\begin{acronyms}
+   \sortitem[ANN]{Approximate Nearest Neighbor}
+   \sortitem[API]{Application Programming Interface}
+   \sortitem[ASGI]{Asynchronous Server Gateway Interface}
+   \sortitem[CORS]{Cross-Origin Resource Sharing}
+   \sortitem[CPU]{Central Processing Unit}
+   \sortitem[CSS]{Cascading Style Sheets}
+   \sortitem[ETL]{Extract, Transform, Load}
+   \sortitem[GenAI]{Generative Artificial Intelligence}
+   \sortitem[GIN]{Generalized Inverted Index}
+   \sortitem[GPU]{Graphics Processing Unit}
+   \sortitem[HDBSCAN]{Hierarchical Density-Based Spatial Clustering of Applications with Noise}
+   \sortitem[HTML]{HyperText Markup Language}
+   \sortitem[HTTP]{HyperText Transfer Protocol}
+   \sortitem[JSON]{JavaScript Object Notation}
+   \sortitem[LLM]{Large Language Model}
+   \sortitem[MLOps]{Machine Learning Operations}
+   \sortitem[NLP]{Natural Language Processing}
+   \sortitem[ORM]{Object-Relational Mapping}
+   \sortitem[RAG]{Retrieval-Augmented Generation}
+   \sortitem[RSS]{Really Simple Syndication}
+   \sortitem[SPA]{Single-Page Application}
+   \sortitem[SQL]{Structured Query Language}
+   \sortitem[SSRF]{Server-Side Request Forgery}
+   \sortitem[SVG]{Scalable Vector Graphics}
+   \sortitem[UI]{User Interface}
+   \sortitem[UML]{Unified Modeling Language}
+   \sortitem[URL]{Uniform Resource Locator}
+   \sortitem[WAF]{Web Application Firewall}
+   \sortitem[WSGI]{Web Server Gateway Interface}
+   \sortitem[XML]{Extensible Markup Language}
+\end{acronyms}

@@ -1,0 +1,29 @@
+sequenceDiagram
+    actor U as User
+    participant FE as ChatWidget.jsx (React)
+    participant RT as genai router (api/routes/genai.py)
+    participant EMB as etl.transform
+    participant DB as PostgreSQL + pgvector
+    participant LLM as Groq LLM (etl.llm.complete)
+
+    U->>FE: ask question q
+    FE->>RT: POST /genai/chat {q}
+    RT->>EMB: embeddings_available()
+
+    alt embedding model cached
+        EMB-->>RT: true
+        RT->>EMB: get_embedding(q)
+        EMB-->>RT: query vector
+        RT->>DB: ORDER BY embedding <=> vector LIMIT 5
+    else model not cached (fallback)
+        EMB-->>RT: false
+        RT->>DB: ORDER BY ts_rank(...) DESC, published_at DESC LIMIT 5
+    end
+    DB-->>RT: id, title, url, content (top 5 articles)
+
+    RT->>RT: build context [1..5] title + excerpt
+    RT->>LLM: complete(system, context + question, model_for("chat"))
+    LLM-->>RT: answer text
+
+    RT-->>FE: {answer, sources: [{id, title, url}]}
+    FE-->>U: render answer + cited sources

@@ -1,0 +1,39 @@
+classDiagram
+    class Article {
+        +int id
+        +string url
+        +string source
+        +string title
+        +string content
+        +string language
+        +datetime scraped_at
+        +datetime published_at
+        +string image_url
+        +string[] categories
+        +vector~384~ embedding
+        +string sentiment
+        +int story_id
+    }
+
+    class Topic["Topic / Theme"] {
+        +int topic_id
+        +string topic_label
+    }
+
+    class Region {
+        +string slug
+        +string name_fr
+        +string name_ar
+        +string geojson_id
+    }
+
+    class Summary {
+        +string text
+        +string model
+    }
+
+    Article "1" --> "0..1" Topic : topic_id / topic_label
+    Article "1" --> "0..1" Region : region
+    Article "1" --> "0..1" Summary : summary
+
+    note for Article "Topic/Theme, Region and Summary are conceptual entities: physically flattened as columns on the single articles table (db/schema.sql) rather than separate tables."

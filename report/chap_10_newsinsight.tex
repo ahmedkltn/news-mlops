@@ -1,0 +1,158 @@
+\chapter{Frontend and Data Visualization}
+
+\section{Introduction}
+\label{sec:frontend-intro}
+\begin{sloppypar}
+Chapter 9 closed by handing off from how the dashboard is packaged and served to ``what it actually shows: the React frontend's own views, components, and data-visualization choices.'' Earlier chapters had already opened individual frontend files precisely once each, for a single, narrow reason: Chapter 6 read \texttt{ChatWidget.jsx} and \texttt{ArticleModal.jsx}'s \texttt{ArticleSummary} to show how the two live GenAI endpoints degrade on the client when a request fails (Sections~\ref{sec:genai-summaries}, \ref{sec:chat-assistant}); Chapter 8 read \texttt{client.js} and \texttt{image.js} only far enough to explain why the API's CORS allowlist barely matters in practice (Section~\ref{sec:api-structure}). This chapter is the first to read \texttt{frontend/\allowbreak src} as one whole application: \texttt{App.jsx}, the single entry point that mounts a router, a persistent navigation header, and a floating chat widget; the six page components each route renders; the smaller, reusable components those pages share; and the two data-visualization libraries (one for charts, one for a choropleth map) that turn the \texttt{articles} table's columns into something a reader can actually look at. Nothing here is invented for the report: every route path, component name, and library import below is read directly from the source tree as it stands on this branch.
+\end{sloppypar}
+
+\section{Frontend technology choice}
+\label{sec:frontend-tech}
+\begin{sloppypar}
+Chapter 1's technology-stack table already gave the frontend its one-line role: ``React, Vite: Web dashboard for browsing, searching, and chatting with the news corpus'' (Table~\ref{tab:tech-stack}), and \texttt{frontend/\allowbreak package.json} shows exactly what that resolves to. \texttt{react} and \texttt{react-dom} are pinned to \texttt{\textasciicircum19.2.4}, and \texttt{vite} to \texttt{\textasciicircum8.0.4} as the build tool and, in development, the dev server Chapter 8 already named behind the \texttt{/api} proxy (Section~\ref{sec:api-structure}). Vite was chosen over the older Create React App tooling for the same reason Chapter 9's two-stage \texttt{frontend/\allowbreak Dockerfile} exists at all: an esbuild-based dev server that starts and hot-reloads in milliseconds rather than seconds, and a production \texttt{npm run build} that outputs a single static \texttt{dist/} directory Section~\ref{sec:containerization} already described \texttt{nginx:alpine} serving with no Node.js runtime left in the shipped image.
+\end{sloppypar}
+
+\begin{sloppypar}
+Four further dependencies do the rest of the work this chapter describes. \texttt{react-router-dom} (\texttt{\textasciicircum7.14.0}) is the client-side router behind every route in Section~\ref{sec:app-structure}; \texttt{axios} (\texttt{\textasciicircum1.15.0}) is the HTTP client \texttt{api/\allowbreak client.js} wraps into the single \texttt{baseURL: '/api'} instance every page imports; \texttt{lucide-react} (\texttt{\textasciicircum1.7.0}) supplies every icon glyph used across the Masthead, the stat cards, and the chat widget, imported by name rather than as a sprite sheet; and, specific to data visualization, \texttt{recharts} (\texttt{\textasciicircum3.8.1}) is the charting library behind every chart in \texttt{Dashboard.jsx}, while \texttt{d3-geo} (\texttt{\textasciicircum3.1.1}) is the projection library behind the governorate map in \texttt{RegionMap.jsx}. There is no separate map component library such as \texttt{react-simple-maps} or Leaflet in the dependency list; the map is a hand-built SVG projected with \texttt{d3-geo}'s low-level \texttt{geoIdentity}/\texttt{geoPath} functions, described in Section~\ref{sec:viz-diversity}. No UI component kit (Material UI, Ant Design, Tailwind) appears in \texttt{package.json} either: every page and component instead pairs a \texttt{.jsx} file with its own same-named \texttt{.module.css} file, scoped per file by Vite's built-in CSS Modules support, on top of a shared set of CSS custom properties (\texttt{-{}-brand}, \texttt{-{}-positive}, \texttt{-{}-neutral}, \texttt{-{}-negative}, among others) that ties the hand-rolled design system together. \texttt{Dashboard.jsx} even reads several of them directly in JavaScript, in its \texttt{TOOLTIP\_STYLE} object applied to every recharts \texttt{Tooltip}.
+\end{sloppypar}
+
+\section{Application structure}
+\label{sec:app-structure}
+\begin{sloppypar}
+\texttt{main.jsx} is the one file that actually calls \texttt{react-dom}: it mounts a single \texttt{<App />} inside \texttt{React.StrictMode} at \texttt{document.getElementById('root')}, and never changes for the lifetime of the application. \texttt{App.jsx} itself is short and declares the whole shape of the site in one component (Listing~10.1): a \texttt{BrowserRouter} wraps three siblings: \texttt{<Masthead />}, a \texttt{<main>} element holding \texttt{<Routes>}, and \texttt{<ChatWidget />}, so the navigation header and the floating chat assistant are the two pieces of chrome present on every route, mounted once outside the \texttt{<Routes>} block rather than repeated inside each page.
+\end{sloppypar}
+
+\begin{verbatim}
+<BrowserRouter>
+  <Masthead />
+  <main className={styles.main}>
+    <Routes>
+      <Route path="/" element={<Reader />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/articles" element={<Articles />} />
+      <Route path="/search" element={<Search />} />
+      <Route path="/carte" element={<Carte />} />
+      <Route path="/pipeline" element={<Pipeline />} />
+    </Routes>
+  </main>
+  <ChatWidget />
+</BrowserRouter>
+\end{verbatim}
+\begin{center}
+\textit{Listing~10.1: the whole application shell (\texttt{App.jsx}): six routes, and two pieces of chrome mounted once, outside the routed content.}
+\end{center}
+
+\begin{sloppypar}
+Table~\ref{tab:routes} lists all six routes with the page component and content each one owns. \texttt{Masthead.jsx} exposes five of them as its own \texttt{NavLink} array (\texttt{À la une}, \texttt{Articles}, \texttt{Carte}, \texttt{Recherche}, \texttt{Analyses}, each paired with a \texttt{lucide-react} icon and pointing at \texttt{/}, \texttt{/articles}, \texttt{/carte}, \texttt{/search}, \texttt{/dashboard} respectively) rendered in a second navigation row below the masthead's top bar; \texttt{/pipeline} is deliberately not among them. It is instead a separate \texttt{NavLink} in the top bar itself, rendered as a single \texttt{Zap} icon with no visible label, next to the current date, a visual demotion consistent with what the page behind it actually is: not a reader-facing view but an operator control panel for triggering pipeline runs, covered in Section~\ref{sec:app-structure} only as a route and left otherwise to Chapter 7's account of what \texttt{POST /pipeline/\allowbreak trigger} and \texttt{POST /pipeline/\allowbreak cluster} actually do (Section~\ref{sec:flow-design}).
+\end{sloppypar}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{2.0cm}|p{2.7cm}|p{8.3cm}|}
+\hline
+\textbf{Route} & \textbf{Component} & \textbf{Content} \\
+\hline
+\texttt{/} & \texttt{Reader.jsx} & Home magazine reader: a hero card for the latest article, then a source-interleaved grid with per-source filter chips (Section~\ref{sec:viz-diversity}). \\
+\hline
+\texttt{/dashboard} & \texttt{Dashboard.jsx} & Stat cards plus three \texttt{recharts} views (sentiment split, top topics, 30-day sentiment timeline) and a recent-articles strip (Section~\ref{sec:viz-diversity}). \\
+\hline
+\texttt{/articles} & \texttt{Articles.jsx} & Full-corpus browser: sentiment, topic, and source filters with offset-based pagination (Section~\ref{sec:exploration-search}). \\
+\hline
+\texttt{/search} & \texttt{Search.jsx} & AI-assisted semantic search over the corpus (Section~\ref{sec:exploration-search}; Chapter 6, Section~\ref{sec:ai-search}). \\
+\hline
+\texttt{/carte} & \texttt{Carte.jsx} & Tunisia governorate map with a volume/sentiment metric toggle and a drill-down side panel (Section~\ref{sec:viz-diversity}). \\
+\hline
+\texttt{/pipeline} & \texttt{Pipeline.jsx} & Operator controls to trigger a scrape run or a BERTopic clustering pass, each behind a confirmation dialog (Chapter 7, Section~\ref{sec:flow-design}). \\
+\hline
+\end{tabular}
+\caption{The six routes \texttt{App.jsx} declares, the page component behind each, and where this report covers its content.}
+\label{tab:routes}
+\end{table}
+
+\begin{sloppypar}
+A small set of components recurs across most of these pages rather than being rebuilt per view. \texttt{ArticleCard.jsx} and \texttt{HeroCard.jsx} render an article's thumbnail (proxied through \texttt{utils/\allowbreak image.js}'s \texttt{proxied()}, Chapter 8's SSRF-guarded \texttt{/img} route, Section~\ref{sec:api-structure}), title, source, a relative timestamp from \texttt{utils/\allowbreak time.js}'s \texttt{relativeTime()}, and a \texttt{SentimentBadge} in its compact \texttt{variant="dot"} form; both fall back to a \texttt{lucide-react} \texttt{ImageOff} placeholder icon if the image fails to load or the article has none. \texttt{ArticleModal.jsx} is the one component every page but \texttt{Pipeline.jsx} mounts on demand to show an article's full text, its cached-or-on-demand LLM summary (Chapter 6, Section~\ref{sec:genai-summaries}), and a link to the original source. \texttt{Reader}, \texttt{Dashboard}, \texttt{Articles}, \texttt{Search}, and \texttt{Carte} each keep their own \texttt{selectedArticle} state and render the same modal when a card or result is clicked. \texttt{PageHeader.jsx} supplies the title-plus-subtitle banner at the top of \texttt{Dashboard}, \texttt{Articles}, \texttt{Search}, \texttt{Carte}, and \texttt{Pipeline} (\texttt{Reader} alone skips it, leading instead with \texttt{HeroCard}), and optionally renders arbitrary children as right-aligned actions. \texttt{Carte.jsx} is the only page that uses this slot, for its volume/sentiment toggle buttons. \texttt{ConfirmDialog.jsx} is used in exactly one place, \texttt{Pipeline.jsx}, gating both the scrape trigger and the clustering trigger behind an explicit confirm/cancel step before either destructive-feeling, potentially long-running action fires.
+\end{sloppypar}
+
+\begin{sloppypar}
+Because \texttt{/carte}, \texttt{/search}, and every other non-root route only exist as client-side state inside this single-page application, the server has to hand back \texttt{index.html} for all of them rather than looking for a matching file: Chapter 9's account of \texttt{frontend/\allowbreak nginx.conf} stopped at its \texttt{/api/} proxy block (Section~\ref{sec:api-structure}), but the same file's \texttt{location /} block is \texttt{try\_files \$uri \$uri/ /index.html}, the SPA fallback \texttt{react-router-dom} needs to take over regardless of which route was requested first. That fallback was the site of a real bug, \texttt{fix/\allowbreak spa-cache-headers} (Chapter 1's branch history): \texttt{index.html} was served with no \texttt{Cache-Control} header, so a browser cached it and kept referencing an old, deleted JavaScript bundle after a deploy. A route added since, such as \texttt{/carte}, then had no matching code and rendered blank. The fix serves \texttt{index.html} as \texttt{no-cache, must-revalidate} while the hashed assets alongside it stay \texttt{immutable} for a year: the shell naming the current routes is always revalidated, the bundles it points to are cached forever.
+\end{sloppypar}
+
+\section{Article exploration and search UX}
+\label{sec:exploration-search}
+\begin{sloppypar}
+\texttt{Articles.jsx} is the corpus browser proper: a filter bar (a \texttt{sentiment} \texttt{<select>}, a \texttt{topic\_id} \texttt{<select>} populated from \texttt{GET /articles/\allowbreak topics}, and a free-text \texttt{source} \texttt{<input>}) feeds a single \texttt{fetchArticles} callback that calls \texttt{GET /articles/} with whichever of \texttt{source}, \texttt{sentiment}, and \texttt{topic\_id} are non-empty, plus \texttt{limit=20} and an \texttt{offset} computed from the current page. Changing any filter resets \texttt{page} to \texttt{0} so a stale offset from a previous filter never silently drops results. Pagination itself works around a real gap in the API: Table~\ref{tab:endpoints} showed that \texttt{GET /articles/} returns a page of rows with no accompanying total count, so \texttt{Articles.jsx} estimates one client-side. Its own comment states the rule plainly, ``if backend doesn't return total, estimate from results'': a full page (twenty rows) assumes at least one more page exists (\texttt{(page + 2) * PAGE\_SIZE}), and a short page sets the total to exactly what has been seen so far. The estimate can only ever overshoot by up to one page, never undershoot, so the ``Page \(n\)'' indicator and the disabled state of the forward arrow (\texttt{disabled=\{articles.length < PAGE\_SIZE\}}) stay consistent with what the user can actually click through.
+\end{sloppypar}
+
+\begin{sloppypar}
+\texttt{Search.jsx} is the frontend half of the AI-assisted semantic search Chapter 6 covered in full from the backend side (Section~\ref{sec:ai-search}): a single input plus a ``Rechercher'' button call \texttt{GET /search/} with the trimmed query and \texttt{limit=20} on submit, showing a \texttt{lucide-react} \texttt{Loader2} spinner in place of the button label while the request is in flight. Each result renders a \texttt{SentimentBadge}, the source name, the title, and, when the API response carries a \texttt{score} or \texttt{similarity} field, a percentage figure alongside a horizontal progress bar whose width is set directly from that score, the same numeric relevance signal Chapter 6 traced back to pgvector cosine distance or, on the LLM-ranking fallback path, the candidate's position in the model's returned ordering. Clicking a result opens the same \texttt{ArticleModal} every other page uses. Figure~\ref{fig:screen-search} shows this view after a query for ``football'': seven results, each carrying its own sentiment badge and source, with no unrelated recency-padded articles mixed in, the visible effect of the search-precision fix Chapter 6 described in detail (Section~\ref{sec:ai-search}).
+\end{sloppypar}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\columnwidth]{img/screen-search.png}
+\caption{The AI-assisted semantic search view (\texttt{Search.jsx}): each result carries a sentiment badge, source, title, and relevance score.}
+\label{fig:screen-search}
+\end{figure}
+
+\section{Visualizations and source diversity}
+\label{sec:viz-diversity}
+\begin{sloppypar}
+\texttt{Reader.jsx}, the site's home route, is the first place a reader's exposure to source diversity is engineered rather than left to whatever order \texttt{GET /articles/} happens to return. Its \texttt{interleaveBySource} helper (Listing~10.2) groups the sixty most recent articles into one queue per source, then round-robins across those queues, pushing one article from each in turn until every queue is empty. The function's own comment states why: ``so À la une shows a mix, not just the source with the most recent scrape batch.'' Without it, a burst of scraping from a single outlet would crowd out every other source from the first screen a reader sees. The resulting list feeds a hero card (the first article) and a grid of the rest, with per-source filter chips computed from the same interleaved set (\texttt{[...new Set(articles.\allowbreak map(a => a.source))]}) plus a ``Toutes'' catch-all tab, so a reader can narrow back down to a single outlet after the homepage has already shown a deliberately mixed first impression. Figure~\ref{fig:screen-dashboard} shows this view: a hero article, then a source-filtered grid (\texttt{Toutes}, \texttt{mosaique}, \texttt{lapresse}, \texttt{kapitalis}) directly below it.
+\end{sloppypar}
+
+\begin{verbatim}
+function interleaveBySource(list) {
+  const bySrc = new Map()
+  for (const a of list) {
+    if (!bySrc.has(a.source)) bySrc.set(a.source, [])
+    bySrc.get(a.source).push(a)
+  }
+  const queues = [...bySrc.values()]
+  const out = []
+  let added = true
+  while (added) {
+    added = false
+    for (const q of queues) {
+      if (q.length) { out.push(q.shift()); added = true }
+    }
+  }
+  return out
+}
+\end{verbatim}
+\begin{center}
+\textit{Listing~10.2: round-robin source interleaving (\texttt{interleaveBySource}, \texttt{Reader.jsx}): one article per source per pass, so no single outlet crowds out the rest of the homepage.}
+\end{center}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\columnwidth]{img/screen-dashboard.png}
+\caption{The home reader view (\texttt{Reader.jsx}, route \texttt{/}): the hero card for the latest article, followed by the source-interleaved ``Dernières actualités'' grid and its per-source filter chips.}
+\label{fig:screen-dashboard}
+\end{figure}
+
+\begin{sloppypar}
+\texttt{Dashboard.jsx}, mounted at \texttt{/dashboard}, is where \texttt{recharts} does the rest of the corpus's diversity justice numerically. On mount it fires four requests in parallel with \texttt{Promise.all}: \texttt{/articles/\allowbreak stats}, \texttt{/articles/} (\texttt{limit=5}, for a recent-articles strip), \texttt{/articles/\allowbreak topics} (kept to the top ten), and \texttt{/articles/\allowbreak timeline} (\texttt{days=30}), and renders three charts from the results. A \texttt{PieChart} with a hollow \texttt{innerRadius} (a donut) shows the positive/neutral/negative split from \texttt{/articles/stats}, each slice's \texttt{Cell} colored from \texttt{SENTIMENT\_COLORS} and labelled with its French name and percentage. A horizontal \texttt{BarChart} (\texttt{layout="vertical"}) shows the ten most common topics by \texttt{topic\_label}, the same LLM-assigned themes Chapter 6 described (Section~\ref{sec:genai-themes}), each bar's category axis truncating a long label to fourteen characters plus an ellipsis. A \texttt{LineChart} plots three separate \texttt{Line} series (positive, neutral, negative) against \texttt{date} over the last thirty days, the frontend rendering of the daily sentiment aggregation Chapter 5's \texttt{etl/\allowbreak metrics.py} (or the equivalent \texttt{/articles/timeline} query) computes. All three charts are wrapped in a \texttt{ResponsiveContainer} and share the same \texttt{TOOLTIP\_STYLE} object described in Section~\ref{sec:frontend-tech}, so a hover tooltip on any of the three looks identical regardless of chart type.
+\end{sloppypar}
+
+\begin{sloppypar}
+\texttt{Carte.jsx}, mounted at \texttt{/carte}, is the geographic counterpart: a choropleth of Tunisia's 24 governorates built from \texttt{regions.py}'s gazetteer (Chapter 5, Section~\ref{sec:enrichment}) rather than any third-party map component. \texttt{RegionMap.jsx} imports \texttt{geoIdentity} and \texttt{geoPath} from \texttt{d3-geo} and projects \texttt{frontend/\allowbreak src/\allowbreak assets/\allowbreak tunisia-governorates.json} (a GeoJSON file whose \texttt{properties.slug} values match the same slugs \texttt{regions.py}'s \texttt{GOVERNORATES} gazetteer assigns each governorate's \texttt{geojson\_id} to) into an SVG \texttt{<path>} per governorate, using a plain planar identity projection with \texttt{reflectY(true)} rather than \texttt{geoMercator}, because, per the component's own comment, a geographic projection ``treats geoBoundaries' ring order as the globe's complement and collapses the map'' on this particular GeoJSON's winding order. \texttt{Carte.jsx} itself fetches \texttt{GET /articles/\allowbreak regions} once and toggles between two coloring \texttt{metric}s that \texttt{RegionMap.jsx}'s \texttt{fillFor} function switches on: a fixed color per dominant sentiment, or a single brand-red fill whose alpha channel scales with a governorate's article count relative to the busiest one. Clicking a governorate (or the ``National / non-localisé'' button for articles \texttt{regions.py} could not place) opens \texttt{RegionPanel.jsx}, which fetches up to eight articles for that region via \texttt{GET /articles/} with a \texttt{region} filter, renders a stacked sentiment bar, and reuses \texttt{ArticleCard} for the list.
+\end{sloppypar}
+
+\begin{sloppypar}
+That article list was itself the subject of a real, documented bug: \texttt{fix/\allowbreak region-panel-scroll} (Chapter 1's branch history again) found that clicking a governorate with many articles scrolled the entire page rather than the panel, with every \texttt{ArticleCard} inside rendering no image at all. Both symptoms traced to one CSS interaction: the panel's article list is a flex column, and with enough cards its flex children were shrunk to fit, collapsing each card's \texttt{overflow: hidden} image wrapper down to zero pixels while leaving the list short enough that the page scrolled instead of it. The fix (\texttt{flex-shrink: 0} on the list's children, the panel itself made \texttt{position: sticky} and capped to the viewport, and \texttt{overscroll-behavior: contain} on the list) is three CSS properties, none touching \texttt{RegionPanel.jsx}'s JavaScript, resolving both the scroll target and the missing images from a single shared root cause.
+\end{sloppypar}
+
+\section{Floating chat assistant}
+\label{sec:frontend-chat}
+\begin{sloppypar}
+Chapter 6 already traced \texttt{POST /genai/chat}'s retrieval-augmented-generation loop and the general shape of \texttt{ChatWidget.jsx}'s rendering in detail (Section~\ref{sec:chat-assistant}); this section is only concerned with where that component sits in the application built in this chapter. As Listing~10.1 showed, \texttt{<ChatWidget />} is mounted once in \texttt{App.jsx}, as a sibling of \texttt{<Routes>} rather than inside any one page, the one piece of UI, alongside \texttt{Masthead}, present identically on all six routes. It renders as a fixed, round floating action button in the bottom-right corner, toggling between a \texttt{Sparkles} icon and an \texttt{X} icon as its \texttt{open} state flips; opening it reveals a docked panel rather than navigating anywhere, so a reader can ask a question without losing whatever page, filter, or map selection they were on underneath it. This placement is the outcome of a documented redesign, commit \textit{feat: AI search, LLM themes, source diversity, floating chat assistant}, which removed a dedicated \texttt{/chat} route and its \texttt{Chat.jsx} page entirely: ``Remove the nav tab + \texttt{/chat} page. Add a bottom-right FAB that opens a chat popup (\texttt{ChatWidget}), available on every page'', the same commit that added \texttt{interleaveBySource} to \texttt{Reader.jsx} (Section~\ref{sec:viz-diversity}) and the AI-search precision work Chapter 6 covered (Section~\ref{sec:ai-search}), all three shipped together as one feature-level change to the frontend.
+\end{sloppypar}
+
+\begin{sloppypar}
+The accessibility details the commit message called out are visible directly in the component: an \texttt{Escape} key handler closes the panel from anywhere, focus moves to the message input on open, and every interactive element carries an explicit \texttt{aria-label}. An empty conversation shows three canned French suggestion buttons that call the same \texttt{ask()} function a typed question would; a message list alternates user and assistant bubbles, auto-scrolls to a trailing sentinel on every update, and renders an assistant reply's \texttt{sources} array (Chapter 6's five retrieved articles) as a bulleted list of external links. The same client-side degrade-on-failure behavior Chapter 6 already traced (an error bubble in French rather than a stalled spinner) is what keeps this always-available widget from ever blocking whatever page it floats over.
+\end{sloppypar}
+
+\section{Conclusion}
+\begin{sloppypar}
+This chapter read \texttt{frontend/\allowbreak src} as the single application Chapter 9 handed off to: a React 19 single-page app built and served by Vite, routed client-side by \texttt{react-router-dom} across six routes (Table~\ref{tab:routes}), with \texttt{Masthead} and \texttt{ChatWidget} mounted once, outside those routes, so navigation and the ask-the-news assistant are identical on every page. A small, hand-rolled component set (\texttt{ArticleCard}, \texttt{HeroCard}, \texttt{ArticleModal}, \texttt{PageHeader}, \texttt{SentimentBadge}, \texttt{ConfirmDialog}) is reused across most of the six pages rather than rebuilt per view, styled through CSS Modules and a shared set of CSS custom properties rather than a component-kit dependency. Two data-visualization libraries turn the \texttt{articles} table into something a reader can read at a glance: \texttt{recharts} drives \texttt{Dashboard.jsx}'s sentiment donut, topic bar chart, and 30-day sentiment timeline, and \texttt{d3-geo}'s low-level \texttt{geoIdentity}/\texttt{geoPath} functions drive \texttt{RegionMap.jsx}'s hand-built choropleth of Tunisia's 24 governorates, with no third-party map or chart-kit dependency doing the projection work for either. Two real, documented bugs (a stale cached \texttt{index.html} breaking client-side routes after a deploy, and a flex-layout interaction that broke both scrolling and images in the same region panel) are further evidence, alongside Chapter 6's own two fixes, that this frontend was iterated against a running system rather than written once and left alone. The final chapter steps back from every individual layer this report has traced (scraping, storage, machine learning, orchestration, the API, and this frontend) to summarize what the finished platform achieves against Chapter 1's original objectives, and what remains open for future work.
+\end{sloppypar}
