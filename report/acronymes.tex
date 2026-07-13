@@ -8,6 +8,19 @@
 % sortable automatically.                       %
 %===============================================%
 
+% Override the class \sortitem: its three minipages sum to 1.0\columnwidth
+% and sit inside an itemize, so every row overflows the right margin by the
+% list indent. Narrow the description column so each row fits the text block.
+\renewcommand{\sortitem}[2][\relax]{%
+  \DTLnewrow{list}%
+  \DTLnewdbentry{list}{sortlabel}{#1}%
+  \DTLnewdbentry{list}{description}{%
+      \begin{minipage}[t]{0.12\columnwidth}~\textbf{#1}\end{minipage}%
+      \begin{minipage}[t]{0.03\columnwidth}\textbf{=}\end{minipage}%
+      \begin{minipage}[t]{0.75\columnwidth}#2\end{minipage}%
+  }%
+}
+
 \begin{acronyms}
    \sortitem[ANN]{Approximate Nearest Neighbor}
    \sortitem[API]{Application Programming Interface}

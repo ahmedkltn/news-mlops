@@ -16,7 +16,17 @@
 \mtcsettitle{minitoc}{Chapter outline}
 
 % Fix footer spacing warning from fancyhdr
-\setlength{\footskip}{12pt}
+\setlength{\footskip}{14pt}
+
+% Absorb hard-to-break lines (long monospace identifiers/URLs) so text
+% does not protrude into the right margin instead of overflowing as an
+% overfull hbox.
+\setlength{\emergencystretch}{3em}
+\hyphenpenalty=1000
+\sloppy
+
+% Slightly tighter cell padding so wide tables sit inside the text block.
+\setlength{\tabcolsep}{4pt}
 
 
 \makeindex

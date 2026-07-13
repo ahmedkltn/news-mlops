@@ -22,7 +22,7 @@ Figure~\ref{fig:db-schema} shows the full storage layer as an entity-relationshi
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.92\columnwidth]{img/db-schema.png}
+\includegraphics[width=0.85\columnwidth]{img/db-schema.png}
 \caption{Storage layer schema: \texttt{articles} (central table, with its pgvector embedding column and indexes), \texttt{entities} (one row per extracted named entity, foreign key to \texttt{articles}), and \texttt{pipeline\_metrics} (one row per pipeline run).}
 \label{fig:db-schema}
 \end{figure}

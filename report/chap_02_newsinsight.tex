@@ -19,7 +19,7 @@ Figure~\ref{fig:arch-highlevel} shows the system end to end. Data flows left to 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\columnwidth]{img/arch-highlevel.png}
+\includegraphics[width=0.85\columnwidth]{img/arch-highlevel.png}
 \caption{High-level architecture of News Insight: sources, storage, enrichment, orchestration/tracking, API, and frontend.}
 \label{fig:arch-highlevel}
 \end{figure}
@@ -29,7 +29,7 @@ Two actors interact with the platform (Figure~\ref{fig:usecase}). The \textbf{Vi
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\columnwidth]{img/usecase.png}
+\includegraphics[width=0.85\columnwidth]{img/usecase.png}
 \caption{UML use case diagram: Visitor and Operator interactions with News Insight.}
 \label{fig:usecase}
 \end{figure}
@@ -39,7 +39,7 @@ Figure~\ref{fig:classes} gives the conceptual class view behind the single \text
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\columnwidth]{img/classes.png}
+\includegraphics[width=0.82\columnwidth]{img/classes.png}
 \caption{Domain model: Article and its conceptual Topic/Theme, Region, and Summary relations.}
 \label{fig:classes}
 \end{figure}
@@ -52,7 +52,7 @@ Figure~\ref{fig:seq-pipeline} traces one run of the \texttt{news-pipeline} Prefe
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\columnwidth]{img/seq-pipeline.png}
+\includegraphics[width=0.88\columnwidth]{img/seq-pipeline.png}
 \caption{Sequence diagram: the scrape / transform / load pipeline, orchestrated by Prefect.}
 \label{fig:seq-pipeline}
 \end{figure}
@@ -62,7 +62,7 @@ Figure~\ref{fig:seq-aisearch} traces a \texttt{GET /search} request (\texttt{api
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\columnwidth]{img/seq-aisearch.png}
+\includegraphics[width=0.88\columnwidth]{img/seq-aisearch.png}
 \caption{Sequence diagram: AI-assisted semantic search, with a keyword + LLM-rank fallback.}
 \label{fig:seq-aisearch}
 \end{figure}
@@ -72,7 +72,7 @@ Figure~\ref{fig:seq-chat} traces a \texttt{POST /genai/chat} request (\texttt{ap
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.95\columnwidth]{img/seq-chat.png}
+\includegraphics[width=0.88\columnwidth]{img/seq-chat.png}
 \caption{Sequence diagram: the ask-the-news RAG chat assistant.}
 \label{fig:seq-chat}
 \end{figure}
