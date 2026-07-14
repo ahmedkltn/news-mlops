@@ -1,0 +1,542 @@
+<!doctype html><html><head><meta charset="utf-8"><title>News Insight — soutenance v3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+:root{ --red:#dc2626; --ink:#3f4d63; --body:#4a5568; --mut:#8a93a3;
+  --hex1:#fdecec; --hex2:#f9c6c6; --hex3:#f08c8c; --hex4:#dc2626; --hex5:#fff5f5; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#555;font-family:'Poppins','Segoe UI',system-ui,sans-serif;color:var(--body)}
+.slide{width:1400px;height:820px;background:#fff;position:relative;display:none;overflow:hidden}
+.slide.active{display:block}
+.hex{position:absolute;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0% 50%)}
+.pagenum{position:absolute;bottom:26px;font-weight:700;font-size:16px;color:var(--ink)}
+h1,h2,h3{color:var(--ink)}
+.ctitle{font-size:44px;font-weight:800;text-align:center;margin-top:54px}
+.bullets{font-size:19px;line-height:1.55;list-style:none}
+.bullets li{padding-left:26px;position:relative;margin-bottom:13px}
+.bullets li:before{content:"•";position:absolute;left:6px;color:var(--ink)}
+.flow{display:flex;align-items:center;justify-content:center;gap:18px}
+.fnode{border:1.5px solid #d6dbe4;border-radius:10px;background:#fff;padding:18px 22px;text-align:center;
+  box-shadow:0 1px 3px rgba(63,77,99,.08)}
+.fnode b{display:block;font-size:17px;color:var(--ink)}
+.fnode span{font-size:13px;color:var(--mut)}
+.farr{color:var(--mut);font-size:22px}
+.shotbox{border:1px solid #e2e6ec;border-radius:8px;overflow:hidden;background:#fff;
+  box-shadow:0 2px 8px rgba(63,77,99,.10)}
+.shotbox img{width:100%;display:block}
+.chip{font-family:Consolas,monospace;font-size:13px;background:#f4f6f9;border:1px solid #e2e6ec;
+  border-radius:6px;padding:3px 9px;color:var(--ink)}
+</style></head><body>
+
+<!-- 1 · TITLE -->
+<section class="slide" id="p1">
+  <div style="position:absolute;top:34px;left:56px;font-family:Georgia,serif;font-weight:700;font-size:24px;color:#1a1a1a">Tuni<span style="color:var(--red)">scope</span> <span style="color:var(--red)">●</span></div>
+  <div style="position:absolute;top:34px;right:56px;text-align:right">
+    <div style="font-weight:800;font-size:20px;color:var(--ink)">TEK-UP</div>
+    <div style="font-size:11.5px;color:var(--mut)">École Supérieure Privée<br>Technologie &amp; Ingénierie</div></div>
+  <div style="position:absolute;top:120px;left:56px;width:640px">
+    <h1 style="font-size:54px;font-weight:800;text-align:center">News Insight</h1>
+    <div style="text-align:center;font-weight:600;font-size:16px;color:var(--body);margin-top:10px">
+      An MLOps Platform for Tunisian News Analysis</div>
+    <hr style="border:none;border-top:1.5px solid #d6dbe4;margin:34px 0 26px">
+    <div style="text-align:center;font-size:26px;font-weight:700;color:var(--ink)">Data Science &amp; AI</div>
+    <div style="text-align:center;font-size:20px;font-weight:600;color:var(--ink);margin-top:6px">TEK-UP – 2025/2026</div>
+    <hr style="border:none;border-top:1.5px solid #d6dbe4;margin:26px 0 30px">
+    <div style="display:flex;gap:90px">
+      <div><div style="font-weight:600;color:var(--ink);margin-bottom:12px">Prepared by:</div>
+        <ul class="bullets" style="font-size:17px">
+          <li>Ahmed Klabi</li><li>Mariem Smadhi</li><li>Hichem Sboui</li></ul></div>
+      <div><div style="font-weight:600;color:var(--ink);margin-bottom:12px">Supervisor:</div>
+        <ul class="bullets" style="font-size:17px"><li>Sawssen Jalel</li></ul></div>
+    </div>
+  </div>
+  <div style="position:absolute;top:150px;right:56px;width:560px" class="shotbox">
+    <img src="img/shot-home.png" style="max-height:440px;object-fit:cover;object-position:top"></div>
+</section>
+
+<!-- 2 · PLAN -->
+<section class="slide" id="p2">
+  <div class="hex" style="width:120px;height:120px;top:-45px;left:-30px;background:var(--hex2)"></div>
+  <div class="hex" style="width:70px;height:70px;top:-15px;left:85px;background:var(--hex1)"></div>
+  <div class="hex" style="width:110px;height:110px;top:-40px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;top:30px;right:-15px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-30px;left:40px;background:var(--hex1)"></div>
+  <div class="hex" style="width:90px;height:90px;bottom:-25px;right:100px;background:var(--hex2)"></div>
+  <h1 style="font-size:52px;font-weight:800;margin:70px 0 30px 100px;position:relative;z-index:2">Plan</h1>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);row-gap:52px;column-gap:40px;padding:10px 150px 0">
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">01</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Introduction</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">02</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Project Objectives</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">03</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Proposed Solution</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">04</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Global Architecture</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">05</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Data Ingestion</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">06</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Storage &amp; Modeling</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">07</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Enrichment Models</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">08</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Orchestration</div></div>
+    <div style="text-align:center"><div style="font-size:30px;font-weight:800;color:var(--ink)">09</div><div style="font-size:20px;font-weight:700;color:var(--ink);margin-top:12px">Backend &amp; Frontend</div></div>
+  </div>
+</section>
+
+<!-- DIVIDER TEMPLATE (repeated) -->
+<!-- 3 · 01 INTRODUCTION -->
+<section class="slide" id="p3">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">01</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Introduction</div>
+  </div>
+  <div class="pagenum" style="left:40px">01</div>
+</section>
+
+<!-- 4 · CONTEXT & PROBLEM -->
+<section class="slide" id="p4">
+  <div class="hex" style="width:120px;height:120px;bottom:-30px;left:-20px;background:var(--hex2)"></div>
+  <div class="hex" style="width:90px;height:90px;bottom:60px;left:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:110px;height:110px;bottom:-25px;right:40px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:70px;right:-10px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Context &amp; Problem</h1>
+  <div style="display:flex;gap:40px;align-items:center;padding:60px 90px 0">
+    <ul class="bullets" style="flex:1">
+      <li>Tunisian news is spread across many independent sites</li>
+      <li>Readers visit each site by hand, in French and Arabic</li>
+      <li>No shared index — no search across sources</li>
+      <li>Tone of the news is never measured</li>
+      <li>No regional view of the coverage</li>
+    </ul>
+    <div style="flex:1.1" class="flow">
+      <div class="fnode"><b>4+ sites</b><span>independent newsrooms</span></div>
+      <div class="farr">→</div>
+      <div class="fnode"><b>Fragmented</b><span>no shared index</span></div>
+      <div class="farr">→</div>
+      <div class="fnode"><b>No overview</b><span>no search · no mood · no map</span></div>
+    </div>
+  </div>
+  <div class="pagenum" style="right:40px">02</div>
+</section>
+
+<!-- 5 · 02 OBJECTIVES DIVIDER -->
+<section class="slide" id="p5">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">02</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Project Objectives</div>
+  </div>
+  <div class="pagenum" style="left:40px">03</div>
+</section>
+
+<!-- 6 · OBJECTIVES CONTENT -->
+<section class="slide" id="p6">
+  <div class="hex" style="width:130px;height:130px;top:60px;right:80px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;top:160px;right:180px;background:var(--hex2)"></div>
+  <div class="hex" style="width:110px;height:110px;top:300px;right:60px;background:var(--hex3);opacity:.8"></div>
+  <div class="hex" style="width:120px;height:120px;top:430px;right:200px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;top:560px;right:90px;background:var(--hex2)"></div>
+  <div class="hex" style="width:90px;height:90px;bottom:-20px;left:60px;background:var(--hex1)"></div>
+  <h1 style="font-size:44px;font-weight:800;margin:70px 0 0 100px">Project Objectives</h1>
+  <ul class="bullets" style="margin:60px 0 0 130px;max-width:760px;font-size:20px">
+    <li>Automate news collection from Tunisian sources</li>
+    <li>Enrich every article: sentiment, theme, region, embedding</li>
+    <li>Enable search by meaning, not just keywords</li>
+    <li>Provide an assistant that answers from real articles</li>
+    <li>Run as a scheduled, monitored, reproducible pipeline</li>
+  </ul>
+  <div class="pagenum" style="left:40px">04</div>
+</section>
+
+<!-- 7 · 03 SOLUTION DIVIDER -->
+<section class="slide" id="p7">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">03</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Proposed Solution</div>
+  </div>
+  <div class="pagenum" style="left:40px">05</div>
+</section>
+
+<!-- 8 · SOLUTION CONTENT -->
+<section class="slide" id="p8">
+  <div class="hex" style="width:110px;height:110px;bottom:-25px;left:-15px;background:var(--hex2)"></div>
+  <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">One Automated Pipeline</h1>
+  <ul class="bullets" style="margin:44px auto 0;max-width:640px">
+    <li>End-to-end MLOps platform: collect → understand → serve</li>
+    <li>Runs unattended every morning, safe to re-run</li>
+    <li>Every run logged and measured</li>
+    <li>Everything usable from one web app — Tuniscope</li>
+  </ul>
+  <div class="flow" style="margin-top:44px">
+    <div class="fnode" style="border-color:var(--red)"><b>Collect</b><span>scrape 4 sources · RSS + HTML</span></div>
+    <div class="farr">→</div>
+    <div class="fnode"><b>Understand</b><span>meaning · mood · theme · region</span></div>
+    <div class="farr">→</div>
+    <div class="fnode" style="border-color:var(--red)"><b>Explore</b><span>read · search · map · ask</span></div>
+  </div>
+  <div class="pagenum" style="right:40px">06</div>
+</section>
+
+<!-- 9 · 04 ARCHITECTURE DIVIDER -->
+<section class="slide" id="p9">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">04</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Global Architecture</div>
+  </div>
+  <div class="pagenum" style="left:40px">07</div>
+</section>
+
+<!-- 10 · ARCHITECTURE CONTENT -->
+<section class="slide" id="p10">
+  <div class="hex" style="width:100px;height:100px;top:30px;left:-15px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;top:110px;left:45px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:60px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Global Architecture</h1>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:36px">
+    <div class="flow">
+      <div class="fnode"><b>News sites</b><span>4 sources</span></div>
+      <div class="farr">→</div>
+      <div class="fnode"><b>Scraping</b><span>RSS + HTML · Python</span></div>
+      <div class="farr">→</div>
+      <div class="fnode" style="background:#fdf5f5;border-color:var(--red)"><b>PostgreSQL + pgvector</b><span>one articles table · text + vectors</span></div>
+      <div class="farr">→</div>
+      <div class="fnode"><b>FastAPI</b><span>REST API</span></div>
+      <div class="farr">→</div>
+      <div class="fnode"><b>React</b><span>Tuniscope UI</span></div>
+    </div>
+    <div class="farr" style="font-size:18px">↑↓ enrichment models read rows, write columns back</div>
+    <div class="flow">
+      <div class="fnode"><b>Prefect</b><span>orchestration</span></div>
+      <div class="fnode"><b>ML models</b><span>embeddings · sentiment · theme · region · topics</span></div>
+      <div class="fnode"><b>MLflow</b><span>experiment tracking</span></div>
+    </div>
+  </div>
+  <ul class="bullets" style="margin:34px auto 0;max-width:620px;font-size:17px">
+    <li>Modular, layered architecture — every layer replaceable</li>
+    <li>One database at the centre; enrichment stored as columns</li>
+  </ul>
+  <div class="pagenum" style="right:40px">08</div>
+</section>
+
+<!-- 11 · 05 INGESTION DIVIDER -->
+<section class="slide" id="p11">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">05</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Data Ingestion</div>
+  </div>
+  <div class="pagenum" style="left:40px">09</div>
+</section>
+
+<!-- 12 · INGESTION CONTENT -->
+<section class="slide" id="p12">
+  <div class="hex" style="width:110px;height:110px;bottom:-25px;left:-15px;background:var(--hex2)"></div>
+  <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Data Ingestion</h1>
+  <ul class="bullets" style="margin:40px auto 0;max-width:660px">
+    <li>4 Tunisian sources: La Presse, Business News, Kapitalis, Mosaïque FM</li>
+    <li>RSS feeds + HTML deep-crawl fallback for Kapitalis</li>
+    <li>Deduplication on URL — re-runs never duplicate articles</li>
+    <li>Failing source is skipped, never breaks the run</li>
+    <li>120 articles collected in the current corpus</li>
+  </ul>
+  <div class="flow" style="margin-top:40px">
+    <div class="fnode"><b>RSS / HTML</b><span>4 scrapers</span></div>
+    <div class="farr">→</div>
+    <div class="fnode"><b>Dedup</b><span>ON CONFLICT (url)</span></div>
+    <div class="farr">→</div>
+    <div class="fnode" style="background:#fdf5f5;border-color:var(--red)"><b>articles</b><span>raw text stored</span></div>
+  </div>
+  <div class="pagenum" style="right:40px">10</div>
+</section>
+
+<!-- 13 · 06 STORAGE DIVIDER -->
+<section class="slide" id="p13">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">06</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Storage &amp; Modeling</div>
+  </div>
+  <div class="pagenum" style="left:40px">11</div>
+</section>
+
+<!-- 14 · STORAGE CONTENT -->
+<section class="slide" id="p14">
+  <div class="hex" style="width:110px;height:110px;bottom:-25px;left:-15px;background:var(--hex2)"></div>
+  <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Storage &amp; Modeling</h1>
+  <div style="text-align:center;margin-top:44px">
+    <div style="font-weight:600;color:var(--ink);margin-bottom:16px">One <span class="chip">articles</span> table — enrichment stored as columns:</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto">
+      <span class="chip">id</span><span class="chip">url</span><span class="chip">source</span>
+      <span class="chip">title</span><span class="chip">content</span><span class="chip">published_at</span>
+      <span class="chip">sentiment</span><span class="chip">topic_label</span><span class="chip">region</span>
+      <span class="chip">summary</span><span class="chip" style="background:#fdecec;border-color:var(--red)">embedding vector(384)</span>
+    </div>
+  </div>
+  <ul class="bullets" style="margin:44px auto 0;max-width:640px">
+    <li>PostgreSQL as the single central store</li>
+    <li>pgvector extension: similarity search inside SQL (cosine)</li>
+    <li>Any prediction auditable with a one-line query</li>
+  </ul>
+  <div class="pagenum" style="right:40px">12</div>
+</section>
+
+<!-- 15 · 07 MODELS DIVIDER -->
+<section class="slide" id="p15">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">07</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Enrichment Models</div>
+  </div>
+  <div class="pagenum" style="left:40px">13</div>
+</section>
+
+<!-- 16 · MODELS CONTENT -->
+<section class="slide" id="p16">
+  <div class="hex" style="width:110px;height:110px;bottom:-25px;left:-15px;background:var(--hex2)"></div>
+  <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Enrichment Models</h1>
+  <ul class="bullets" style="margin:44px auto 0;max-width:760px">
+    <li><b style="color:var(--ink)">e5-small</b> — multilingual embeddings (384-dim), meaning of each article</li>
+    <li><b style="color:var(--ink)">XLM-RoBERTa</b> — sentiment: positive / neutral / negative</li>
+    <li><b style="color:var(--ink)">Groq LLM</b> — theme classification, 1 of 10 fixed themes</li>
+    <li><b style="color:var(--ink)">Gazetteer + LLM</b> — region extraction to governorate</li>
+    <li><b style="color:var(--ink)">BERTopic</b> — discovers topics across the corpus, periodically</li>
+  </ul>
+  <div style="text-align:center;margin-top:36px;font-size:17px;color:var(--mut)">
+    Each model writes one column back to the <span class="chip">articles</span> table.</div>
+  <div class="pagenum" style="right:40px">14</div>
+</section>
+
+<!-- 17 · 08 ORCHESTRATION DIVIDER -->
+<section class="slide" id="p17">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">08</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Orchestration</div>
+  </div>
+  <div class="pagenum" style="left:40px">15</div>
+</section>
+
+<!-- 18 · ORCHESTRATION CONTENT -->
+<section class="slide" id="p18">
+  <div class="hex" style="width:100px;height:100px;top:30px;left:-15px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;top:110px;left:45px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Orchestration &amp; Tracking</h1>
+  <div style="display:flex;gap:30px;padding:34px 70px 0;align-items:flex-start">
+    <div style="flex:1.2">
+      <div class="shotbox"><img src="img/shot-prefect.png" style="max-height:330px;object-fit:cover;object-position:left top"></div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Prefect — this morning's run, COMPLETED in 7m 26s</div>
+    </div>
+    <ul class="bullets" style="flex:1;font-size:17.5px;margin-top:10px">
+      <li>Prefect flow, scheduled 06:00 every day</li>
+      <li>HTTP trigger for on-demand runs</li>
+      <li>Retries: 2× / 60s on failure</li>
+      <li>One <span class="chip" style="font-size:12px">pipeline_metrics</span> row per run: articles, topics, sentiment</li>
+      <li>MLflow logs every clustering run: params, metrics, model</li>
+    </ul>
+  </div>
+  <div class="pagenum" style="right:40px">16</div>
+</section>
+
+<!-- 19 · MLFLOW CONTENT -->
+<section class="slide" id="p19">
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:60px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Experiment Tracking — MLflow</h1>
+  <div style="display:flex;gap:30px;padding:34px 70px 0;align-items:flex-start">
+    <ul class="bullets" style="flex:1;font-size:17.5px;margin-top:10px">
+      <li>Every BERTopic clustering run is logged</li>
+      <li>Params: embedding model, min cluster size</li>
+      <li>Metrics: number of topics, outlier share</li>
+      <li>Latest run: 6 topics, 16.7% outliers</li>
+      <li>Runs comparable and reproducible over time</li>
+    </ul>
+    <div style="flex:1.2">
+      <div class="shotbox"><img src="img/shot-mlflow.png" style="max-height:330px;object-fit:cover;object-position:left top"></div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">MLflow — the real run behind these numbers</div>
+    </div>
+  </div>
+  <div class="pagenum" style="right:40px">17</div>
+</section>
+
+<!-- 20 · 09 BACKEND & FRONTEND DIVIDER -->
+<section class="slide" id="p20">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">09</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Backend &amp; Frontend</div>
+  </div>
+  <div class="pagenum" style="left:40px">18</div>
+</section>
+
+<!-- 21 · BACKEND & FRONTEND CONTENT -->
+<section class="slide" id="p21">
+  <h1 class="ctitle">The Product — Tuniscope</h1>
+  <div style="display:flex;gap:24px;padding:30px 60px 0">
+    <div style="flex:1"><div class="shotbox"><img src="img/shot-dashboard.png" style="max-height:330px;object-fit:cover;object-position:top"></div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Analyses — 120 articles · 43% negative / 33% positive / 25% neutral</div></div>
+    <div style="flex:1"><div class="shotbox"><img src="img/shot-chat.png" style="max-height:330px;object-fit:cover;object-position:top"></div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">AI assistant — answers with numbered, clickable sources</div></div>
+  </div>
+  <ul class="bullets" style="margin:24px auto 0;max-width:820px;font-size:16.5px;columns:2;column-gap:60px">
+    <li>FastAPI backend — 5 routers</li>
+    <li>React + Vite frontend, French UI</li>
+    <li>Semantic search + map + dashboard</li>
+    <li>RAG assistant grounded in the corpus</li>
+  </ul>
+  <div class="pagenum" style="right:40px">19</div>
+</section>
+
+<!-- 22 · 10 CONCLUSION DIVIDER -->
+<section class="slide" id="p22">
+  <div class="hex" style="width:150px;height:150px;top:20px;right:230px;background:var(--hex2)"></div>
+  <div class="hex" style="width:120px;height:120px;top:90px;right:120px;background:var(--hex1)"></div>
+  <div class="hex" style="width:130px;height:130px;top:140px;right:330px;background:var(--hex3);opacity:.85"></div>
+  <div class="hex" style="width:110px;height:110px;top:270px;right:200px;background:var(--hex2)"></div>
+  <div class="hex" style="width:150px;height:150px;top:330px;right:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:120px;height:120px;top:420px;right:340px;background:var(--hex4);opacity:.8"></div>
+  <div class="hex" style="width:140px;height:140px;top:530px;right:150px;background:var(--hex2)"></div>
+  <div class="hex" style="width:100px;height:100px;top:640px;right:320px;background:var(--hex1)"></div>
+  <div style="position:absolute;top:250px;left:100px">
+    <div style="width:40px;border-top:3px solid var(--ink);margin-bottom:22px"></div>
+    <div style="font-size:88px;font-weight:800;color:var(--ink);line-height:1">10</div>
+    <div style="font-size:56px;font-weight:800;color:var(--ink);margin-top:14px">Conclusion &amp; Future Work</div>
+  </div>
+  <div class="pagenum" style="left:40px">20</div>
+</section>
+
+<!-- 23 · CONCLUSION CONTENT -->
+<section class="slide" id="p23">
+  <div class="hex" style="width:110px;height:110px;bottom:-25px;left:-15px;background:var(--hex2)"></div>
+  <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Conclusion</h1>
+  <ul class="bullets" style="margin:56px auto 0;max-width:860px;font-size:19px">
+    <li>Complete MLOps platform: scraping → enrichment → semantic search → assistant → dashboard</li>
+    <li>Real-world application on live Tunisian news, running today (120 articles)</li>
+    <li>Modular open-source stack: Python + PostgreSQL/pgvector + Prefect + MLflow + FastAPI + React</li>
+    <li>Reproducible: one docker-compose, 52 automated tests, CI on every push</li>
+  </ul>
+  <div class="pagenum" style="right:40px">21</div>
+</section>
+
+<!-- 24 · PERSPECTIVES -->
+<section class="slide" id="p24">
+  <div class="hex" style="width:110px;height:110px;bottom:-25px;left:-15px;background:var(--hex2)"></div>
+  <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
+  <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
+  <h1 class="ctitle">Perspectives</h1>
+  <ul class="bullets" style="margin:56px auto 0;max-width:640px;font-size:19px">
+    <li>More sources beyond the four feeds</li>
+    <li>Arabic dialect content &amp; sentiment</li>
+    <li>Named-entity extraction (people, places, organisations)</li>
+    <li>Embedding backfill for the full corpus</li>
+    <li>Sentiment evaluation on a labelled Tunisian set</li>
+  </ul>
+  <div class="pagenum" style="right:40px">22</div>
+</section>
+
+<!-- 25 · THANK YOU -->
+<section class="slide" id="p25">
+  <div class="hex" style="width:150px;height:150px;top:40px;left:60px;background:var(--hex1)"></div>
+  <div class="hex" style="width:110px;height:110px;top:150px;left:180px;background:var(--hex2)"></div>
+  <div class="hex" style="width:130px;height:130px;bottom:80px;right:100px;background:var(--hex2)"></div>
+  <div class="hex" style="width:90px;height:90px;bottom:200px;right:220px;background:var(--hex1)"></div>
+  <div class="hex" style="width:100px;height:100px;bottom:60px;right:280px;background:var(--hex3);opacity:.8"></div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center">
+    <h1 style="font-size:72px;font-weight:800">Thank You</h1>
+    <div style="font-size:22px;color:var(--mut);margin-top:16px">Questions &amp; discussion</div>
+  </div>
+</section>
+
+<script>
+function show(n){document.querySelectorAll('.slide').forEach(function(s,i){
+  s.classList.toggle('active', i===n-1);});}
+show(1);
+document.addEventListener('keydown',function(e){
+  var all=document.querySelectorAll('.slide');
+  var a=[].indexOf.call(all,document.querySelector('.slide.active'))+1;
+  if(e.key==='ArrowRight')show(Math.min(a+1,all.length));
+  if(e.key==='ArrowLeft')show(Math.max(a-1,1));});
+</script></body></html>
