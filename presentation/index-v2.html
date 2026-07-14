@@ -125,7 +125,7 @@ body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink
   <div class="kicker">Part 1 · The answer</div>
   <div class="assert">One pipeline: collect the news, understand it, serve it.</div>
   <div class="stats">
-    <div class="stat"><div class="n"><i>60</i></div><div class="l">articles in corpus</div></div>
+    <div class="stat"><div class="n"><i>120</i></div><div class="l">articles in corpus</div></div>
     <div class="stat"><div class="n">4</div><div class="l">sources scraped</div></div>
     <div class="stat"><div class="n"><i>5</i></div><div class="l">ML models in the loop</div></div>
     <div class="stat"><div class="n">24</div><div class="l">governorates mapped</div></div>
@@ -157,7 +157,7 @@ body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink
   <div class="assert" style="margin-bottom:16px">Every source lands in one feed, tagged by topic and mood.</div>
   <div class="cols">
     <div class="fig"><img src="img/shot-home.png" style="max-height:470px;object-fit:cover;object-position:top">
-      <div class="figcap"><b>Fig. 1</b> — the unified feed ("À la une"): all four sources interleaved;
+      <div class="figcap"><b>Fig. 1</b> — the unified feed ("À la une"): the live sources interleaved;
         each card shows its source, theme and sentiment. <i>The interface is French, for a Tunisian audience.</i></div></div>
     <div class="why"><b>Why this view —</b><br>
       This page <b>is</b> the pipeline's output made visible: the source and every tag
@@ -177,17 +177,17 @@ body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink
   <div class="assert" style="margin-bottom:16px">Sentiment, themes and geography — measured, not guessed.</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1;min-height:0;align-items:start">
     <div class="fig"><img src="img/shot-dashboard.png" style="max-height:470px;object-fit:cover;object-position:top">
-      <div class="figcap"><b>Fig. 2</b> — Analyses: 60 articles · sentiment 45% negative / 28% neutral /
-        27% positive · top themes Sport, Société, Sécurité. <i>Every number is a SQL aggregate, recomputed live.</i></div></div>
+      <div class="figcap"><b>Fig. 2</b> — Analyses: 120 articles · sentiment 43% negative / 25% neutral /
+        33% positive · fixed themes and discovered topics side by side. <i>Every number is a SQL aggregate, recomputed live.</i></div></div>
     <div class="fig"><img src="img/shot-map.png" style="max-height:470px;object-fit:cover;object-position:top">
       <div class="figcap"><b>Fig. 3</b> — Carte: all 24 governorates, shaded by article volume or average
-        sentiment; 11 governorates carry coverage in the current corpus. <i>Region extracted per article (slide 9).</i></div></div>
+        sentiment; 14 governorates carry coverage in the current corpus. <i>Region extracted per article (slide 9).</i></div></div>
   </div>
   <div class="stats" style="margin-top:18px;margin-bottom:26px">
-    <div class="stat"><div class="n" style="font-size:30px"><i>45%</i></div><div class="l">negative — news skews dark</div></div>
-    <div class="stat"><div class="n" style="font-size:30px">27%</div><div class="l">positive · 28% neutral</div></div>
-    <div class="stat"><div class="n" style="font-size:30px"><i>9</i></div><div class="l">topics discovered in corpus</div></div>
-    <div class="stat"><div class="n" style="font-size:30px">11 / 24</div><div class="l">governorates with coverage</div></div>
+    <div class="stat"><div class="n" style="font-size:30px"><i>43%</i></div><div class="l">negative — news skews dark</div></div>
+    <div class="stat"><div class="n" style="font-size:30px">33%</div><div class="l">positive · 25% neutral</div></div>
+    <div class="stat"><div class="n" style="font-size:30px"><i>6</i></div><div class="l">topics in latest clustering</div></div>
+    <div class="stat"><div class="n" style="font-size:30px">14 / 24</div><div class="l">governorates with coverage</div></div>
   </div>
   <div class="folio"><span>News Insight · Soutenance</span><span>5 / 15</span></div>
 </section>
@@ -217,6 +217,185 @@ body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink
     <span style="color:var(--mut);font-size:12.5px;margin-left:8px">mechanics · slide 12</span>
   </div>
   <div class="folio"><span>News Insight · Soutenance</span><span>6 / 15</span></div>
+</section>
+
+<!-- SLIDE 7 · ARCHITECTURE -->
+<section class="slide" id="s7">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 2 · Architecture</span></div>
+  <div class="kicker">Part 2 · Architecture</div>
+  <div class="assert" style="margin-bottom:14px">From live sites to one database to one app — every layer replaceable.</div>
+  <div class="cols" style="grid-template-columns:1fr 280px;gap:30px">
+    <div style="display:flex;flex-direction:column;gap:6px;justify-content:center">
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px">
+        <div class="node"><b>RSS scrapers ×4</b><div class="gloss">La Presse · Business News · Kapitalis · Mosaïque FM</div></div>
+        <div class="node" style="border-style:dashed"><b>Kapitalis HTML</b><div class="gloss">deep-crawl fallback</div></div>
+      </div>
+      <div class="arr">Prefect · scrape → transform → load ↓</div>
+      <div class="node" style="background:#f0ede7"><b>PostgreSQL + pgvector</b>
+        <div class="gloss">one <span class="mono">articles</span> table · text + <span class="mono">vector(384)</span> · <span class="mono">UNIQUE(url)</span> — pgvector · vector similarity inside SQL</div></div>
+      <div class="arr">each model reads rows, writes one column back ↓</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+        <div class="node"><b style="font-size:14.5px">Embeddings</b><div class="gloss">e5-small<br>meaning vector</div></div>
+        <div class="node"><b style="font-size:14.5px">Sentiment</b><div class="gloss">XLM-RoBERTa<br>pos / neu / neg</div></div>
+        <div class="node"><b style="font-size:14.5px">Theme</b><div class="gloss">Groq LLM<br>1 of 10 fixed</div></div>
+        <div class="node"><b style="font-size:14.5px">Region</b><div class="gloss">gazetteer + LLM<br>governorate</div></div>
+        <div class="node"><b style="font-size:14.5px">Topics</b><div class="gloss">BERTopic<br>discovered groups</div></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin:2px 0">
+        <span class="code" style="font-size:12px">Groq · external LLM API</span>
+        <span class="code" style="font-size:12px">MLflow · logs every clustering run</span>
+      </div>
+      <div class="arr">FastAPI serves the enriched rows ↓</div>
+      <div class="node" style="background:var(--ink);color:var(--paper);border-color:var(--ink)">
+        <b>FastAPI → React + Vite</b>
+        <div class="gloss" style="color:#c9c4ba">5 routers · articles, search, genai, img, pipeline</div></div>
+    </div>
+    <div class="why"><b>Why one table —</b><br>
+      Enrichment is <span class="mono" style="font-size:13px">UPDATE</span>-in-place columns, so any result is
+      inspectable with plain SQL.<br><br>
+      <b>Why pgvector —</b><br>
+      Similarity search lives inside PostgreSQL
+      (<span class="mono" style="font-size:13px">cosine &lt;=&gt;</span>): joins with filters for free, one
+      fewer service to operate than a dedicated vector DB.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>7 / 15</span></div>
+</section>
+
+<!-- SLIDE 8 · COLLECTION -->
+<section class="slide" id="s8">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 2 · Collection</span></div>
+  <div class="kicker">Part 2 · Collection</div>
+  <div class="assert" style="margin-bottom:16px">Collection survives messy sources: RSS, an HTML fallback, idempotent writes.</div>
+  <div class="cols">
+    <div>
+      <div style="display:grid;grid-template-columns:1fr 80px 1fr 80px 1fr;align-items:center;margin-bottom:20px">
+        <div class="node"><b>4 RSS feeds</b><div class="gloss">+ Kapitalis HTML deep-crawl<br>when the feed runs dry</div></div>
+        <div class="arr">parse →</div>
+        <div class="node"><b>Dedup</b><div class="gloss"><span class="mono">ON CONFLICT (url)</span><br><span class="mono">DO NOTHING</span></div></div>
+        <div class="arr">new only →</div>
+        <div class="node" style="background:#f0ede7"><b>articles</b><div class="gloss">one table<br><span class="mono">UNIQUE(url)</span></div></div>
+      </div>
+      <div class="fig" style="padding:14px 16px">
+        <div class="figcap" style="margin:0"><b>Field note</b> — from this morning's run log:</div>
+        <div class="mono" style="font-size:12px;color:#8a2222;margin-top:8px;line-height:1.5">ERROR | etl.extract — businessnews failed: SSLError(CERTIFICATE_VERIFY_FAILED:<br>&nbsp;&nbsp;unable to get local issuer certificate) — https://www.businessnews.com.tn/rss.xml</div>
+        <div class="figcap" style="margin-top:8px"><i>The site serves an incomplete certificate chain. The run continues on the
+          three healthy feeds instead of failing — a source outage costs coverage, never the pipeline.</i></div>
+      </div>
+      <table class="press" style="margin-top:20px">
+        <tr><th>Source</th><th>Articles in corpus</th><th>Status today</th></tr>
+        <tr><td><b>Mosaïque FM</b></td><td>80</td><td>delivering</td></tr>
+        <tr><td><b>Kapitalis</b></td><td>20</td><td>delivering (RSS + HTML)</td></tr>
+        <tr><td><b>La Presse</b></td><td>20</td><td>delivering</td></tr>
+        <tr><td><b>Business News</b></td><td>0</td><td style="color:#8a2222">down — broken TLS chain, skipped</td></tr>
+      </table>
+    </div>
+    <div class="why"><b>Proven live —</b><br>
+      We re-ran the full pipeline while writing this deck: the corpus went
+      60 → 120 articles with <b>zero duplicates</b> — every re-inserted URL hit
+      <span class="mono" style="font-size:13px">UNIQUE(url)</span> and was skipped.<br><br>
+      The daily 06:00 cron can therefore never double-count an article, no matter
+      how often it fires.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>8 / 15</span></div>
+</section>
+
+<!-- SLIDE 9 · ENRICHMENT MODELS -->
+<section class="slide" id="s9">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 2 · Models</span></div>
+  <div class="kicker">Part 2 · Models</div>
+  <div class="assert" style="margin-bottom:16px">Four models enrich every article — each chosen for a reason.</div>
+  <div class="cols">
+    <div>
+      <table class="press">
+        <tr><th>Model</th><th>Task</th><th>Output column</th><th>Why this one</th></tr>
+        <tr><td><b>e5-small</b><div class="gloss">multilingual, 118 MB</div></td>
+          <td>embedding</td><td class="mono" style="font-size:13px">vector(384)</td>
+          <td>multilingual French/Arabic, strong retrieval, cheap on CPU</td></tr>
+        <tr><td><b>XLM-RoBERTa</b><div class="gloss">cardiffnlp sentiment</div></td>
+          <td>sentiment</td><td class="mono" style="font-size:13px">positive · neutral · negative</td>
+          <td>trained on 100+ languages incl. Arabic — no translation step</td></tr>
+        <tr><td><b>Groq LLM</b><div class="gloss">external API</div></td>
+          <td>theme</td><td class="mono" style="font-size:13px">1 of 10 fixed themes</td>
+          <td>fixed label space keeps charts comparable run after run</td></tr>
+        <tr><td><b>Gazetteer + LLM</b><div class="gloss">place-name lookup</div></td>
+          <td>region</td><td class="mono" style="font-size:13px">governorate</td>
+          <td>place names beat generic NER on short news briefs</td></tr>
+      </table>
+      <div style="font-size:14px;color:var(--mut);margin-top:14px">
+        A fifth model, <b style="color:var(--ink)">BERTopic</b>, runs periodically across the whole corpus — next slide.</div>
+      <div class="fig" style="padding:14px 16px;margin-top:18px">
+        <div class="figcap" style="margin:0"><b>Audit in one line</b> — run against the live database this morning:</div>
+        <div class="mono" style="font-size:13px;margin-top:8px;line-height:1.6">news_db=# SELECT sentiment, COUNT(*) FROM articles GROUP BY 1 ORDER BY 2 DESC;<br>
+&nbsp;&nbsp;negative | 51&nbsp;&nbsp;&nbsp;&nbsp;positive | 39&nbsp;&nbsp;&nbsp;&nbsp;neutral | 30</div>
+      </div>
+    </div>
+    <div class="why"><b>Why columns —</b><br>
+      Each model writes exactly one column back to
+      <span class="mono" style="font-size:13px">articles</span>. Any prediction can be audited with a
+      one-line SQL query, and any model can be swapped without touching the others.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>9 / 15</span></div>
+</section>
+
+<!-- SLIDE 10 · TOPICS + MLFLOW -->
+<section class="slide" id="s10">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 2 · Topic discovery</span></div>
+  <div class="kicker">Part 2 · Topic discovery</div>
+  <div class="assert" style="margin-bottom:16px">BERTopic finds the topics; MLflow keeps the receipts.</div>
+  <div class="cols" style="grid-template-columns:440px 1fr">
+    <div style="display:flex;flex-direction:column;justify-content:center;gap:8px">
+      <div class="node"><b>BERTopic</b><div class="gloss">clusters the e5 vectors of similar articles — topics are discovered, not predefined</div></div>
+      <div class="arr">keywords per cluster ↓</div>
+      <div class="node"><b>LLM names each cluster</b><div class="gloss">"Tunisie et Crise du Golfe" · "Météo Tunisienne" — sanitized before storing</div></div>
+      <div class="arr">write topic_id · topic_label ↓</div>
+      <div class="node" style="background:#f0ede7"><b>articles table</b><div class="gloss">filters, dashboard, map pick the labels up instantly</div></div>
+      <div class="why" style="margin-top:14px"><b>This run —</b><br>
+        6 topics across the embedded corpus, 16.7% outliers
+        (<span class="mono" style="font-size:13px">min_cluster_size = 3</span>).</div>
+    </div>
+    <div class="fig"><img src="img/shot-mlflow.png" style="max-height:520px;object-fit:cover;object-position:left top">
+      <div class="figcap"><b>Fig. 6</b> — the MLflow run logged by this clustering pass: run
+        <span class="mono" style="font-size:12px">gaudy-goose-52</span>, experiment <i>news-clustering</i>, status FINISHED —
+        params (embed model, min cluster size) and metrics (n_topics, outlier_pct). <i>Captured this morning.</i></div></div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>10 / 15</span></div>
+</section>
+
+<!-- SLIDE 11 · OPERATIONS -->
+<section class="slide" id="s11">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 3 · Operations</span></div>
+  <div class="kicker">Part 3 · Operations &amp; monitoring</div>
+  <div class="assert" style="margin-bottom:16px">Prefect runs it every morning — and every run leaves a metrics row.</div>
+  <div class="cols" style="grid-template-columns:1fr 470px">
+    <div class="fig"><img src="img/shot-prefect.png" style="max-height:440px;object-fit:cover;object-position:left top">
+      <div class="figcap"><b>Fig. 7</b> — the Prefect run behind this deck's numbers:
+        <span class="mono" style="font-size:12px">news-pipeline · amorphous-shellfish</span>, COMPLETED in 7m 26s.
+        <i>Captured this morning.</i></div></div>
+    <div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <span class="code">cron 06:00 Africa/Tunis</span>
+        <span class="code">HTTP trigger</span>
+        <span class="code">retries 2× / 60s</span>
+        <span class="code">idempotent upsert</span>
+      </div>
+      <table class="press" style="font-size:14px">
+        <tr><th colspan="2">pipeline_metrics · row 1 · 2026-07-14 08:34</th></tr>
+        <tr><td class="mono" style="font-size:13px">articles_new</td><td><b>60</b></td></tr>
+        <tr><td class="mono" style="font-size:13px">sentiment pos / neu / neg</td><td><b>23 / 13 / 24</b></td></tr>
+        <tr><td class="mono" style="font-size:13px">embed_model</td><td class="mono" style="font-size:12.5px">intfloat/multilingual-e5-small</td></tr>
+      </table>
+      <div class="why" style="margin-top:16px"><b>One row per run —</b><br>
+        A drop in <span class="mono" style="font-size:13px">articles_new</span> or a sentiment spike is visible
+        in a single SQL query the next morning. This row was written by the run we
+        triggered while building this deck.</div>
+    </div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>11 / 15</span></div>
 </section>
 
 <!-- SLIDE 15 · THANKS -->
