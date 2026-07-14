@@ -1,0 +1,109 @@
+<!doctype html><html><head><meta charset="utf-8"><title>News Insight — soutenance v2</title>
+<style>
+:root{ --red:#dc2626;
+  --paper:#faf9f7; --ink:#1a1a1a; --mut:#6d675e; --rule:#d8d4cc; --hair:#c9c5bd; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink)}
+.slide{width:1400px;height:820px;background:var(--paper);padding:48px 72px 64px;
+  position:relative;display:none;flex-direction:column}
+.slide.active{display:flex}
+.serif{font-family:'Playfair Display',Georgia,'Times New Roman',serif}
+.mono{font-family:'JetBrains Mono','Cascadia Code',Consolas,monospace}
+/* masthead */
+.mast{display:flex;justify-content:space-between;align-items:baseline;
+  border-bottom:3px double var(--ink);padding-bottom:10px}
+.mast .brand{font-family:Georgia,serif;font-weight:700;font-size:21px}
+.mast .brand i{color:var(--red);font-style:normal}
+.mast .ed{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
+/* headline block */
+.kicker{font-size:12.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--red);margin:24px 0 6px}
+.assert{font-family:'Playfair Display',Georgia,serif;font-size:42px;line-height:1.12;
+  font-weight:700;max-width:1120px;margin-bottom:22px}
+/* layout */
+.cols{display:grid;grid-template-columns:1fr 340px;gap:40px;flex:1;min-height:0}
+.why{border-left:2px solid var(--red);padding:2px 0 2px 16px;font-size:15px;
+  line-height:1.5;color:#3a372f;margin-top:8px}
+.why b{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+/* figures */
+.fig{border:1px solid var(--hair);background:#fff;padding:10px}
+.fig img{width:100%;display:block}
+.figcap{font-size:13px;color:#3a372f;margin-top:9px;line-height:1.45}
+.figcap b{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink)}
+.figcap i{color:var(--mut)}
+/* stat strip */
+.stats{display:flex;border-top:3px double var(--ink);border-bottom:3px double var(--ink)}
+.stat{flex:1;padding:16px 18px;border-right:1px solid var(--rule)}
+.stat:last-child{border-right:none}
+.stat .n{font-family:Georgia,serif;font-size:38px;font-weight:700}
+.stat .n i{font-style:normal;color:var(--red)}
+.stat .l{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);margin-top:2px}
+/* press table */
+.press{width:100%;border-collapse:collapse;font-size:15px;line-height:1.4}
+.press th{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;text-align:left;
+  color:var(--red);border-bottom:2px solid var(--ink);padding:0 14px 8px 0}
+.press td{border-bottom:1px solid var(--rule);padding:10px 14px 10px 0;vertical-align:top}
+/* diagram atoms */
+.node{border:1.5px solid var(--ink);background:#fff;padding:10px 14px;text-align:center}
+.node b{font-size:16px}
+.gloss{font-size:12.5px;color:var(--mut)}
+.arr{color:var(--red);font-family:Consolas,monospace;font-size:12.5px;font-weight:700;
+  text-align:center;align-self:center}
+.code{font-family:Consolas,monospace;font-size:13.5px;background:#f0ede7;padding:2px 7px}
+/* folio */
+.folio{position:absolute;left:72px;right:72px;bottom:20px;display:flex;
+  justify-content:space-between;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--mut);border-top:1px solid var(--rule);padding-top:9px}
+/* dark back page */
+.divider-dark{background:var(--ink);color:var(--paper)}
+.divider-dark .mast{border-bottom-color:var(--paper)}
+.divider-dark .folio{color:#a49e93;border-top-color:#4a463f}
+</style></head><body>
+
+<!-- SLIDE 1 · TITLE -->
+<section class="slide" id="s1">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">TEK-UP University · Data Science &amp; AI · 2025–2026</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">End-of-semester project · MLOps · Soutenance edition</div>
+    <div class="serif" style="font-size:88px;font-weight:700;line-height:1.02">News Insight</div>
+    <div class="serif" style="font-size:26px;font-style:italic;color:#3a372f;margin-top:14px">
+      An MLOps platform that collects, understands and serves Tunisian news.</div>
+    <div style="display:flex;gap:64px;margin-top:44px;font-size:16px">
+      <div><div class="kicker" style="margin:0 0 6px">Prepared by</div>
+        Ahmed Klabi · Mariem Smadhi · Hichem Sboui</div>
+      <div><div class="kicker" style="margin:0 0 6px">Supervisor</div>Sawssen Jalel</div>
+    </div>
+  </div>
+  <div class="stats" style="margin-bottom:26px">
+    <div class="stat"><div class="l" style="margin:0">In this edition</div></div>
+    <div class="stat"><div class="l" style="margin:0">1 · The problem &amp; the product</div></div>
+    <div class="stat"><div class="l" style="margin:0">2 · Architecture &amp; models</div></div>
+    <div class="stat"><div class="l" style="margin:0">3 · Operations &amp; monitoring</div></div>
+    <div class="stat"><div class="l" style="margin:0">4 · Contributions</div></div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>1 / 15</span></div>
+</section>
+
+<!-- SLIDE 15 · THANKS -->
+<section class="slide divider-dark" id="s15">
+  <div class="mast"><span class="brand" style="color:var(--paper)">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed" style="color:#a49e93">Back page</span></div>
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+    <div class="serif" style="font-size:76px;font-weight:700">Thank you.</div>
+    <div class="serif" style="font-size:24px;font-style:italic;color:#c9c4ba;margin-top:16px">
+      Questions &amp; discussion — the stack is running, ask for any live view.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>15 / 15</span></div>
+</section>
+
+<script>
+function show(n){document.querySelectorAll('.slide').forEach(function(s,i){
+  s.classList.toggle('active', i===n-1);});}
+show(1);
+document.addEventListener('keydown',function(e){
+  var all=document.querySelectorAll('.slide');
+  var a=[].indexOf.call(all,document.querySelector('.slide.active'))+1;
+  if(e.key==='ArrowRight')show(Math.min(a+1,all.length));
+  if(e.key==='ArrowLeft')show(Math.max(a-1,1));});
+</script></body></html>
