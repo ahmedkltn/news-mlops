@@ -44,8 +44,9 @@ services:
       mlflow server
       --host 0.0.0.0
       --port 5000
-      --backend-store-uri sqlite:///mlflow.db
+      --backend-store-uri sqlite:////mlflow/mlflow.db
       --default-artifact-root /mlflow/artifacts
+      --allowed-hosts mlflow:5000,localhost:5001,localhost:5000,127.0.0.1:5001
     ports:
       # Host 5000 is often taken (macOS AirPlay, other services); map to 5001.
       # Internal api→mlflow still uses http://mlflow:5000 on the compose net.
