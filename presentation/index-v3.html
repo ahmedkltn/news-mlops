@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><title>News Insight — soutenance v3</title>
+<!doctype html><html><head><meta charset="utf-8"><title>News Insight, soutenance v3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 :root{ --red:#dc2626; --ink:#3f4d63; --body:#4a5568; --mut:#8a93a3;
@@ -14,12 +14,17 @@ h1,h2,h3{color:var(--ink)}
 .bullets{font-size:19px;line-height:1.55;list-style:none}
 .bullets li{padding-left:26px;position:relative;margin-bottom:13px}
 .bullets li:before{content:"•";position:absolute;left:6px;color:var(--ink)}
-.flow{display:flex;align-items:center;justify-content:center;gap:18px}
-.fnode{border:1.5px solid #d6dbe4;border-radius:10px;background:#fff;padding:18px 22px;text-align:center;
-  box-shadow:0 1px 3px rgba(63,77,99,.08)}
-.fnode b{display:block;font-size:17px;color:var(--ink)}
-.fnode span{font-size:13px;color:var(--mut)}
-.farr{color:var(--mut);font-size:22px}
+.flow{display:flex;align-items:center;justify-content:center;gap:20px}
+.fnode{border:1.5px solid #d6dbe4;border-radius:14px;background:#fff;padding:24px 28px;text-align:center;
+  box-shadow:0 2px 6px rgba(63,77,99,.10);min-width:190px}
+.fnode b{display:block;font-size:21px;color:var(--ink)}
+.fnode span{font-size:15px;color:var(--mut);display:block;margin-top:4px;line-height:1.4}
+.fnode img.tool{height:46px;width:auto;max-width:160px;object-fit:contain;display:block;margin:0 auto 12px}
+.badge{display:flex;align-items:center;justify-content:center;height:46px;width:46px;border-radius:50%;
+  background:#fdecec;color:var(--red);font-weight:800;font-size:17px;margin:0 auto 12px}
+.farr{color:var(--mut);font-size:30px;font-weight:600}
+.toolstrip{display:flex;gap:34px;justify-content:center;align-items:center;flex-wrap:wrap}
+.toolstrip img{height:44px;width:auto;max-width:150px;object-fit:contain}
 .shotbox{border:1px solid #e2e6ec;border-radius:8px;overflow:hidden;background:#fff;
   box-shadow:0 2px 8px rgba(63,77,99,.10)}
 .shotbox img{width:100%;display:block}
@@ -39,7 +44,7 @@ h1,h2,h3{color:var(--ink)}
       An MLOps Platform for Tunisian News Analysis</div>
     <hr style="border:none;border-top:1.5px solid #d6dbe4;margin:34px 0 26px">
     <div style="text-align:center;font-size:26px;font-weight:700;color:var(--ink)">Data Science &amp; AI</div>
-    <div style="text-align:center;font-size:20px;font-weight:600;color:var(--ink);margin-top:6px">TEK-UP – 2025/2026</div>
+    <div style="text-align:center;font-size:20px;font-weight:600;color:var(--ink);margin-top:6px">TEK-UP · 2025/2026</div>
     <hr style="border:none;border-top:1.5px solid #d6dbe4;margin:26px 0 30px">
     <div style="display:flex;gap:90px">
       <div><div style="font-weight:600;color:var(--ink);margin-bottom:12px">Prepared by:</div>
@@ -103,18 +108,18 @@ h1,h2,h3{color:var(--ink)}
   <h1 class="ctitle">Context &amp; Problem</h1>
   <div style="display:flex;gap:40px;align-items:center;padding:60px 90px 0">
     <ul class="bullets" style="flex:1">
-      <li>Tunisian news is spread across many independent sites</li>
-      <li>Readers visit each site by hand, in French and Arabic</li>
-      <li>No shared index — no search across sources</li>
-      <li>Tone of the news is never measured</li>
-      <li>No regional view of the coverage</li>
+      <li>Tunisian news lives on separate, independent sites</li>
+      <li>Following it means opening each site by hand, every day</li>
+      <li>Nothing lets you search across sources</li>
+      <li>Nobody measures the tone of the coverage</li>
+      <li>Nobody maps which regions the news actually covers</li>
     </ul>
     <div style="flex:1.1" class="flow">
       <div class="fnode"><b>4+ sites</b><span>independent newsrooms</span></div>
       <div class="farr">→</div>
       <div class="fnode"><b>Fragmented</b><span>no shared index</span></div>
       <div class="farr">→</div>
-      <div class="fnode"><b>No overview</b><span>no search · no mood · no map</span></div>
+      <div class="fnode"><b>Blind spot</b><span>no search, no mood, no map</span></div>
     </div>
   </div>
   <div class="pagenum" style="right:40px">02</div>
@@ -186,14 +191,14 @@ h1,h2,h3{color:var(--ink)}
     <li>End-to-end MLOps platform: collect → understand → serve</li>
     <li>Runs unattended every morning, safe to re-run</li>
     <li>Every run logged and measured</li>
-    <li>Everything usable from one web app — Tuniscope</li>
+    <li>Everything usable from one web app: Tuniscope</li>
   </ul>
   <div class="flow" style="margin-top:44px">
-    <div class="fnode" style="border-color:var(--red)"><b>Collect</b><span>scrape 4 sources · RSS + HTML</span></div>
+    <div class="fnode" style="border-color:var(--red)"><img class="tool" src="img/python.png"><b>Collect</b><span>scrape 4 sources · RSS + HTML</span></div>
     <div class="farr">→</div>
-    <div class="fnode"><b>Understand</b><span>meaning · mood · theme · region</span></div>
+    <div class="fnode"><img class="tool" src="img/huggingface.png"><b>Understand</b><span>meaning · mood · theme · region</span></div>
     <div class="farr">→</div>
-    <div class="fnode" style="border-color:var(--red)"><b>Explore</b><span>read · search · map · ask</span></div>
+    <div class="fnode" style="border-color:var(--red)"><img class="tool" src="img/react.png"><b>Explore</b><span>read · search · map · ask</span></div>
   </div>
   <div class="pagenum" style="right:40px">06</div>
 </section>
@@ -223,28 +228,28 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:60px;right:-5px;background:var(--hex2)"></div>
   <h1 class="ctitle">Global Architecture</h1>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:36px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:30px">
     <div class="flow">
-      <div class="fnode"><b>News sites</b><span>4 sources</span></div>
+      <div class="fnode" style="min-width:150px"><div class="badge">TN</div><b>News sites</b><span>4 sources</span></div>
       <div class="farr">→</div>
-      <div class="fnode"><b>Scraping</b><span>RSS + HTML · Python</span></div>
+      <div class="fnode" style="min-width:150px"><img class="tool" src="img/python.png"><b>Scraping</b><span>RSS + HTML</span></div>
       <div class="farr">→</div>
-      <div class="fnode" style="background:#fdf5f5;border-color:var(--red)"><b>PostgreSQL + pgvector</b><span>one articles table · text + vectors</span></div>
+      <div class="fnode" style="background:#fdf5f5;border-color:var(--red);min-width:230px"><img class="tool" src="img/postgresql.png"><b>PostgreSQL + pgvector</b><span>one articles table · text + vectors</span></div>
       <div class="farr">→</div>
-      <div class="fnode"><b>FastAPI</b><span>REST API</span></div>
+      <div class="fnode" style="min-width:150px"><img class="tool" src="img/fastapi.png"><b>FastAPI</b><span>REST API</span></div>
       <div class="farr">→</div>
-      <div class="fnode"><b>React</b><span>Tuniscope UI</span></div>
+      <div class="fnode" style="min-width:150px"><img class="tool" src="img/react.png"><b>React</b><span>Tuniscope UI</span></div>
     </div>
-    <div class="farr" style="font-size:18px">↑↓ enrichment models read rows, write columns back</div>
+    <div style="font-size:17px;color:var(--mut);font-weight:600">↑ ↓ &nbsp;the models below read rows and write their column back</div>
     <div class="flow">
-      <div class="fnode"><b>Prefect</b><span>orchestration</span></div>
-      <div class="fnode"><b>ML models</b><span>embeddings · sentiment · theme · region · topics</span></div>
-      <div class="fnode"><b>MLflow</b><span>experiment tracking</span></div>
+      <div class="fnode"><img class="tool" src="img/prefect.png"><b>Prefect</b><span>runs the pipeline daily</span></div>
+      <div class="fnode"><img class="tool" src="img/huggingface.png"><b>ML models</b><span>embeddings · sentiment · theme · region · topics</span></div>
+      <div class="fnode"><img class="tool" src="img/mlflow.png"><b>MLflow</b><span>tracks every clustering run</span></div>
     </div>
   </div>
-  <ul class="bullets" style="margin:34px auto 0;max-width:620px;font-size:17px">
-    <li>Modular, layered architecture — every layer replaceable</li>
-    <li>One database at the centre; enrichment stored as columns</li>
+  <ul class="bullets" style="margin:26px auto 0;max-width:640px;font-size:17px">
+    <li>Layered and modular: any layer can be swapped without touching the rest</li>
+    <li>One database at the centre; enrichment stored as plain columns</li>
   </ul>
   <div class="pagenum" style="right:40px">08</div>
 </section>
@@ -277,16 +282,16 @@ h1,h2,h3{color:var(--ink)}
   <ul class="bullets" style="margin:40px auto 0;max-width:660px">
     <li>4 Tunisian sources: La Presse, Business News, Kapitalis, Mosaïque FM</li>
     <li>RSS feeds + HTML deep-crawl fallback for Kapitalis</li>
-    <li>Deduplication on URL — re-runs never duplicate articles</li>
+    <li>Deduplication on URL, so re-runs never duplicate articles</li>
     <li>Failing source is skipped, never breaks the run</li>
     <li>120 articles collected in the current corpus</li>
   </ul>
   <div class="flow" style="margin-top:40px">
-    <div class="fnode"><b>RSS / HTML</b><span>4 scrapers</span></div>
+    <div class="fnode"><img class="tool" src="img/python.png"><b>RSS / HTML</b><span>4 scrapers</span></div>
     <div class="farr">→</div>
-    <div class="fnode"><b>Dedup</b><span>ON CONFLICT (url)</span></div>
+    <div class="fnode"><div class="badge">=</div><b>Dedup</b><span>ON CONFLICT (url)</span></div>
     <div class="farr">→</div>
-    <div class="fnode" style="background:#fdf5f5;border-color:var(--red)"><b>articles</b><span>raw text stored</span></div>
+    <div class="fnode" style="background:#fdf5f5;border-color:var(--red)"><img class="tool" src="img/postgresql.png"><b>articles</b><span>raw text stored</span></div>
   </div>
   <div class="pagenum" style="right:40px">10</div>
 </section>
@@ -316,8 +321,9 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
   <h1 class="ctitle">Storage &amp; Modeling</h1>
-  <div style="text-align:center;margin-top:44px">
-    <div style="font-weight:600;color:var(--ink);margin-bottom:16px">One <span class="chip">articles</span> table — enrichment stored as columns:</div>
+  <div style="text-align:center;margin-top:36px">
+    <img src="img/postgresql.png" style="height:64px;margin-bottom:14px">
+    <div style="font-weight:600;color:var(--ink);margin-bottom:16px">One <span class="chip">articles</span> table, enrichment stored as columns:</div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto">
       <span class="chip">id</span><span class="chip">url</span><span class="chip">source</span>
       <span class="chip">title</span><span class="chip">content</span><span class="chip">published_at</span>
@@ -358,15 +364,16 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
   <h1 class="ctitle">Enrichment Models</h1>
-  <ul class="bullets" style="margin:44px auto 0;max-width:760px">
-    <li><b style="color:var(--ink)">e5-small</b> — multilingual embeddings (384-dim), meaning of each article</li>
-    <li><b style="color:var(--ink)">XLM-RoBERTa</b> — sentiment: positive / neutral / negative</li>
-    <li><b style="color:var(--ink)">Groq LLM</b> — theme classification, 1 of 10 fixed themes</li>
-    <li><b style="color:var(--ink)">Gazetteer + LLM</b> — region extraction to governorate</li>
-    <li><b style="color:var(--ink)">BERTopic</b> — discovers topics across the corpus, periodically</li>
-  </ul>
-  <div style="text-align:center;margin-top:36px;font-size:17px;color:var(--mut)">
-    Each model writes one column back to the <span class="chip">articles</span> table.</div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px;padding:50px 70px 0">
+    <div class="fnode" style="min-width:0"><img class="tool" src="img/huggingface.png"><b style="font-size:18px">e5-small</b><span>embeddings, 384-dim<br>the meaning of each article</span></div>
+    <div class="fnode" style="min-width:0"><img class="tool" src="img/huggingface.png"><b style="font-size:18px">XLM-RoBERTa</b><span>sentiment<br>positive / neutral / negative</span></div>
+    <div class="fnode" style="min-width:0"><div class="badge">G</div><b style="font-size:18px">Groq LLM</b><span>theme<br>1 of 10 fixed themes</span></div>
+    <div class="fnode" style="min-width:0"><div class="badge">TN</div><b style="font-size:18px">Gazetteer + LLM</b><span>region<br>place names → governorate</span></div>
+    <div class="fnode" style="min-width:0"><div class="badge">B</div><b style="font-size:18px">BERTopic</b><span>topic discovery<br>runs across the whole corpus</span></div>
+  </div>
+  <div style="text-align:center;margin-top:40px;font-size:18px;color:var(--body)">
+    Each model writes one column back to the <span class="chip">articles</span> table, so any prediction
+    can be checked with a simple SQL query.</div>
   <div class="pagenum" style="right:40px">14</div>
 </section>
 
@@ -392,11 +399,12 @@ h1,h2,h3{color:var(--ink)}
 <section class="slide" id="p18">
   <div class="hex" style="width:100px;height:100px;top:30px;left:-15px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;top:110px;left:45px;background:var(--hex2)"></div>
-  <h1 class="ctitle">Orchestration &amp; Tracking</h1>
+  <h1 class="ctitle" style="display:flex;align-items:center;justify-content:center;gap:18px">
+    <img src="img/prefect.png" style="height:52px">Orchestration &amp; Tracking</h1>
   <div style="display:flex;gap:30px;padding:34px 70px 0;align-items:flex-start">
     <div style="flex:1.2">
       <div class="shotbox"><img src="img/shot-prefect.png" style="max-height:330px;object-fit:cover;object-position:left top"></div>
-      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Prefect — this morning's run, COMPLETED in 7m 26s</div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Prefect: this morning's run, COMPLETED in 7m 26s</div>
     </div>
     <ul class="bullets" style="flex:1;font-size:17.5px;margin-top:10px">
       <li>Prefect flow, scheduled 06:00 every day</li>
@@ -413,7 +421,8 @@ h1,h2,h3{color:var(--ink)}
 <section class="slide" id="p19">
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:60px;right:-5px;background:var(--hex2)"></div>
-  <h1 class="ctitle">Experiment Tracking — MLflow</h1>
+  <h1 class="ctitle" style="display:flex;align-items:center;justify-content:center;gap:18px">
+    <img src="img/mlflow.png" style="height:52px">Experiment Tracking</h1>
   <div style="display:flex;gap:30px;padding:34px 70px 0;align-items:flex-start">
     <ul class="bullets" style="flex:1;font-size:17.5px;margin-top:10px">
       <li>Every BERTopic clustering run is logged</li>
@@ -424,7 +433,7 @@ h1,h2,h3{color:var(--ink)}
     </ul>
     <div style="flex:1.2">
       <div class="shotbox"><img src="img/shot-mlflow.png" style="max-height:330px;object-fit:cover;object-position:left top"></div>
-      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">MLflow — the real run behind these numbers</div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">MLflow: the real run behind these numbers</div>
     </div>
   </div>
   <div class="pagenum" style="right:40px">17</div>
@@ -450,15 +459,15 @@ h1,h2,h3{color:var(--ink)}
 
 <!-- 21 · BACKEND & FRONTEND CONTENT -->
 <section class="slide" id="p21">
-  <h1 class="ctitle">The Product — Tuniscope</h1>
+  <h1 class="ctitle">The Product: Tuniscope</h1>
   <div style="display:flex;gap:24px;padding:30px 60px 0">
     <div style="flex:1"><div class="shotbox"><img src="img/shot-dashboard.png" style="max-height:330px;object-fit:cover;object-position:top"></div>
-      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Analyses — 120 articles · 43% negative / 33% positive / 25% neutral</div></div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Analyses: 120 articles · 43% negative / 33% positive / 25% neutral</div></div>
     <div style="flex:1"><div class="shotbox"><img src="img/shot-chat.png" style="max-height:330px;object-fit:cover;object-position:top"></div>
-      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">AI assistant — answers with numbered, clickable sources</div></div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">AI assistant: answers with numbered, clickable sources</div></div>
   </div>
   <ul class="bullets" style="margin:24px auto 0;max-width:820px;font-size:16.5px;columns:2;column-gap:60px">
-    <li>FastAPI backend — 5 routers</li>
+    <li>FastAPI backend, 5 routers</li>
     <li>React + Vite frontend, French UI</li>
     <li>Semantic search + map + dashboard</li>
     <li>RAG assistant grounded in the corpus</li>
@@ -493,10 +502,15 @@ h1,h2,h3{color:var(--ink)}
   <h1 class="ctitle">Conclusion</h1>
   <ul class="bullets" style="margin:56px auto 0;max-width:860px;font-size:19px">
     <li>Complete MLOps platform: scraping → enrichment → semantic search → assistant → dashboard</li>
-    <li>Real-world application on live Tunisian news, running today (120 articles)</li>
-    <li>Modular open-source stack: Python + PostgreSQL/pgvector + Prefect + MLflow + FastAPI + React</li>
+    <li>Runs today on live Tunisian news, with 120 articles in the corpus</li>
+    <li>Modular, fully open-source stack</li>
     <li>Reproducible: one docker-compose, 52 automated tests, CI on every push</li>
   </ul>
+  <div class="toolstrip" style="margin-top:48px">
+    <img src="img/python.png"><img src="img/postgresql.png"><img src="img/prefect.png">
+    <img src="img/mlflow.png"><img src="img/fastapi.png"><img src="img/react.png">
+    <img src="img/docker.png">
+  </div>
   <div class="pagenum" style="right:40px">21</div>
 </section>
 
