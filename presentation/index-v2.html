@@ -85,6 +85,140 @@ body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink
   <div class="folio"><span>News Insight · Soutenance</span><span>1 / 15</span></div>
 </section>
 
+<!-- SLIDE 2 · PROBLEM -->
+<section class="slide" id="s2">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 1 · The problem</span></div>
+  <div class="kicker">Part 1 · The problem</div>
+  <div class="assert">Tunisian news is scattered across sites — unsearchable, unmeasured.</div>
+  <div class="cols">
+    <div>
+      <table class="press">
+        <tr><th>Source</th><th>Site</th><th>Language</th><th>Format</th></tr>
+        <tr><td><b>La Presse</b></td><td class="mono" style="font-size:13.5px">lapresse.tn</td><td>French</td><td>RSS feed</td></tr>
+        <tr><td><b>Business News</b></td><td class="mono" style="font-size:13.5px">businessnews.com.tn</td><td>French</td><td>RSS feed</td></tr>
+        <tr><td><b>Kapitalis</b></td><td class="mono" style="font-size:13.5px">kapitalis.com</td><td>French</td><td>RSS + HTML pages</td></tr>
+        <tr><td><b>Mosaïque FM</b></td><td class="mono" style="font-size:13.5px">mosaiquefm.net</td><td>French</td><td>RSS feed</td></tr>
+      </table>
+      <div style="font-size:15px;line-height:1.55;margin-top:22px;max-width:640px">
+        Four newsrooms, four websites, four archives. No shared index exists across them:
+        you cannot search them together, compare their tone, or see which regions of
+        Tunisia the coverage actually reaches.</div>
+      <div class="stats" style="margin-top:30px">
+        <div class="stat"><div class="n" style="font-size:22px">No search</div><div class="l">by meaning, across sources</div></div>
+        <div class="stat"><div class="n" style="font-size:22px">No mood</div><div class="l">tone is never measured</div></div>
+        <div class="stat"><div class="n" style="font-size:22px">No map</div><div class="l">regional coverage invisible</div></div>
+      </div>
+    </div>
+    <div class="why"><b>Why it matters —</b><br>
+      To follow the news today a reader visits each site by hand — and still cannot
+      search <b>by meaning</b>, see the overall <b>mood</b>, or view coverage on a
+      <b>map</b>. Analysts have no measurable view of the Tunisian news cycle at all.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>2 / 15</span></div>
+</section>
+
+<!-- SLIDE 3 · THE ANSWER -->
+<section class="slide" id="s3">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 1 · The answer</span></div>
+  <div class="kicker">Part 1 · The answer</div>
+  <div class="assert">One pipeline: collect the news, understand it, serve it.</div>
+  <div class="stats">
+    <div class="stat"><div class="n"><i>60</i></div><div class="l">articles in corpus</div></div>
+    <div class="stat"><div class="n">4</div><div class="l">sources scraped</div></div>
+    <div class="stat"><div class="n"><i>5</i></div><div class="l">ML models in the loop</div></div>
+    <div class="stat"><div class="n">24</div><div class="l">governorates mapped</div></div>
+    <div class="stat"><div class="n"><i>1</i></div><div class="l">command to deploy</div></div>
+  </div>
+  <div class="cols" style="margin-top:30px">
+    <div style="display:grid;grid-template-columns:1fr 90px 1fr 90px 1fr;align-items:center;align-content:center">
+      <div class="node" style="padding:30px 18px">
+        <b style="font-size:22px">Collect</b><div class="gloss" style="margin-top:8px;font-size:14px">scrape 4 sources · RSS + HTML<br>dedup on URL · daily at 06:00</div></div>
+      <div class="arr">new rows →</div>
+      <div class="node" style="padding:30px 18px">
+        <b style="font-size:22px">Understand</b><div class="gloss" style="margin-top:8px;font-size:14px">meaning · mood · theme · region<br>per article, written back as columns</div></div>
+      <div class="arr">serve →</div>
+      <div class="node" style="padding:30px 18px;border-width:2.5px">
+        <b style="font-size:22px">Explore</b><div class="gloss" style="margin-top:8px;font-size:14px">read · search · map · dashboard · ask<br>one web app</div></div>
+    </div>
+    <div class="why"><b>Why MLOps —</b><br>
+      The loop runs unattended on a schedule, survives re-runs, and every run is
+      logged and measured. Not a notebook — an operated pipeline.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>3 / 15</span></div>
+</section>
+
+<!-- SLIDE 4 · PRODUCT: FEED -->
+<section class="slide" id="s4">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 1 · The product</span></div>
+  <div class="kicker">Part 1 · The product</div>
+  <div class="assert" style="margin-bottom:16px">Every source lands in one feed, tagged by topic and mood.</div>
+  <div class="cols">
+    <div class="fig"><img src="img/shot-home.png" style="max-height:470px;object-fit:cover;object-position:top">
+      <div class="figcap"><b>Fig. 1</b> — the unified feed ("À la une"): all four sources interleaved;
+        each card shows its source, theme and sentiment. <i>The interface is French, for a Tunisian audience.</i></div></div>
+    <div class="why"><b>Why this view —</b><br>
+      This page <b>is</b> the pipeline's output made visible: the source and every tag
+      on every card (theme, sentiment) were produced by the models on slides 9–10,
+      not entered by hand.<br><br>
+      Sources can be filtered per newsroom; the date line and tags update as the
+      pipeline runs.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>4 / 15</span></div>
+</section>
+
+<!-- SLIDE 5 · PRODUCT: ANALYTICS + MAP -->
+<section class="slide" id="s5">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 1 · The product</span></div>
+  <div class="kicker">Part 1 · The product</div>
+  <div class="assert" style="margin-bottom:16px">Sentiment, themes and geography — measured, not guessed.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1;min-height:0;align-items:start">
+    <div class="fig"><img src="img/shot-dashboard.png" style="max-height:470px;object-fit:cover;object-position:top">
+      <div class="figcap"><b>Fig. 2</b> — Analyses: 60 articles · sentiment 45% negative / 28% neutral /
+        27% positive · top themes Sport, Société, Sécurité. <i>Every number is a SQL aggregate, recomputed live.</i></div></div>
+    <div class="fig"><img src="img/shot-map.png" style="max-height:470px;object-fit:cover;object-position:top">
+      <div class="figcap"><b>Fig. 3</b> — Carte: all 24 governorates, shaded by article volume or average
+        sentiment; 11 governorates carry coverage in the current corpus. <i>Region extracted per article (slide 9).</i></div></div>
+  </div>
+  <div class="stats" style="margin-top:18px;margin-bottom:26px">
+    <div class="stat"><div class="n" style="font-size:30px"><i>45%</i></div><div class="l">negative — news skews dark</div></div>
+    <div class="stat"><div class="n" style="font-size:30px">27%</div><div class="l">positive · 28% neutral</div></div>
+    <div class="stat"><div class="n" style="font-size:30px"><i>9</i></div><div class="l">topics discovered in corpus</div></div>
+    <div class="stat"><div class="n" style="font-size:30px">11 / 24</div><div class="l">governorates with coverage</div></div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>5 / 15</span></div>
+</section>
+
+<!-- SLIDE 6 · PRODUCT: SEARCH + ASSISTANT -->
+<section class="slide" id="s6">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 1 · The product</span></div>
+  <div class="kicker">Part 1 · The product</div>
+  <div class="assert" style="margin-bottom:16px">Search works by meaning; the assistant answers only from real articles.</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1;min-height:0;align-items:start">
+    <div class="fig"><img src="img/shot-search.png" style="max-height:470px;object-fit:cover;object-position:top">
+      <div class="figcap"><b>Fig. 4</b> — Recherche: "football" returns transfer and match news ranked by
+        relevance — including articles that never contain the word. <i>Semantic ranking, slide 12.</i></div></div>
+    <div class="fig"><img src="img/shot-chat.png" style="max-height:470px;object-fit:cover;object-position:top">
+      <div class="figcap"><b>Fig. 5</b> — the assistant answers a question and lists the exact articles it
+        used as numbered sources. <i>It refuses to answer beyond them.</i></div></div>
+  </div>
+  <div style="display:flex;gap:14px;align-items:center;margin-top:18px;margin-bottom:26px;font-size:14px">
+    <span class="code">"football"</span><span class="arr">e5 embed →</span>
+    <span class="code">384-dim vector</span><span class="arr">cosine &lt;=&gt; →</span>
+    <span class="code">nearest articles</span>
+    <span style="color:var(--mut);margin:0 10px">|</span>
+    <span class="code">question</span><span class="arr">retrieve 5 →</span>
+    <span class="code">LLM reads only those</span><span class="arr">grounded →</span>
+    <span class="code">answer + sources</span>
+    <span style="color:var(--mut);font-size:12.5px;margin-left:8px">mechanics · slide 12</span>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>6 / 15</span></div>
+</section>
+
 <!-- SLIDE 15 · THANKS -->
 <section class="slide divider-dark" id="s15">
   <div class="mast"><span class="brand" style="color:var(--paper)">Tuni<i>scope</i> <i>●</i></span>
