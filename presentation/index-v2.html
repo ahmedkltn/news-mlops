@@ -307,7 +307,7 @@ body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink
     <span class="ed">Part 2 · Models</span></div>
   <div class="kicker">Part 2 · Models</div>
   <div class="assert" style="margin-bottom:16px">Four models enrich every article — each chosen for a reason.</div>
-  <div class="cols">
+  <div class="cols" style="align-items:center">
     <div>
       <table class="press">
         <tr><th>Model</th><th>Task</th><th>Output column</th><th>Why this one</th></tr>
@@ -396,6 +396,118 @@ body{background:#333;font-family:'Segoe UI',system-ui,sans-serif;color:var(--ink
     </div>
   </div>
   <div class="folio"><span>News Insight · Soutenance</span><span>11 / 15</span></div>
+</section>
+
+<!-- SLIDE 12 · RAG MECHANICS -->
+<section class="slide" id="s12">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 3 · The assistant</span></div>
+  <div class="kicker">Part 3 · The assistant</div>
+  <div class="assert" style="margin-bottom:16px">The assistant reads five retrieved articles — not its memory.</div>
+  <div class="cols" style="align-items:center">
+    <div>
+      <div style="display:grid;grid-template-columns:1fr 74px 1fr 74px 1fr;align-items:center;margin-bottom:20px">
+        <div class="node"><b>Question</b><div class="gloss">plain language,<br>French or Arabic</div></div>
+        <div class="arr">e5 embed →</div>
+        <div class="node"><b>pgvector search</b><div class="gloss">cosine <span class="mono">&lt;=&gt;</span> · nearest-neighbour<br>5 closest articles</div></div>
+        <div class="arr">as context →</div>
+        <div class="node" style="background:var(--ink);color:var(--paper);border-color:var(--ink)"><b>Groq LLM</b><div class="gloss" style="color:#c9c4ba">reads only those 5<br>answer + numbered sources</div></div>
+      </div>
+      <div class="fig" style="padding:14px 16px">
+        <div class="figcap" style="margin:0"><b>The actual retrieval query</b> — <span class="mono" style="font-size:12px">api/routes/genai.py</span>:</div>
+        <div class="mono" style="font-size:13px;margin-top:8px;line-height:1.65">SELECT id, title, url, content FROM articles<br>
+WHERE embedding IS NOT NULL<br>
+ORDER BY embedding &lt;=&gt; %s::vector&nbsp;&nbsp;<span style="color:var(--mut)">-- cosine distance, pgvector index</span><br>
+LIMIT 5;</div>
+      </div>
+      <div style="font-size:14px;color:var(--mut);margin-top:14px">
+        If the embedding model is missing, the same endpoint degrades to French full-text
+        ranking — the assistant keeps working, only less semantic.</div>
+      <div class="fig" style="padding:14px 16px;margin-top:16px">
+        <div class="figcap" style="margin:0"><b>Grounding, in practice</b> — from this morning's captured chat (Fig. 5):</div>
+        <div class="serif" style="font-size:15.5px;font-style:italic;margin-top:8px;line-height:1.5">
+          « Aucune information n'est fournie sur les performances ou les résultats récents
+          des équipes tunisiennes dans les compétitions en cours. »</div>
+        <div class="figcap" style="margin-top:6px"><i>Asked beyond its five articles, it declines — it cannot hallucinate an answer.</i></div>
+      </div>
+    </div>
+    <div class="why"><b>Why retrieval, not fine-tuning —</b><br>
+      The corpus changes every morning; retrieval follows it for free.<br><br>
+      Because the model only sees the retrieved articles, every claim carries a
+      numbered citation the jury can open — and when the articles say nothing,
+      the assistant says so instead of inventing.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>12 / 15</span></div>
+</section>
+
+<!-- SLIDE 13 · REPRODUCIBILITY -->
+<section class="slide" id="s13">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 3 · Reproducibility</span></div>
+  <div class="kicker">Part 3 · Reproducibility</div>
+  <div class="assert" style="margin-bottom:16px">The whole platform reproduces with one command.</div>
+  <div class="cols" style="align-items:center">
+    <div>
+      <div class="fig" style="padding:14px 16px;margin-bottom:18px">
+        <div class="mono" style="font-size:14px;line-height:1.7">$ docker-compose up<br>
+<span style="color:var(--mut)">✔ news_postgres&nbsp;&nbsp;:5433&nbsp;&nbsp;PostgreSQL 16 + pgvector<br>
+✔ news_prefect&nbsp;&nbsp;&nbsp;:4200&nbsp;&nbsp;orchestration UI<br>
+✔ news_mlflow&nbsp;&nbsp;&nbsp;&nbsp;:5001&nbsp;&nbsp;experiment tracking<br>
+✔ news_api&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:8001&nbsp;&nbsp;FastAPI + pipeline<br>
+✔ news_frontend&nbsp;&nbsp;:5180&nbsp;&nbsp;React dashboard</span></div>
+      </div>
+      <table class="press" style="font-size:14px">
+        <tr><th>Guarantee</th><th>Mechanism</th></tr>
+        <tr><td>Same schema everywhere</td><td><span class="mono" style="font-size:12.5px">db/schema.sql</span> auto-applied on first boot</td></tr>
+        <tr><td>Same behaviour</td><td>52 pytest tests, run in CI on every push</td></tr>
+        <tr><td>No secrets in the repo</td><td>one <span class="mono" style="font-size:12.5px">.env</span> file, ignored by git</td></tr>
+        <tr><td>Open source throughout</td><td>Python · PostgreSQL · Prefect · MLflow · FastAPI · React</td></tr>
+      </table>
+    </div>
+    <div class="why"><b>Why it matters —</b><br>
+      A fresh machine reaches this exact running stack — database, pipeline,
+      tracking, UI — from a clone and one command. That, plus the scheduled runs
+      and the metrics trail, is what makes this MLOps rather than a notebook.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>13 / 15</span></div>
+</section>
+
+<!-- SLIDE 14 · CONTRIBUTIONS -->
+<section class="slide" id="s14">
+  <div class="mast"><span class="brand">Tuni<i>scope</i> <i>●</i></span>
+    <span class="ed">Part 4 · Contributions</span></div>
+  <div class="kicker">Part 4 · Contributions</div>
+  <div class="assert" style="margin-bottom:16px">What this project demonstrates — and where it stops.</div>
+  <div class="cols" style="align-items:center">
+    <div>
+      <table class="press">
+        <tr><th>Claim</th><th>Evidence</th></tr>
+        <tr><td><b>A complete platform, running today</b></td>
+          <td>live app, slides 4–6 — captured this morning, not mocked</td></tr>
+        <tr><td><b>Search by meaning over French news</b></td>
+          <td>e5 vectors + pgvector <span class="mono" style="font-size:12.5px">cosine &lt;=&gt;</span>, slide 12</td></tr>
+        <tr><td><b>An assistant that cites its sources</b></td>
+          <td>RAG over the corpus, numbered citations, Fig. 5</td></tr>
+        <tr><td><b>Operated, measured MLOps</b></td>
+          <td>Prefect run + MLflow run + <span class="mono" style="font-size:12.5px">pipeline_metrics</span> row, slides 10–11</td></tr>
+      </table>
+      <div style="font-size:14.5px;line-height:1.55;margin-top:16px;color:#3a372f">
+        <b style="font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--red)">Honest limits —</b>
+        a 120-article, 4-day corpus; French-first (Arabic dialect untested); sentiment not yet
+        evaluated against a labelled Tunisian set; one source down (TLS); half the corpus awaits
+        its embedding backfill.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+        <span class="code">next · more sources</span>
+        <span class="code">next · Arabic dialect sentiment</span>
+        <span class="code">next · named-entity extraction</span>
+        <span class="code">next · embedding backfill job</span>
+      </div>
+    </div>
+    <div class="why"><b>Sized to the evidence —</b><br>
+      Every claim on this slide points at something the jury can open live:
+      the app, the Prefect UI, the MLflow run, or a one-line SQL query.</div>
+  </div>
+  <div class="folio"><span>News Insight · Soutenance</span><span>14 / 15</span></div>
 </section>
 
 <!-- SLIDE 15 · THANKS -->
