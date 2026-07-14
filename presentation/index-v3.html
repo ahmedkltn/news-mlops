@@ -10,7 +10,7 @@ body{background:#555;font-family:'Poppins','Segoe UI',system-ui,sans-serif;color
 .hex{position:absolute;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0% 50%)}
 .pagenum{position:absolute;bottom:26px;font-weight:700;font-size:16px;color:var(--ink)}
 h1,h2,h3{color:var(--ink)}
-.ctitle{font-size:44px;font-weight:800;text-align:center;margin-top:54px}
+.ctitle{font-size:50px;font-weight:800;text-align:center;margin-top:54px}
 .bullets{font-size:19px;line-height:1.55;list-style:none}
 .bullets li{padding-left:26px;position:relative;margin-bottom:13px}
 .bullets li:before{content:"•";position:absolute;left:6px;color:var(--ink)}
@@ -30,6 +30,64 @@ h1,h2,h3{color:var(--ink)}
 .shotbox img{width:100%;display:block}
 .chip{font-family:Consolas,monospace;font-size:13px;background:#f4f6f9;border:1px solid #e2e6ec;
   border-radius:6px;padding:3px 9px;color:var(--ink)}
+.storyline{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;align-items:stretch;max-width:1240px;margin:34px auto 0;position:relative}
+.storyline:before{content:"";position:absolute;top:104px;left:8%;right:8%;border-top:2px solid #cbd3df;z-index:0}
+.story-step{position:relative;z-index:1;background:#fff;border:1.5px solid #d6dbe4;border-radius:10px;min-height:214px;padding:19px 16px 16px;box-shadow:0 3px 10px rgba(63,77,99,.09);text-align:center}
+.story-step:after{content:"→";position:absolute;right:-20px;top:82px;color:#8793a5;background:#fff;font-size:25px;font-weight:700;padding:0 3px}
+.story-step:last-child:after{display:none}
+.step-num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 11px;background:#fdecec;color:var(--red);font-size:15px;font-weight:800}
+.story-step img{height:41px;max-width:130px;object-fit:contain;margin:0 auto 10px;display:block}
+.story-step b{font-size:18px;color:var(--ink);display:block;line-height:1.25}
+.story-step span{font-size:14px;color:var(--mut);display:block;margin-top:7px;line-height:1.42}
+.story-step.highlight{border-color:var(--red);background:#fff7f7}
+.ops-rail{max-width:940px;margin:31px auto 0;border-top:1px solid #e2e6ec;padding-top:21px;display:flex;justify-content:center;align-items:center;gap:22px;color:var(--ink)}
+.ops-rail img{height:35px;width:auto;max-width:110px;object-fit:contain}
+.ops-rail strong{font-size:16px}.ops-rail span{font-size:15px;color:var(--mut)}
+.record-layout{display:grid;grid-template-columns:1.06fr 1.3fr;gap:46px;max-width:1120px;margin:34px auto 0;align-items:center}
+.article-card{border:1.5px solid #d6dbe4;border-radius:10px;background:#fff;padding:26px 28px;box-shadow:0 4px 13px rgba(63,77,99,.10);position:relative}
+.article-card:after{content:"→";position:absolute;right:-38px;top:46%;font-size:34px;color:var(--red);font-weight:700}
+.source-line{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--red)}
+.article-title{color:var(--ink);font-size:23px;font-weight:800;line-height:1.28;margin:16px 0 12px}
+.article-copy{font-size:14px;line-height:1.6;color:var(--mut);border-top:1px solid #e7eaf0;padding-top:13px}
+.record-caption{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:13px}
+.fact-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.fact{border:1px solid #e1e5ec;border-radius:8px;padding:15px 14px;background:#fff;min-height:98px}
+.fact strong{display:block;font-size:16px;color:var(--ink);margin-bottom:5px}.fact span{display:block;font-size:13.5px;color:var(--mut);line-height:1.35}
+.fact.red{background:#fff7f7;border-color:#f3b3b3}.fact .mini{color:var(--red);font-weight:800;font-size:13px;margin-bottom:3px}
+.enrichment{display:grid;grid-template-columns:1fr 1.8fr;gap:42px;max-width:1170px;margin:32px auto 0;align-items:center}
+.model-output{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.model-output .fact{min-height:112px;padding:17px}.model-output .wide{grid-column:span 2;min-height:86px;display:flex;align-items:center;gap:16px}
+.model-output img{height:35px;width:auto;object-fit:contain}
+.source-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.source-shot{height:144px;border:1px solid #e2e6ec;border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 2px 7px rgba(63,77,99,.08)}
+.source-shot img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
+.browser-icon{width:70px;height:49px;border:3px solid var(--red);border-radius:7px;margin:0 auto 15px;position:relative;background:#fff}
+.browser-icon:before{content:"";position:absolute;left:0;right:0;top:9px;border-top:3px solid var(--red)}
+.browser-icon:after{content:"•••";position:absolute;left:8px;top:-10px;color:var(--red);font-size:13px;letter-spacing:3px}
+.etl-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:42px;max-width:1060px;margin:40px auto 0;position:relative}
+.etl-stage{position:relative;text-align:center;border:1.5px solid #d6dbe4;border-radius:10px;min-height:260px;padding:26px 27px;background:#fff;box-shadow:0 3px 10px rgba(63,77,99,.09)}
+.etl-stage:after{content:"→";position:absolute;right:-32px;top:105px;color:var(--red);font-size:34px;font-weight:800}.etl-stage:last-child:after{display:none}
+.etl-letter{font-size:46px;line-height:1;font-weight:800;color:var(--red);margin-bottom:15px}.etl-stage b{display:block;font-size:25px;color:var(--ink);margin-bottom:10px}.etl-stage span{font-size:17px;line-height:1.45;color:var(--mut);display:block}.etl-stage.highlight{background:#fff7f7;border-color:var(--red)}
+.objective-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;max-width:1210px;margin:54px auto 0}
+.objective{min-height:254px;border:1.5px solid #d6dbe4;border-radius:10px;background:#fff;padding:25px 17px;text-align:center;box-shadow:0 3px 10px rgba(63,77,99,.09)}
+.objective:first-child,.objective:last-child{border-color:var(--red);background:#fff7f7}.objective-num{font-size:18px;font-weight:800;color:var(--red);margin-bottom:31px}.objective b{display:block;font-size:22px;line-height:1.2;color:var(--ink);margin-bottom:12px}.objective span{display:block;font-size:16px;line-height:1.43;color:var(--mut)}
+.solution-flow{display:grid;grid-template-columns:290px 80px 310px 80px 510px;gap:16px;align-items:center;max-width:1320px;margin:42px auto 0}
+.solution-sources{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.solution-sources .source-shot{height:112px}
+.solution-arrow{text-align:center;color:var(--red);font-size:46px;font-weight:800}.solution-engine{min-height:266px;border:2px solid var(--red);border-radius:10px;background:#fff7f7;padding:27px 26px;text-align:center;box-shadow:0 4px 13px rgba(63,77,99,.10)}
+.solution-engine h2{font-size:28px;font-weight:800;margin:11px 0 20px}.solution-engine .engine-line{border-top:1px solid #efc6c6;padding:12px 0;font-size:18px;font-weight:700;color:var(--ink)}
+.solution-product .shotbox{height:266px}.solution-product .shotbox img{height:100%;object-fit:cover;object-position:top}.solution-label{font-size:21px;font-weight:800;color:var(--ink);text-align:center;margin-bottom:13px}.solution-note{font-size:18px;color:var(--mut);text-align:center;line-height:1.4;margin-top:20px}
+.objective-showcase{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1120px;margin:42px auto 0}.objective-shot{border:1.5px solid #d6dbe4;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 3px 10px rgba(63,77,99,.10)}
+.objective-shot img{display:block;width:100%;height:205px;object-fit:cover;object-position:top}.objective-shot b{display:block;font-size:23px;color:var(--ink);padding:17px 19px 5px}.objective-shot span{display:block;font-size:16px;color:var(--mut);line-height:1.4;padding:0 19px 19px}.objective-shot:first-child{border-color:var(--red)}
+.architecture-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;max-width:1240px;margin:40px auto 0;align-items:stretch}.architecture-layer{position:relative;border:1.5px solid #d6dbe4;border-radius:10px;background:#fff;min-height:310px;padding:22px 15px;text-align:center;box-shadow:0 3px 10px rgba(63,77,99,.09)}
+.architecture-layer:after{content:"→";position:absolute;right:-29px;top:132px;color:var(--red);font-size:35px;font-weight:800}.architecture-layer:last-child:after{display:none}.architecture-layer.highlight{border-color:var(--red);background:#fff7f7}.architecture-layer h2{font-size:23px;font-weight:800;margin:13px 0 10px}.architecture-layer p{font-size:16px;line-height:1.42;color:var(--mut)}
+.architecture-layer .source-grid{margin-top:12px;gap:7px}.architecture-layer .source-shot{height:66px}.architecture-layer .browser-icon{transform:scale(.8);margin:6px auto 5px}.architecture-layer img.arch-logo{height:53px;max-width:150px;object-fit:contain;margin:6px auto 5px;display:block}.arch-list{list-style:none;text-align:left;margin:14px 3px 0}.arch-list li{font-size:15px;color:var(--body);padding:8px 0;border-top:1px solid #e5e8ed}.arch-list li:first-child{border-top:none}.arch-rail{display:flex;align-items:center;justify-content:center;gap:14px;max-width:810px;margin:24px auto 0;padding-top:18px;border-top:1px solid #e2e6ec;font-size:17px;color:var(--mut)}.arch-rail img{height:33px;width:auto;max-width:105px}
+.enrichment-split{display:grid;grid-template-columns:1.08fr .92fr;gap:34px;max-width:1120px;margin:34px auto 0;align-items:stretch}.enrichment-panel{border:1.5px solid #d6dbe4;border-radius:10px;background:#fff;padding:24px;box-shadow:0 3px 10px rgba(63,77,99,.09)}.enrichment-panel.highlight{border-color:var(--red);background:#fff7f7}.enrichment-panel h2{font-size:24px;margin-bottom:7px}.enrichment-panel p{font-size:16px;color:var(--mut);line-height:1.4}.benefit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:18px}.benefit{border:1px solid #e1e5ec;border-radius:8px;padding:14px;min-height:96px;background:#fff}.benefit strong{display:block;font-size:17px;color:var(--ink);margin-bottom:5px}.benefit span{display:block;font-size:14px;color:var(--mut);line-height:1.35}.enrichment-panel .shotbox{margin-top:17px}.enrichment-panel .shotbox img{height:204px;object-fit:cover;object-position:top}
+.tracking-layout{display:grid;grid-template-columns:1.08fr .92fr;gap:34px;max-width:1120px;margin:34px auto 0;align-items:start}.tracking-values{display:grid;gap:13px;margin-top:18px}.tracking-value{border:1px solid #e1e5ec;border-radius:8px;padding:16px 18px;background:#fff}.tracking-value strong{display:block;font-size:19px;color:var(--ink);margin-bottom:5px}.tracking-value span{display:block;font-size:15px;line-height:1.4;color:var(--mut)}
+.slide#p12 .etl-flow{margin-top:46px}.slide#p12 .etl-stage{min-height:290px;padding:30px}.slide#p12 .etl-letter{font-size:54px}.slide#p12 .etl-stage b{font-size:29px}.slide#p12 .etl-stage span{font-size:19px}.slide#p12 .etl-flow + div{font-size:19px!important;margin-top:30px!important}
+.slide#p14 .record-layout{grid-template-columns:1fr 1fr;max-width:1200px;gap:56px;margin-top:40px}.slide#p14 .article-card{text-align:center;padding:31px 34px}.slide#p14 .source-line{justify-content:center;font-size:16px}.slide#p14 .article-title{font-size:28px}.slide#p14 .article-copy{font-size:18px;line-height:1.5}.slide#p14 .record-caption{text-align:center;font-size:21px;margin-bottom:17px}.slide#p14 .fact{min-height:116px;padding:19px;text-align:center}.slide#p14 .fact strong{font-size:19px}.slide#p14 .fact span{font-size:16px}.slide#p14 .fact .mini{font-size:14px}.slide#p14 .record-layout + div{font-size:19px!important;margin-top:34px!important}
+.conclusion-points{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;max-width:1040px;margin:50px auto 0}.conclusion-point{border:1.5px solid #d6dbe4;border-radius:10px;padding:24px 27px;min-height:112px;text-align:center;background:#fff;box-shadow:0 3px 10px rgba(63,77,99,.08);font-size:21px;font-weight:700;line-height:1.35;color:var(--ink)}.conclusion-point:first-child{border-color:var(--red);background:#fff7f7}.slide#p23 .toolstrip{margin-top:35px!important}.slide#p23 .toolstrip img{height:52px}
+.operations-shot{width:670px;margin:28px auto 0}.operations-shot img{height:255px;object-fit:cover;object-position:left top}.operations-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1040px;margin:22px auto 0}.operation{border:1.5px solid #d6dbe4;border-radius:10px;min-height:108px;padding:19px 22px;text-align:center;background:#fff;box-shadow:0 3px 10px rgba(63,77,99,.08)}.operation:first-child{border-color:var(--red);background:#fff7f7}.operation strong{display:block;font-size:21px;color:var(--ink);margin-bottom:7px}.operation span{display:block;font-size:17px;line-height:1.35;color:var(--mut)}
+.tracking-centered{max-width:1040px;margin:28px auto 0}.tracking-shot{width:680px;margin:0 auto}.tracking-shot img{height:265px;object-fit:cover;object-position:left top}.tracking-centered .tracking-values{grid-template-columns:repeat(3,1fr);gap:18px;margin-top:22px}.tracking-centered .tracking-value{min-height:126px;text-align:center;padding:20px}.tracking-centered .tracking-value strong{font-size:21px}.tracking-centered .tracking-value span{font-size:16px}
 </style></head><body>
 
 <!-- 1 · TITLE -->
@@ -106,20 +164,21 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:110px;height:110px;bottom:-25px;right:40px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:70px;right:-10px;background:var(--hex2)"></div>
   <h1 class="ctitle">Context &amp; Problem</h1>
-  <div style="display:flex;gap:40px;align-items:center;padding:60px 90px 0">
-    <ul class="bullets" style="flex:1">
-      <li>Tunisian news lives on separate, independent sites</li>
-      <li>Following it means opening each site by hand, every day</li>
-      <li>Nothing lets you search across sources</li>
-      <li>Nobody measures the tone of the coverage</li>
-      <li>Nobody maps which regions the news actually covers</li>
-    </ul>
-    <div style="flex:1.1" class="flow">
-      <div class="fnode"><b>4+ sites</b><span>independent newsrooms</span></div>
-      <div class="farr">→</div>
-      <div class="fnode"><b>Fragmented</b><span>no shared index</span></div>
-      <div class="farr">→</div>
-      <div class="fnode"><b>Blind spot</b><span>no search, no mood, no map</span></div>
+  <div style="display:grid;grid-template-columns:1fr 84px 1.13fr;gap:25px;align-items:center;padding:40px 105px 0">
+    <div>
+      <div style="font-size:27px;font-weight:800;color:var(--ink);margin-bottom:17px">Separate sites. Separate views.</div>
+      <div class="source-grid">
+        <div class="source-shot"><img src="img/sources/lapresse.png" alt="La Presse"></div>
+        <div class="source-shot"><img src="img/sources/businessnews.png" alt="Business News"></div>
+        <div class="source-shot"><img src="img/sources/kapitalis.png" alt="Kapitalis"></div>
+        <div class="source-shot"><img src="img/sources/mosaique.png" alt="Mosaïque FM"></div>
+      </div>
+    </div>
+    <div style="text-align:center;color:var(--red);font-size:48px;font-weight:800">→</div>
+    <div>
+      <div style="font-size:27px;font-weight:800;color:var(--ink);margin-bottom:17px">One place to explore the story.</div>
+      <div class="shotbox"><img src="img/shot-home.png" style="height:310px;object-fit:cover;object-position:top" alt="Tuniscope home"></div>
+      <div style="margin-top:17px;font-size:19px;line-height:1.45;color:var(--body);text-align:center">Search across sources. See the tone. Map the coverage. Ask with evidence.</div>
     </div>
   </div>
   <div class="pagenum" style="right:40px">02</div>
@@ -145,20 +204,14 @@ h1,h2,h3{color:var(--ink)}
 
 <!-- 6 · OBJECTIVES CONTENT -->
 <section class="slide" id="p6">
-  <div class="hex" style="width:130px;height:130px;top:60px;right:80px;background:var(--hex1)"></div>
-  <div class="hex" style="width:100px;height:100px;top:160px;right:180px;background:var(--hex2)"></div>
-  <div class="hex" style="width:110px;height:110px;top:300px;right:60px;background:var(--hex3);opacity:.8"></div>
-  <div class="hex" style="width:120px;height:120px;top:430px;right:200px;background:var(--hex1)"></div>
-  <div class="hex" style="width:100px;height:100px;top:560px;right:90px;background:var(--hex2)"></div>
-  <div class="hex" style="width:90px;height:90px;bottom:-20px;left:60px;background:var(--hex1)"></div>
-  <h1 style="font-size:44px;font-weight:800;margin:70px 0 0 100px">Project Objectives</h1>
-  <ul class="bullets" style="margin:60px 0 0 130px;max-width:760px;font-size:20px">
-    <li>Automate news collection from Tunisian sources</li>
-    <li>Enrich every article: sentiment, theme, region, embedding</li>
-    <li>Enable search by meaning, not just keywords</li>
-    <li>Provide an assistant that answers from real articles</li>
-    <li>Run as a scheduled, monitored, reproducible pipeline</li>
-  </ul>
+  <h1 class="ctitle">One simple objective</h1>
+  <div style="text-align:center;font-size:26px;font-weight:700;color:var(--ink);margin-top:10px">Make Tunisian news easier to follow, search and understand.</div>
+  <div class="objective-showcase">
+    <div class="objective-shot"><img src="img/shot-home.png" alt="Tuniscope home"><b>Follow the news</b><span>See articles from different sources in one place.</span></div>
+    <div class="objective-shot"><img src="img/shot-search.png" alt="Tuniscope search"><b>Find the story</b><span>Search by meaning, not only by exact words.</span></div>
+    <div class="objective-shot"><img src="img/shot-chat.png" alt="Tuniscope assistant"><b>Ask with sources</b><span>Get an answer grounded in collected articles.</span></div>
+  </div>
+  <div style="text-align:center;font-size:18px;color:var(--mut);margin-top:24px">Behind these three moments: automated collection, enrichment and a reliable daily pipeline.</div>
   <div class="pagenum" style="left:40px">04</div>
 </section>
 
@@ -186,20 +239,32 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
-  <h1 class="ctitle">One Automated Pipeline</h1>
-  <ul class="bullets" style="margin:44px auto 0;max-width:640px">
-    <li>End-to-end MLOps platform: collect → understand → serve</li>
-    <li>Runs unattended every morning, safe to re-run</li>
-    <li>Every run logged and measured</li>
-    <li>Everything usable from one web app: Tuniscope</li>
-  </ul>
-  <div class="flow" style="margin-top:44px">
-    <div class="fnode" style="border-color:var(--red)"><img class="tool" src="img/python.png"><b>Collect</b><span>scrape 4 sources · RSS + HTML</span></div>
-    <div class="farr">→</div>
-    <div class="fnode"><img class="tool" src="img/huggingface.png"><b>Understand</b><span>meaning · mood · theme · region</span></div>
-    <div class="farr">→</div>
-    <div class="fnode" style="border-color:var(--red)"><img class="tool" src="img/react.png"><b>Explore</b><span>read · search · map · ask</span></div>
+  <h1 class="ctitle">The proposed solution</h1>
+  <div style="text-align:center;font-size:22px;color:var(--mut);margin-top:8px">One platform turns separate news sites into a clear, searchable daily view.</div>
+  <div class="solution-flow">
+    <div>
+      <div class="solution-label">Tunisian news sites</div>
+      <div class="solution-sources">
+        <div class="source-shot"><img src="img/sources/lapresse.png" alt="La Presse"></div>
+        <div class="source-shot"><img src="img/sources/businessnews.png" alt="Business News"></div>
+        <div class="source-shot"><img src="img/sources/kapitalis.png" alt="Kapitalis"></div>
+        <div class="source-shot"><img src="img/sources/mosaique.png" alt="Mosaïque FM"></div>
+      </div>
+    </div>
+    <div class="solution-arrow">→</div>
+    <div class="solution-engine">
+      <img src="img/python.png" style="height:44px"><h2>News Insight</h2>
+      <div class="engine-line">Collect articles</div>
+      <div class="engine-line">Understand the story</div>
+      <div class="engine-line">Keep one useful record</div>
+    </div>
+    <div class="solution-arrow">→</div>
+    <div class="solution-product">
+      <div class="solution-label">Tuniscope</div>
+      <div class="shotbox"><img src="img/shot-home.png" alt="Tuniscope home"></div>
+    </div>
   </div>
+  <div class="solution-note">Readers can search across sources, follow the coverage, and ask questions with article-based answers.</div>
   <div class="pagenum" style="right:40px">06</div>
 </section>
 
@@ -227,30 +292,16 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:80px;height:80px;top:110px;left:45px;background:var(--hex2)"></div>
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:60px;right:-5px;background:var(--hex2)"></div>
-  <h1 class="ctitle">Global Architecture</h1>
-  <div style="display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:30px">
-    <div class="flow">
-      <div class="fnode" style="min-width:150px"><div class="badge">TN</div><b>News sites</b><span>4 sources</span></div>
-      <div class="farr">→</div>
-      <div class="fnode" style="min-width:150px"><img class="tool" src="img/python.png"><b>Scraping</b><span>RSS + HTML</span></div>
-      <div class="farr">→</div>
-      <div class="fnode" style="background:#fdf5f5;border-color:var(--red);min-width:230px"><img class="tool" src="img/postgresql.png"><b>PostgreSQL + pgvector</b><span>one articles table · text + vectors</span></div>
-      <div class="farr">→</div>
-      <div class="fnode" style="min-width:150px"><img class="tool" src="img/fastapi.png"><b>FastAPI</b><span>REST API</span></div>
-      <div class="farr">→</div>
-      <div class="fnode" style="min-width:150px"><img class="tool" src="img/react.png"><b>React</b><span>Tuniscope UI</span></div>
-    </div>
-    <div style="font-size:17px;color:var(--mut);font-weight:600">↑ ↓ &nbsp;the models below read rows and write their column back</div>
-    <div class="flow">
-      <div class="fnode"><img class="tool" src="img/prefect.png"><b>Prefect</b><span>runs the pipeline daily</span></div>
-      <div class="fnode"><img class="tool" src="img/huggingface.png"><b>ML models</b><span>embeddings · sentiment · theme · region · topics</span></div>
-      <div class="fnode"><img class="tool" src="img/mlflow.png"><b>MLflow</b><span>tracks every clustering run</span></div>
-    </div>
+  <h1 class="ctitle">Five stages, one news platform</h1>
+  <div style="text-align:center;font-size:21px;color:var(--mut);margin-top:7px">ETL prepares reliable article data first. AI enrichment then adds the signals that make the product useful.</div>
+  <div class="architecture-grid">
+    <div class="architecture-layer"><div class="step-num">1</div><h2>Sources</h2><p>Independent publishers keep their own voice.</p><div class="source-grid"><div class="source-shot"><img src="img/sources/lapresse.png"></div><div class="source-shot"><img src="img/sources/businessnews.png"></div><div class="source-shot"><img src="img/sources/kapitalis.png"></div><div class="source-shot"><img src="img/sources/mosaique.png"></div></div></div>
+    <div class="architecture-layer"><div class="step-num">2</div><img class="arch-logo" src="img/python.png"><h2>ETL ingestion</h2><p>Prepare a reliable article record.</p><ul class="arch-list"><li>Extract from sources</li><li>Normalize fields</li><li>Load raw articles</li></ul></div>
+    <div class="architecture-layer highlight"><div class="step-num">3</div><img class="arch-logo" src="img/huggingface.png"><h2>AI enrich</h2><p>Add understanding after ingestion.</p><ul class="arch-list"><li>Meaning for search</li><li>Sentiment and theme</li><li>Region and topics</li></ul></div>
+    <div class="architecture-layer highlight"><div class="step-num">4</div><img class="arch-logo" src="img/postgresql.png"><h2>Article store</h2><p>Keep evidence and enrichment together.</p><ul class="arch-list"><li>Original article</li><li>Model results</li><li>One queryable record</li></ul></div>
+    <div class="architecture-layer"><div class="step-num">5</div><div class="browser-icon"></div><h2>Tuniscope</h2><p>Turn stored articles into a usable news experience.</p><ul class="arch-list"><li>Follow coverage</li><li>Search by meaning</li><li>Map and ask with sources</li></ul></div>
   </div>
-  <ul class="bullets" style="margin:26px auto 0;max-width:640px;font-size:17px">
-    <li>Layered and modular: any layer can be swapped without touching the rest</li>
-    <li>One database at the centre; enrichment stored as plain columns</li>
-  </ul>
+  <div class="arch-rail"><img src="img/prefect.png"><strong style="color:var(--ink)">Prefect runs the daily ETL.</strong><span>The original article remains the evidence behind every result.</span></div>
   <div class="pagenum" style="right:40px">08</div>
 </section>
 
@@ -278,21 +329,14 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
-  <h1 class="ctitle">Data Ingestion</h1>
-  <ul class="bullets" style="margin:40px auto 0;max-width:660px">
-    <li>4 Tunisian sources: La Presse, Business News, Kapitalis, Mosaïque FM</li>
-    <li>RSS feeds + HTML deep-crawl fallback for Kapitalis</li>
-    <li>Deduplication on URL, so re-runs never duplicate articles</li>
-    <li>Failing source is skipped, never breaks the run</li>
-    <li>120 articles collected in the current corpus</li>
-  </ul>
-  <div class="flow" style="margin-top:40px">
-    <div class="fnode"><img class="tool" src="img/python.png"><b>RSS / HTML</b><span>4 scrapers</span></div>
-    <div class="farr">→</div>
-    <div class="fnode"><div class="badge">=</div><b>Dedup</b><span>ON CONFLICT (url)</span></div>
-    <div class="farr">→</div>
-    <div class="fnode" style="background:#fdf5f5;border-color:var(--red)"><img class="tool" src="img/postgresql.png"><b>articles</b><span>raw text stored</span></div>
+  <h1 class="ctitle">ETL pipeline: extract, transform, load</h1>
+  <div style="text-align:center;font-size:23px;color:var(--mut);margin-top:10px">ETL prepares a clean, reliable article record. AI enrichment happens after this ingestion stage.</div>
+  <div class="etl-flow">
+    <div class="etl-stage"><div class="etl-letter">E</div><img src="img/python.png" style="height:54px;margin-bottom:12px"><b>Extract</b><span>Read RSS feeds and article pages from Tunisian news sources.</span></div>
+    <div class="etl-stage"><div class="etl-letter">T</div><img src="img/python.png" style="height:54px;margin-bottom:12px"><b>Transform</b><span>Normalize the article fields and prevent duplicate URLs.</span></div>
+    <div class="etl-stage highlight"><div class="etl-letter">L</div><img src="img/postgresql.png" style="height:54px;margin-bottom:12px"><b>Load</b><span>Save the prepared article, ready for the AI enrichment stage.</span></div>
   </div>
+  <div style="text-align:center;font-size:17px;color:var(--mut);margin-top:28px">The article URL is the unique key, so a later run updates the same story instead of creating a duplicate.</div>
   <div class="pagenum" style="right:40px">10</div>
 </section>
 
@@ -320,22 +364,25 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
-  <h1 class="ctitle">Storage &amp; Modeling</h1>
-  <div style="text-align:center;margin-top:36px">
-    <img src="img/postgresql.png" style="height:64px;margin-bottom:14px">
-    <div style="font-weight:600;color:var(--ink);margin-bottom:16px">One <span class="chip">articles</span> table, enrichment stored as columns:</div>
-    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto">
-      <span class="chip">id</span><span class="chip">url</span><span class="chip">source</span>
-      <span class="chip">title</span><span class="chip">content</span><span class="chip">published_at</span>
-      <span class="chip">sentiment</span><span class="chip">topic_label</span><span class="chip">region</span>
-      <span class="chip">summary</span><span class="chip" style="background:#fdecec;border-color:var(--red)">embedding vector(384)</span>
+  <h1 class="ctitle">One article, made useful in four ways</h1>
+  <div style="text-align:center;font-size:23px;color:var(--mut);margin-top:10px">The original story stays intact. Its added facts power what the reader sees in Tuniscope.</div>
+  <div class="record-layout">
+    <div class="article-card">
+      <div class="source-line"><span class="badge" style="width:32px;height:32px;margin:0;font-size:12px">TN</span> ORIGINAL ARTICLE</div>
+      <div class="article-title">The original story is the source of truth</div>
+      <div class="article-copy">Title, source, date, image and full text stay together. Every result can be traced back to this article.</div>
+    </div>
+    <div>
+      <div class="record-caption">What those facts make possible</div>
+      <div class="fact-grid">
+        <div class="fact red"><div class="mini">SEARCH</div><strong>Find related stories</strong><span>Even when readers use different words.</span></div>
+        <div class="fact"><div class="mini">FILTER</div><strong>Read the tone</strong><span>Positive, neutral or negative coverage.</span></div>
+        <div class="fact"><div class="mini">EXPLORE</div><strong>Follow a theme</strong><span>Economy, politics, sport and more.</span></div>
+        <div class="fact"><div class="mini">MAP</div><strong>See the place</strong><span>Governorate when a location is mentioned.</span></div>
+      </div>
     </div>
   </div>
-  <ul class="bullets" style="margin:44px auto 0;max-width:640px">
-    <li>PostgreSQL as the single central store</li>
-    <li>pgvector extension: similarity search inside SQL (cosine)</li>
-    <li>Any prediction auditable with a one-line query</li>
-  </ul>
+  <div style="text-align:center;margin-top:31px;font-size:17px;color:var(--body)"><img src="img/postgresql.png" style="height:31px;vertical-align:middle;margin-right:10px">PostgreSQL + pgvector keeps the original article and the signals that make these experiences possible.</div>
   <div class="pagenum" style="right:40px">12</div>
 </section>
 
@@ -363,17 +410,12 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:85px;height:85px;bottom:55px;left:55px;background:var(--hex1)"></div>
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
-  <h1 class="ctitle">Enrichment Models</h1>
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px;padding:50px 70px 0">
-    <div class="fnode" style="min-width:0"><img class="tool" src="img/huggingface.png"><b style="font-size:18px">e5-small</b><span>embeddings, 384-dim<br>the meaning of each article</span></div>
-    <div class="fnode" style="min-width:0"><img class="tool" src="img/huggingface.png"><b style="font-size:18px">XLM-RoBERTa</b><span>sentiment<br>positive / neutral / negative</span></div>
-    <div class="fnode" style="min-width:0"><div class="badge">G</div><b style="font-size:18px">Groq LLM</b><span>theme<br>1 of 10 fixed themes</span></div>
-    <div class="fnode" style="min-width:0"><div class="badge">TN</div><b style="font-size:18px">Gazetteer + LLM</b><span>region<br>place names → governorate</span></div>
-    <div class="fnode" style="min-width:0"><div class="badge">B</div><b style="font-size:18px">BERTopic</b><span>topic discovery<br>runs across the whole corpus</span></div>
+  <h1 class="ctitle">Two levels of enrichment</h1>
+  <div style="text-align:center;font-size:20px;color:var(--mut);margin-top:6px">Some models explain one article. BERTopic reveals patterns across the whole collection.</div>
+  <div class="enrichment-split">
+    <div class="enrichment-panel"><h2>For every article</h2><p>Focused models add facts that readers can use right away.</p><div class="benefit-grid"><div class="benefit"><strong>Related stories</strong><span>Semantic search connects similar coverage.</span></div><div class="benefit"><strong>Sentiment</strong><span>Shows the tone of the coverage.</span></div><div class="benefit"><strong>Theme</strong><span>Organises articles into clear subjects.</span></div><div class="benefit"><strong>Region</strong><span>Places coverage on the Tunisian map.</span></div></div></div>
+    <div class="enrichment-panel highlight"><h2>Across the whole collection</h2><p>BERTopic groups related articles to surface recurring topics.</p><div class="shotbox"><img src="img/shot-dashboard.png" alt="Tuniscope dashboard"></div><div style="font-size:17px;font-weight:700;color:var(--ink);margin-top:14px">From individual stories to a view of what the news is talking about.</div></div>
   </div>
-  <div style="text-align:center;margin-top:40px;font-size:18px;color:var(--body)">
-    Each model writes one column back to the <span class="chip">articles</span> table, so any prediction
-    can be checked with a simple SQL query.</div>
   <div class="pagenum" style="right:40px">14</div>
 </section>
 
@@ -401,19 +443,9 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:80px;height:80px;top:110px;left:45px;background:var(--hex2)"></div>
   <h1 class="ctitle" style="display:flex;align-items:center;justify-content:center;gap:18px">
     <img src="img/prefect.png" style="height:52px">Orchestration &amp; Tracking</h1>
-  <div style="display:flex;gap:30px;padding:34px 70px 0;align-items:flex-start">
-    <div style="flex:1.2">
-      <div class="shotbox"><img src="img/shot-prefect.png" style="max-height:330px;object-fit:cover;object-position:left top"></div>
-      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Prefect: this morning's run, COMPLETED in 7m 26s</div>
-    </div>
-    <ul class="bullets" style="flex:1;font-size:17.5px;margin-top:10px">
-      <li>Prefect flow, scheduled 06:00 every day</li>
-      <li>HTTP trigger for on-demand runs</li>
-      <li>Retries: 2× / 60s on failure</li>
-      <li>One <span class="chip" style="font-size:12px">pipeline_metrics</span> row per run: articles, topics, sentiment</li>
-      <li>MLflow logs every clustering run: params, metrics, model</li>
-    </ul>
-  </div>
+  <div style="text-align:center;font-size:23px;color:var(--mut);margin-top:8px">The pipeline is scheduled, observable and safe to run again.</div>
+  <div class="operations-shot"><div class="shotbox"><img src="img/shot-prefect.png" alt="Prefect flow run"></div><div style="font-size:16px;color:var(--mut);margin-top:9px;text-align:center">A completed Prefect flow makes every stage visible.</div></div>
+  <div class="operations-row"><div class="operation"><strong>Runs every day</strong><span>The ETL flow starts automatically on schedule.</span></div><div class="operation"><strong>Starts on demand</strong><span>An HTTP trigger supports a manual refresh when needed.</span></div><div class="operation"><strong>Recovers from errors</strong><span>Retries protect the run when a source is temporarily unavailable.</span></div></div>
   <div class="pagenum" style="right:40px">16</div>
 </section>
 
@@ -421,19 +453,14 @@ h1,h2,h3{color:var(--ink)}
 <section class="slide" id="p19">
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:60px;right:-5px;background:var(--hex2)"></div>
-  <h1 class="ctitle" style="display:flex;align-items:center;justify-content:center;gap:18px">
-    <img src="img/mlflow.png" style="height:52px">Experiment Tracking</h1>
-  <div style="display:flex;gap:30px;padding:34px 70px 0;align-items:flex-start">
-    <ul class="bullets" style="flex:1;font-size:17.5px;margin-top:10px">
-      <li>Every BERTopic clustering run is logged</li>
-      <li>Params: embedding model, min cluster size</li>
-      <li>Metrics: number of topics, outlier share</li>
-      <li>Latest run: 6 topics, 16.7% outliers</li>
-      <li>Runs comparable and reproducible over time</li>
-    </ul>
-    <div style="flex:1.2">
-      <div class="shotbox"><img src="img/shot-mlflow.png" style="max-height:330px;object-fit:cover;object-position:left top"></div>
-      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">MLflow: the real run behind these numbers</div>
+  <h1 class="ctitle">Why MLflow matters</h1>
+  <div style="text-align:center;font-size:23px;color:var(--mut);margin-top:8px">Topic discovery can change as articles and settings change. MLflow makes those changes explainable.</div>
+  <div class="tracking-centered">
+    <div class="tracking-shot"><div class="shotbox"><img src="img/shot-mlflow.png" alt="MLflow experiment run"></div><div style="font-size:16px;color:var(--mut);margin-top:9px;text-align:center">A real BERTopic run: settings, metrics and output are kept together.</div></div>
+    <div class="tracking-values">
+      <div class="tracking-value"><strong>Compare runs</strong><span>When the topics change, see whether the corpus or the clustering settings changed too.</span></div>
+      <div class="tracking-value"><strong>Reproduce a result</strong><span>Keep the embedding model, minimum topic size and output tied to the same run.</span></div>
+      <div class="tracking-value"><strong>Choose with evidence</strong><span>Use topic count and outlier share to identify a weak clustering result before it reaches the product.</span></div>
     </div>
   </div>
   <div class="pagenum" style="right:40px">17</div>
@@ -462,7 +489,7 @@ h1,h2,h3{color:var(--ink)}
   <h1 class="ctitle">The Product: Tuniscope</h1>
   <div style="display:flex;gap:24px;padding:30px 60px 0">
     <div style="flex:1"><div class="shotbox"><img src="img/shot-dashboard.png" style="max-height:330px;object-fit:cover;object-position:top"></div>
-      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Analyses: 120 articles · 43% negative / 33% positive / 25% neutral</div></div>
+      <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">Dashboard: sentiment, themes and coverage at a glance</div></div>
     <div style="flex:1"><div class="shotbox"><img src="img/shot-chat.png" style="max-height:330px;object-fit:cover;object-position:top"></div>
       <div style="font-size:13.5px;color:var(--mut);margin-top:8px;text-align:center">AI assistant: answers with numbered, clickable sources</div></div>
   </div>
@@ -500,12 +527,12 @@ h1,h2,h3{color:var(--ink)}
   <div class="hex" style="width:100px;height:100px;bottom:-20px;right:50px;background:var(--hex1)"></div>
   <div class="hex" style="width:80px;height:80px;bottom:65px;right:-5px;background:var(--hex2)"></div>
   <h1 class="ctitle">Conclusion</h1>
-  <ul class="bullets" style="margin:56px auto 0;max-width:860px;font-size:19px">
-    <li>Complete MLOps platform: scraping → enrichment → semantic search → assistant → dashboard</li>
-    <li>Runs today on live Tunisian news, with 120 articles in the corpus</li>
-    <li>Modular, fully open-source stack</li>
-    <li>Reproducible: one docker-compose, 52 automated tests, CI on every push</li>
-  </ul>
+  <div class="conclusion-points">
+    <div class="conclusion-point">One platform: collection, enrichment, search, assistant and dashboard.</div>
+    <div class="conclusion-point">Built for live Tunisian news, with every run extending the corpus.</div>
+    <div class="conclusion-point">A modular, fully open-source stack.</div>
+    <div class="conclusion-point">Reproducible with Docker Compose, automated tests and CI.</div>
+  </div>
   <div class="toolstrip" style="margin-top:48px">
     <img src="img/python.png"><img src="img/postgresql.png"><img src="img/prefect.png">
     <img src="img/mlflow.png"><img src="img/fastapi.png"><img src="img/react.png">
